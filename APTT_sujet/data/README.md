@@ -1,4 +1,5 @@
 # Δelta δata
+
 ### Analyse de données ouvertes
 
 L'exercice consiste à prendre des données ouvertes et à les mettre en forme pour aider à l'analyse. Cela peut se faire sous forme d'articles avec des graphiques (voir les feuilles Jupyter dans le dépôt) ou de graphiques interactifs (voir  https://delta.lrde.epita.fr/).
