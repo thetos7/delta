@@ -23,7 +23,7 @@ class Deces():
         df = df.loc['1973':now - np.timedelta64(2, 'M')]
 
         # calcul de la moyenne journalière avec des fenêtres
-        # 2 passages pour retirer les valeurs qui dépasse l'écart type par rapport au sinus
+        # 2 passages pour retirer les valeurs qui dépassent l'écart type par rapport au sinus
         width = 10
         df2 = df.copy()
         for _ in range(2):
@@ -42,6 +42,7 @@ class Deces():
             prediction = np.array([p.real for p in prediction.x]) / prediction_nb.x
             std = np.std(df.morts - prediction)
             df2.morts[df2.morts > prediction + std] = prediction.astype('int') + int(std)
+            df2.morts[df2.morts < prediction - std] = prediction.astype('int') - int(std)
         del df2
 
         self.df = df
@@ -52,8 +53,8 @@ class Deces():
             html.Div([ dcc.Graph(id='mpj-main-graph'), ], style={'width':'100%', }),
             html.Div([ dcc.RadioItems(id='mpj-mean', 
                                      options=[{'label':'Courbe seule', 'value':0},
-                                              {'label':'Tendence générale', 'value':1}, 
-                                              {'label':'Moyenne journalière (les décalages au 1er janv. indique la tendence)', 'value':2}], 
+                                              {'label':'Courbe + Tendence générale', 'value':1}, 
+                                              {'label':'Courbe + Moyenne journalière (les décalages au 1er janv. indique la tendence)', 'value':2}], 
                                      value=2,
                                      labelStyle={'display':'block'}) ,
                                      ]),
