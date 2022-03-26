@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from ARPA_inequality_per_political_party import inequality
+from ARPA_inequality_per_political_party import inequalities
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -13,7 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
-ine = inequality.Inequalities(app)
+ine = inequalities.Inequalities(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
