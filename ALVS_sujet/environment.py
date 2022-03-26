@@ -28,7 +28,7 @@ class EuropeanEnvironmentStudies():
                         html.Div('Pays'),
                         dcc.Checklist(
                             id='wps-crossfilter-which-pays',
-                            options=[{'label': self.pays[i], 'value': i} for i in range(len(self.pays))],
+                            options=[{'label': self.pays[i], 'value': self.pays[i]} for i in range(len(self.pays))],
                             value=sorted(self.pays),
                             labelStyle={'display':'block'},
                         ),
@@ -37,7 +37,7 @@ class EuropeanEnvironmentStudies():
                         dcc.RadioItems(
                             id='wps-crossfilter-xaxis-type',
                             options=[{'label': i, 'value': i} for i in ['Linéaire', 'Log']],
-                            value='Log',
+                            value='Linéaire',
                             labelStyle={'display':'block'},
                         ),
                         
@@ -81,7 +81,19 @@ class EuropeanEnvironmentStudies():
                 }),
 
             html.Br(),
-            
+            html.Div(id='wps-div-country'),
+
+            html.Div([
+                dcc.Graph(id='wps-income-time-series', 
+                          style={'width':'33%', 'display':'inline-block'}),
+                dcc.Graph(id='wps-fertility-time-series',
+                          style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
+                dcc.Graph(id='wps-pop-time-series',
+                          style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
+            ], style={ 'display':'flex', 
+                       'borderTop': 'thin lightgrey solid',
+                       'borderBottom': 'thin lightgrey solid',
+                       'justifyContent':'center', }),
             
             
             
@@ -105,9 +117,9 @@ class EuropeanEnvironmentStudies():
             [ dash.dependencies.Input('wps-crossfilter-which-pays', 'value'),
               dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value'),
               dash.dependencies.Input('wps-crossfilter-year-slider', 'value')])(self.update_graph)
-        #self.app.callback(
-        #    dash.dependencies.Output('wps-div-country', 'children'),
-        #    dash.dependencies.Input('wps-main-graph', 'hoverData'))(self.country_chosen)
+        self.app.callback(
+            dash.dependencies.Output('wps-div-country', 'children'),
+            dash.dependencies.Input('wps-main-graph', 'hoverData'))(self.country_chosen)
         self.app.callback(
             dash.dependencies.Output('wps-button-start-stop', 'children'),
             dash.dependencies.Input('wps-button-start-stop', 'n_clicks'),
@@ -122,7 +134,6 @@ class EuropeanEnvironmentStudies():
             dash.dependencies.Input('wps-auto-stepper', 'n_intervals'),
             [dash.dependencies.State('wps-crossfilter-year-slider', 'value'),
              dash.dependencies.State('wps-button-start-stop', 'children')])(self.on_interval)
-        """
         self.app.callback(
             dash.dependencies.Output('wps-income-time-series', 'figure'),
             [dash.dependencies.Input('wps-main-graph', 'hoverData'),
@@ -135,7 +146,6 @@ class EuropeanEnvironmentStudies():
             dash.dependencies.Output('wps-pop-time-series', 'figure'),
             [dash.dependencies.Input('wps-main-graph', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_pop_timeseries)
-        """
 
     def update_graph(self, pays, xaxis_type, year):
         dfg = self.df[self.df.Time == year]
@@ -183,23 +193,21 @@ class EuropeanEnvironmentStudies():
     def country_chosen(self, hoverData):
         return self.get_country(hoverData)
 
-    """
     # graph incomes vs years
     def update_income_timeseries(self, hoverData, xaxis_type):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'incomes', xaxis_type, 'PIB par personne (US $)')
+        return self.create_time_series(country, 'T_HAB', xaxis_type, 'T_HAB')
 
     # graph children vs years
     def update_fertility_timeseries(self, hoverData, xaxis_type):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'fertility', xaxis_type, "Nombre d'enfants par femme")
+        return self.create_time_series(country, 'PIB', xaxis_type, "PIB")
 
     # graph population vs years
     def update_pop_timeseries(self, hoverData, xaxis_type):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'population', xaxis_type, 'Population')
+        return self.create_time_series(country, 'TAXES', xaxis_type, 'TAXES')
 
-    """
        # start and stop the movie
     def button_on_click(self, n_clicks, text):
         if text == self.START:
