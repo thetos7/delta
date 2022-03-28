@@ -7,14 +7,16 @@ prices = pd.read_csv('data/gas_price_US.csv',
                 engine = 'python',
                 parse_dates = True)
 
-#pollution = pd.read_csv('data/pollution_2000_2021.csv',
-#                engine = 'python',
-#                parse_dates = True)
+pollution = pd.read_csv('data/pollution_2000_2021.csv',
+                engine = 'python',
+                parse_dates = True)
+del pollution["Year"]
+del pollution["Month"]
+del pollution["Day"]
 
 prices['Date'] = pd.to_datetime(prices['Date'], format='%m/%d/%Y')
-prices = prices.loc[(prices['Date'] >= '2020-01-03')]
+prices = prices.loc[(prices['Date'] >= '2000-01-03')]
 
-#print(prices)
-
-fig = px.line(prices, x="Date", y=" Regular All Formulations Retail Gasoline Prices Dollars per Gallon", title='Gas price per week')
+fig = px.line(prices, x="Date", y="Regular All Formulations Retail Gasoline Prices Dollars per Gallon", title='Gas price per week')
 fig.show()
+
