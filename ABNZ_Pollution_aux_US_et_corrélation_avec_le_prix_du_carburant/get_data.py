@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import plotly.express as px
 
 
 prices = pd.read_csv('data/gas_price_US.csv',
@@ -13,4 +14,7 @@ prices = pd.read_csv('data/gas_price_US.csv',
 prices['Date'] = pd.to_datetime(prices['Date'], format='%m/%d/%Y')
 prices = prices.loc[(prices['Date'] >= '2020-01-03')]
 
-print(prices)
+#print(prices)
+
+fig = px.line(prices, x="Date", y=" Regular All Formulations Retail Gasoline Prices Dollars per Gallon", title='Gas price per week')
+fig.show()
