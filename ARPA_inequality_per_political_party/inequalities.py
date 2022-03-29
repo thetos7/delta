@@ -51,8 +51,19 @@ class Inequalities():
                 ], style={
                     'display': 'flex',
                     'justifyContent':'center'
-                })
-        ])
+                }),
+            html.Br(),
+            html.Div(id='ine-div-country'),
+            html.Div([
+                    dcc.Graph(id='ine-gini-evolution',
+                              style={'width':'50%', 'display':'inline-block'}),
+                    dcc.Graph(id='ine-mean-gini-per-party',
+                              style={'width':'50%', 'display':'inline-block'}),
+                ], style={ 'display':'flex', 
+                           'borderTop': 'thin lightgrey solid',
+                           'borderBottom': 'thin lightgrey solid',
+                           'justifyContent':'center' }),
+        ], style={'padding': '10px 50px 10px 50px'})
         
         if application:
             self.app = application
@@ -78,12 +89,20 @@ class Inequalities():
             dash.dependencies.Input('ine-auto-stepper', 'n_intervals'),
             [dash.dependencies.State('ine-crossfilter-year-slider', 'value'),
              dash.dependencies.State('ine-button-start-stop', 'children')])(self.on_interval)
-
+        self.app.callback(
+            dash.dependencies.Output('ine-div-country', 'children'),
+            dash.dependencies.Input('ine-main-graph', 'hoverData'))(self.get_country)
+        self.app.callback(
+            dash.dependencies.Output('ine-gini-evolution', 'figure'),
+            [dash.dependencies.Input('ine-main-graph', 'hoverData')])(self.update_gini_evolution)
+        self.app.callback(
+            dash.dependencies.Output('ine-mean-gini-per-party', 'figure'),
+            [dash.dependencies.Input('ine-main-graph', 'hoverData')])(self.update_mean_gini_per_party)
 
     def update_graph(self, year):
         dfg = self.df[self.df.year == year]
         fig = px.scatter_geo(dfg, locations="iso", hover_name="country", hover_data=['gini'], scope='europe',
-                             size="gini_display", color='color', color_discrete_sequence=["orange", "red", "blue"],
+                             size="gini_display", color='Main Party', color_discrete_map={"centre": "orange", "gauche":"red", "droite": "blue"},
                              projection='natural earth')
         fig.update_geos(
             resolution=50,
@@ -93,6 +112,33 @@ class Inequalities():
         )
         fig.update_layout(height=500, margin={"r":0,"t":0,"l":0,"b":0})
         return fig
+
+    def update_gini_evolution(self, hover_data):
+        country = self.get_country(hover_data)
+        dfg = self.df[self.df.country == country]
+        fig = px.line(dfg, x='year', y='gini', color='country')
+        fig.update_layout(
+                 margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
+                 hovermode='closest',
+                 showlegend=False,
+            )
+        return fig
+    
+    def update_mean_gini_per_party(self, hover_data):
+        country = self.get_country(hover_data)
+        dfg = self.df[self.df.country == country]
+        dfg = dfg.groupby('Main Party')['gini'].mean().to_frame(name='mean').reset_index()
+        fig = px.bar(dfg, x='Main Party', y='mean')
+        fig.update_layout(
+                 margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
+                 hovermode='closest'
+            )
+        return fig
+
+    def get_country(self, hover_data):
+        if hover_data == None:  # init value
+            return self.df['country'].iloc[np.random.randint(len(self.df))]
+        return hover_data['points'][0]['hovertext']
 
     # start and stop the movie
     def button_on_click(self, n_clicks, text):
