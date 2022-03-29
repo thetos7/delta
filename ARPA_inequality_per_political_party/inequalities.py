@@ -83,7 +83,15 @@ class Inequalities():
     def update_graph(self, year):
         dfg = self.df[self.df.year == year]
         fig = px.scatter_geo(dfg, locations="iso", hover_name="country", hover_data=['gini'], scope='europe',
-                             size="gini_display", color='color', color_discrete_sequence=["orange", "red", "blue"])
+                             size="gini_display", color='color', color_discrete_sequence=["orange", "red", "blue"],
+                             projection='natural earth')
+        fig.update_geos(
+            resolution=50,
+            showcoastlines=True, coastlinecolor="RebeccaPurple",
+            showland=True, landcolor="LightGreen",
+            showocean=True, oceancolor="LightBlue",
+        )
+        fig.update_layout(height=500, margin={"r":0,"t":0,"l":0,"b":0})
         return fig
 
     # start and stop the movie
