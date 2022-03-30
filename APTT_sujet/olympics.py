@@ -8,8 +8,13 @@ import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
 import dateutil as du
+import matplotlib.pyplot as plt
+import seaborn as sns
+import folium
+import json
 
-class Energies():
+
+class Olympic():
     """mois = {'janv':1, 'févr':2, 'mars':3, 'avr':4, 'mai':5, 'juin':6, 'juil':7, 'août':8, 'sept':9, 'oct':10, 'nov':11, 'déc':12}
 
     quoi = {"Prix d'une tonne de propane":[1000, 'Propane'], "Bouteille de butane de 13 kg":[13, 'Butane'],
@@ -30,88 +35,42 @@ class Energies():
         ma = d.split('-')                                      # coupe la chaine au - et ainsi ma[0] est le mois et ma[1] l'année
         return du.parser.parse(f"15-{Energies.mois[ma[0].lower()]}-{ma[1]}")  # parfois le mois a une majuscule d'où lower()
     """
-    def _make_dataframe_from_pegase(filename):
-        df = pd.read_csv(filename, sep=";", encoding="latin1", skiprows=[0,1,3], header=None)
-        df = df.set_index(0).T
-        df['date'] = df['Période'].apply(Energies._conv_date)
-        df = df.set_index('date')
-        df.drop(columns=['Période'], inplace=True)
-        df = df.replace('-', np.nan).astype('float64')
+
+    def _make_dataframe(filename):
+        df = pd.read_csv(filename)
+        df = df.drop(["City", "Sport", "Gender", "Athlete"], axis=1)
+        df = df[df["Year"] >= 1918]
+        df.drop(df.index[(df['Country'] == 'YUG') | (df['Country'] == 'TCH') | (df['Country'] == 'AHO') | (
+                df['Country'] == 'EUN') | (df['Country'] == 'IOP') | (df['Country'] == 'IOA')], inplace=True)
         return df
 
-    def __init__(self, application = None):
-        bois = Energies._make_dataframe_from_pegase("data/pegase_prix_bois_particulier.csv")
-        petrole = Energies._make_dataframe_from_pegase("data/pegase_prix_petrole_particulier.csv")
+    def __init__(self, application=None):
+        summer = Olympic._make_dataframe("data/summer.csv")
+        winter = Olympic._make_dataframe("data/winter.csv")
 
-        bois.drop(columns=['Une tonne de granulés de bois en sacs', '100 kWh PCI de bois en sacs'], inplace=True)
-        petrole.drop(columns=["Tarif d'une tonne de propane en citerne","100 kWh PCI de propane en citerne", "100 kWh PCS de propane",
-                              "Un litre d'essence ordinaire",  
-                            "100 kWh PCI de propane", "100 kWh PCI de FOD au tarif C1"], inplace=True)  # doublons
-
-        electricite = pd.read_csv('data/prix_reglemente_electricite.csv', sep=';', decimal=',', parse_dates=['DATE_DEBUT'])
-        electricite = electricite.set_index(['P_SOUSCRITE',"DATE_DEBUT"])
-        electricite.drop(columns=['DATE_FIN', 'PART_FIXE_HT', 'PART_FIXE_TTC', 'PART_VARIABLE_HT'], inplace=True)
-        electricite.dropna(inplace=True)
-        electricite = electricite.unstack().T.reset_index(0, drop=True)
-        electricite = electricite.rename(columns={i:f"1 kWh (contrat {i:.0f} kW)" for i in electricite.columns})
-        duration = pd.DatetimeIndex(electricite.index.values)
-        new_index = pd.DatetimeIndex([f"{y}-{m:02d}-15" for y in range(duration[0].year, duration[-1].year+1) for m in range(1,13)])
-        electricite = electricite.reindex(np.concatenate([electricite.index.values , new_index.values]))
-        electricite.sort_index(inplace=True)
-        electricite = electricite.fillna(method='ffill')
-        electricite = electricite.loc[new_index]
-        electricite = electricite.reindex(bois.index)
-        electricite.drop(columns=["1 kWh (contrat 6 kW)", "1 kWh (contrat 12 kW)", "1 kWh (contrat 15 kW)"], inplace=True)
-
-        self.petrole = petrole
-        self.energie = pd.concat([petrole, bois, electricite])
-        self.years =np.arange(petrole.index.min().year, petrole.index.max().year+1)
+        self.olympic = pd.concat([summer, winter])
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Évolution des prix de différentes énergies en France'),
-            html.Div([ dcc.Graph(id='nrg-main-graph'), ], style={'width':'100%', }),
+            html.H3(children='Nombre de médailles olympiques par pays'),
+            # html.Div([dcc.Graph(id='med-main-graph'), ], style={'width': '100%', }),
+            html.Iframe(id="map", srcDoc=open('map.html', 'r').read(), width='100%', height='600'),
             html.Div([
-                html.Div([ html.Div('Prix'),
-                           dcc.RadioItems(
-                               id='nrg-price-type',
-                               options=[{'label':'Absolu', 'value':0}, 
-                                        {'label':'Équivalent J','value':1},
-                                        {'label':'Relatif : 1 en ','value':2}],
-                               value=1,
-                               labelStyle={'display':'block'},
-                           )
-                         ], style={'width': '9em'} ),
-                html.Div([ html.Div('Mois ref.'),
-                           dcc.Dropdown(
-                               id='nrg-which-month',
-                               options=[{'label': i, 'value': Energies.mois[i]} for i in Energies.mois],
-                               value=1,
-                               disabled=True,
-                           ),
-                         ], style={'width': '6em', 'padding':'2em 0px 0px 0px'}), # bas D haut G
-                html.Div([ html.Div('Annee ref.'),
-                           dcc.Dropdown(
-                               id='nrg-which-year',
-                               options=[{'label': i, 'value': i} for i in self.years],
-                               value=2000,
-                               disabled=True,
-                           ),
-                         ], style={'width': '6em', 'padding':'2em 0px 0px 0px'} ),
-                html.Div(style={'width':'2em'}),
-                html.Div([ html.Div('Échelle en y'),
-                           dcc.RadioItems(
-                               id='nrg-xaxis-type',
-                               options=[{'label': i, 'value': i} for i in ['Linéaire', 'Logarithmique']],
-                               value='Logarithmique',
-                               labelStyle={'display':'block'},
-                           )
-                         ], style={'width': '15em', 'margin':"0px 0px 0px 40px"} ), # bas D haut G
-                ], style={
-                            'padding': '10px 50px', 
-                            'display':'flex',
-                            'flexDirection':'row',
-                            'justifyContent':'flex-start',
-                        }),
+                html.Div([html.Div('Medals'),
+                          dcc.RadioItems(
+                              id='med-spe',
+                              options=[{'label': 'Marathon', 'value': 'Marathon'},
+                                       {'label': '100M', 'value': '100M'}],
+                              value='Marathon',
+                              labelStyle={'display': 'block'},
+                          )
+                          ], style={'width': '9em'}),
+                html.Div([html.Div('Event'),
+                          dcc.Dropdown(
+                              id='med-event',
+                              options=['Marathon','100M'],
+                              value=1,
+                              disabled=False,
+                          )]),
                 html.Br(),
                 dcc.Markdown("""
                 Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
@@ -124,10 +83,10 @@ class Energies():
                       * [base Pégase](http://developpement-durable.bsocom.fr/Statistiques/) du ministère du développement durable
                       * [tarifs réglementés de l'électricité](https://www.data.gouv.fr/en/datasets/historique-des-tarifs-reglementes-de-vente-delectricite-pour-les-consommateurs-residentiels/) sur data.gouv.fr
                 """)
-        ], style={
-            'backgroundColor': 'white',
-             'padding': '10px 50px 10px 50px',
-             }
+            ], style={
+                'backgroundColor': 'white',
+                'padding': '10px 50px 10px 50px',
+            })]
         )
 
         if application:
@@ -138,50 +97,42 @@ class Energies():
             self.app.layout = self.main_layout
 
         self.app.callback(
-                    dash.dependencies.Output('nrg-main-graph', 'figure'),
-                    [ dash.dependencies.Input('nrg-price-type', 'value'),
-                      dash.dependencies.Input('nrg-which-month', 'value'),
-                      dash.dependencies.Input('nrg-which-year', 'value'),
-                      dash.dependencies.Input('nrg-xaxis-type', 'value')])(self.update_graph)
-        self.app.callback(
-                    [ dash.dependencies.Output('nrg-which-month', 'disabled'),
-                      dash.dependencies.Output('nrg-which-year', 'disabled')],
-                      dash.dependencies.Input('nrg-price-type', 'value') )(self.disable_month_year)
+            dash.dependencies.Output('map', 'srcDoc'),
+            [dash.dependencies.Input('med-spe', 'value'),
+             dash.dependencies.Input('med-event', 'value')])(self.update_graph)
 
-    def update_graph(self, price_type, month, year, xaxis_type):
-        if price_type == 0 or month == None or year == None:
-            df = self.energie
-        elif price_type == 1:
-            df = self.energie.copy()
-            for c in df.columns:
-                alias = Energies.quoi[c][1]
-                try:
-                    df[c] = df[c] / (Energies.quoi[c][0] * Energies.densité[alias] * Energies.calor[alias])
-                except:  # l'unité est déjà en kg et donc densité n'existe pas
-                    df[c] = df[c] / (Energies.quoi[c][0] * Energies.calor[alias])
-        else:
-            df = self.petrole.copy()
-            df /= df.loc[f"{year}-{month}-15"]
-        fig = px.line(df[df.columns[0]], template='plotly_white')
-        for c in df.columns[1:]:
-            fig.add_scatter(x = df.index, y=df[c], mode='lines', name=c, text=c, hoverinfo='x+y+text')
-        ytitle = ['Prix en €', 'Prix en € pour 1 mégajoule', 'Prix relative (sans unité)']
-        fig.update_layout(
-            #title = 'Évolution des prix de différentes énergies',
-            yaxis = dict( title = ytitle[price_type],
-                          type= 'linear' if xaxis_type == 'Linéaire' else 'log',),
-            height=450,
-            hovermode='closest',
-            legend = {'title': 'Énergie'},
-        )
-        return fig
+    def update_graph(self, med_type, name):
+        event = self.olympic[self.olympic["Event"] == med_type]
+        data = event["Country"].value_counts()
+        df = pd.DataFrame.from_dict(data)
+        df["ISO"] = list(df.index.values)
+        fig = folium.Map(location=[28.5736, 9.0750], tiles=None, zoom_start=2, max_bounds=True, min_zoom=1)
+        folium.Rectangle([(-20000, -20000), (20000, 20000)], fill=True, fill_color="#0080ff").add_to(fig)
+        choro = folium.Choropleth(
+            geo_data=f'data/countries.geojson',
+            name='choropleth',
+            data=df,
+            columns=['ISO', 'Country'],
+            key_on='feature.properties.ISO_A3',
+            fill_color='RdPu',
+            fill_opacity=1,
+            line_opacity=0.8,
+            Highlight=True,
+            line_color='black',
+            nan_fill_color="White",
+            legend_name="Number of medals"
+        ).add_to(fig)
+        for c in choro.geojson.data['features']:
+            if c['properties']['ISO_A3'] in df['ISO']:
+                c['properties']['Medals'] = float(df.loc[c['properties']['ISO_A3'], 'Country'])
+            else:
+                c['properties']['Medals'] = 0
+        folium.GeoJsonTooltip(['Country', 'Medals']).add_to(choro.geojson)
+        folium.LayerControl().add_to(fig)
+        fig.save("map.html")
+        return open('map.html', 'r').read()
 
-    def disable_month_year(self, price_type):
-        if price_type == 2:
-            return False, False
-        else:
-            return True, True
-        
+
 if __name__ == '__main__':
-    nrg = Energies()
-    nrg.app.run_server(debug=True, port=8051)
+    nrg = Olympic()
+    nrg.app.run_server(debug=True, port=8052)
