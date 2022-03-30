@@ -2,7 +2,7 @@ import pandas as pd
 
 def color_party(left, mid, right):
     values = [left, mid, right]
-    parties = ['gauche', 'centre', 'droite']
+    parties = ['Gauche', 'Centre', 'Droite']
     return parties[values.index(max(values))]
 
 def extract_data():
