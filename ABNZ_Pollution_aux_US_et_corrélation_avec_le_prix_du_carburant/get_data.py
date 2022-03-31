@@ -1,7 +1,10 @@
 import pandas as pd
 import numpy as np
+import glob
 import plotly.express as px
 
+# Pollution data
+# --------------------------------------------------------------------------------------
 
 pollution = pd.read_csv('data/pollution_2000_2021.csv',
                 engine = 'python',
@@ -44,6 +47,7 @@ COfig.show()
 SO2fig.show()
 NO2fig.show()
 
+# Prices data
 # --------------------------------------------------------------------------------------
 
 prices = pd.read_csv('data/gas_price_US.csv',
@@ -59,3 +63,31 @@ prices = prices.loc[(prices['Date'] >= '2000-01-03')]
 # drawing graph
 pricesFig = px.line(prices, x="Date", y="Regular All Formulations Retail Gasoline Prices Dollars per Gallon", title='Gas price per week')
 pricesFig.show()
+
+# Temperature and precipitation data
+# --------------------------------------------------------------------------------------
+
+path = 'data/US_weather_data/'
+filenames = glob.glob(path + "/*.csv")
+cities = []
+
+for f in filenames:
+    df = pd.read_csv(f, engine = 'python', parse_dates = True)
+    df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
+    df = df.loc[(df['Date'] >= '2000-01-03')]
+    df['average_celsius'] = (df[['tmax', 'tmin']].mean(axis=1) - 32)/1.8
+    df['prcp'] = df['prcp']/2.54
+    df.rename(columns={'prcp': 'prcp_cm'}, inplace=True)
+    del df['tmax']
+    del df['tmin']
+    df = df.iloc[: , 1:]
+    cities.append(df)
+
+# averaging all cities data
+average_cities = pd.concat(cities).groupby('Date', as_index=False).mean()
+
+# drawing graphs
+celsiusFig = px.line(average_cities, x="Date", y="average_celsius", title='average_celsius')
+prcpFig = px.line(average_cities, x="Date", y="prcp_cm", title='prcp_cm')
+celsiusFig.show()
+prcpFig.show()
