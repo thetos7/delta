@@ -15,6 +15,7 @@ class Inequalities():
         self.df = extract_data()
         self.color = {'Gauche': 'indianred', 'Centre': 'goldenrod', 'Droite': 'darkcyan'}
         self.years = self.df.year.unique()
+        self.offset = 0.025
 
         self.main_layout = html.Div(children=[
             html.H3(children='Répartition des inéqualités par parti politique en Europe'),
@@ -25,13 +26,26 @@ class Inequalities():
                     html.Div([
                         html.Br(),
                         html.Br(),
-                        html.Div('Orientation politique', style={'font-weight': 'bold'}),
+                        html.Br(),
+                        html.Div('Orientation Politique', style={'font-weight': 'bold'}),
                         dcc.Checklist(
                             id='ine-crossfilter-which-party',
                             options=[{'label': " " + i, 'value': i} for i in sorted(self.color.keys())],
                             value=sorted(self.color.keys()),
                             labelStyle={'display':'block'},
-                        )
+                        ),
+                        html.Br(),
+                        html.Br(),
+                        html.Br(),
+                        html.Div('Paramètre Politique', style={'font-weight': 'bold'}),
+                        dcc.Dropdown(
+                            id='ine-which-parameter',
+                            options=[{'label': 'Gouvernement', 'value': 'Government'},
+                                     {'label': 'Parlement', 'value': 'Parliament'}],
+                            value='Government',
+                            clearable=False,
+                            style={'width': '102%'}
+                        ),
                     ], style={'margin-left':'90px', 'float':'right'}),
                 ], style={
                     'display':'flex',
@@ -50,10 +64,10 @@ class Inequalities():
                         ),
                         style={'width':"60%", 'margin-right': '40px'}
                     ),
-                    dcc.Interval(            # fire a callback periodically
+                    dcc.Interval( # fire a callback periodically
                         id='ine-auto-stepper',
                         interval=750,       # in milliseconds
-                        max_intervals = -1,  # start running
+                        max_intervals = -1, # start running
                         n_intervals = 0
                     ),
                     html.Button(
@@ -88,7 +102,8 @@ class Inequalities():
         self.app.callback(
             dash.dependencies.Output('ine-main-graph', 'figure'),
             [dash.dependencies.Input('ine-crossfilter-which-party', 'value'),
-            dash.dependencies.Input('ine-crossfilter-year-slider', 'value')])(self.update_graph)
+            dash.dependencies.Input('ine-crossfilter-year-slider', 'value'),
+            dash.dependencies.Input('ine-which-parameter', 'value')])(self.update_graph)
         self.app.callback(
             dash.dependencies.Output('ine-button-start-stop', 'children'),
             dash.dependencies.Input('ine-button-start-stop', 'n_clicks'),
@@ -108,21 +123,23 @@ class Inequalities():
             dash.dependencies.Input('ine-main-graph', 'hoverData'))(self.get_country)
         self.app.callback(
             dash.dependencies.Output('ine-gini-evolution', 'figure'),
-            [dash.dependencies.Input('ine-main-graph', 'hoverData')])(self.update_gini_evolution)
+            [dash.dependencies.Input('ine-main-graph', 'hoverData'),
+            dash.dependencies.Input('ine-which-parameter', 'value')])(self.update_gini_evolution)
         self.app.callback(
             dash.dependencies.Output('ine-mean-gini-per-party', 'figure'),
-            [dash.dependencies.Input('ine-main-graph', 'hoverData')])(self.update_mean_gini_per_party)
+            [dash.dependencies.Input('ine-main-graph', 'hoverData'),
+            dash.dependencies.Input('ine-which-parameter', 'value')])(self.update_mean_gini_per_party)
 
-    def update_graph(self, parties, year):
+    def update_graph(self, parties, year, parameter):
         dfg = self.df[self.df.year == year]
-        dfg = dfg[dfg['Main Party'].isin(parties)]
+        dfg = dfg[dfg[f'Main {parameter} Party'].isin(parties)]
 
         if dfg.empty:
             fig = go.Figure(go.Scattergeo())
         else:
             fig = px.scatter_geo(dfg, locations="iso", hover_name="country", hover_data=['gini'],
-                                 size="gini_display", color='Main Party', color_discrete_map=self.color,
-                                 opacity=0.95)
+                                 size="gini_display", color=f'Main {parameter} Party',
+                                 color_discrete_map=self.color, opacity=0.95)
         fig.update_geos(
             resolution=50,
             showcoastlines=True, coastlinecolor="RebeccaPurple",
@@ -133,27 +150,44 @@ class Inequalities():
         fig.update_layout(height=500, margin={"r":0,"t":0,"l":0,"b":0}, showlegend=False)
         return fig
 
-    def update_gini_evolution(self, hover_data):
+    def update_gini_evolution(self, hover_data, parameter):
         country = self.get_country(hover_data)
         dfg = self.df[self.df.country == country]
         offset = 0.025
 
         fig = go.Figure()
         for index, row in dfg.reset_index().iterrows():
-            previous_year = 2000 if index == 0 else dfg.iloc[[index - 1]].year
             previous_gini = dfg.iloc[[0]].gini if index == 0 else dfg.iloc[[index - 1]].gini
-            fig.add_trace(go.Scatter(x=[int(previous_year), row.year], y=[float(previous_gini), row.gini],
-                                     fill='tozeroy', fillcolor=self.color[row['Main Party']], line_color=self.color[row['Main Party']], text=row['Main Party']))
-        fig.update_layout(showlegend=False, yaxis_range=[dfg['gini'].min() - offset, dfg['gini'].max() + offset])
+            previous_year = 2000 if index == 0 else dfg.iloc[[index - 1]].year
+            party = row[f'Main {parameter} Party']
+
+            fig.add_trace(go.Scatter(x=[int(previous_year), row.year],
+                                     y=[float(previous_gini), row.gini],
+                                     fill='tozeroy', fillcolor=self.color[party],
+                                     line_color=self.color[party], text=party))
+
+        fig.update_layout(margin={"r":110,"t":60,"l":30,"b":80},
+                          showlegend=False,
+                          hovermode='closest',
+                          yaxis_range=[dfg['gini'].min() - self.offset,
+                                       dfg['gini'].max() + self.offset]
+        )
         
         return fig
     
-    def update_mean_gini_per_party(self, hover_data):
+    def update_mean_gini_per_party(self, hover_data, parameter):
         country = self.get_country(hover_data)
         dfg = self.df[self.df.country == country]
-        dfg = dfg.groupby('Main Party')['gini'].mean().to_frame(name='mean').reset_index()
-        fig = px.bar(dfg, x='Main Party', y='mean')
-        fig.update_layout(hovermode='closest')
+        dfg = dfg.groupby(f'Main {parameter} Party')['gini'].mean().to_frame(name='mean').reset_index()
+        
+        fig = px.bar(dfg, x=f'Main {parameter} Party', y='mean',
+                     color=f'Main {parameter} Party', color_discrete_map=self.color)
+        
+        fig.update_layout(showlegend=False,
+                          hovermode='closest',
+                          yaxis_range=[dfg['mean'].min() - self.offset,
+                                       dfg['mean'].max() + self.offset]
+        )
         return fig
 
     def get_country(self, hover_data):

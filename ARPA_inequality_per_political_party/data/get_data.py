@@ -16,7 +16,8 @@ def extract_data():
     
     df1 = pd.read_excel('./ARPA_inequality_per_political_party/data/politique_mondiale.xlsx', usecols=columns, skipfooter=1, dtype={'year': int}).query('(eu == 1) & (year >= 2000)')
     df1 = df1.replace(df1['country'].unique().tolist(), country_name_fr)
-    df1['Main Party'] = df1.apply(lambda x: color_party(x['gov_left1'], x['gov_cent1'], x['gov_right1']), axis=1)
+    df1['Main Government Party'] = df1.apply(lambda x: color_party(x['gov_left1'], x['gov_cent1'], x['gov_right1']), axis=1)
+    df1['Main Parliament Party'] = df1.apply(lambda x: color_party(x['gov_left3'], x['gov_cent3'], x['gov_right3']), axis=1)
 
     df2 = pd.read_excel('./ARPA_inequality_per_political_party/data/inegalite_europe.xlsx', header=None, names=['country', 'def', 'pall', 'year', 'gini'], usecols=['country', 'year', 'gini'])
     df2['gini_display'] = df2['gini'] ** 6 # A displayable gini coefficient
