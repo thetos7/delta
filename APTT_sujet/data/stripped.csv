@@ -8,11 +8,11 @@ Year,Country,Medal,Event
 1976,BGR,Gold,Weightlifting Men's 110 kg
 1976,BGR,Silver,Weightlifting Men's 82.5 kg
 1976,POL,Gold,Weightlifting Men's 67.5 kg
-1984,FIN,Silver,Athletics Men's 10,000 m
+1984,FIN,Silver,Athletics Men's 10 000 m
 1984,SWE,Silver,Wrestling Men's Greco-Roman +100 kg
 1988,BGR,Gold,Weightlifting Men's 56 kg
 1988,BGR,Gold,Weightlifting Men's 67.5 kg
-1988,CAN,Gold,Athletics, Men's 100 m
+1988,CAN,Gold,Athletics Men's 100 m
 1988,HUN,Silver,Weightlifting Men's 100 kg
 1988,GBR,Bronze,Judo Men's 71 kg
 2000,ARM,Bronze,Weightlifting Men's +105 kg
@@ -137,7 +137,7 @@ Year,Country,Medal,Event
 2012,USA,Silver,Athletics Men's 4x100 m relay
 2012,UKR,Gold,Weightlifting Men's 105 kg
 2012,UKR,Silver,Athletics Men's javelin throw
-2012,UKR,Bronze,Weightlifting,Women's 58 kg
+2012,UKR,Bronze,Weightlifting Women's 58 kg
 2012,UZB,Gold,Wrestling Men's freestyle 120 kg
 2012,UZB,Bronze,Wrestling Men's freestyle 74 kg
 2014,RUS,Gold,Bobsleigh Two-man
@@ -146,7 +146,7 @@ Year,Country,Medal,Event
 2014,RUS,Silver,Biathlon Women's relay
 2016,KAZ,Gold,Weightlifting Men's 77 kg
 2016,KGZ,Bronze,Weightlifting Men's 69 kg
-2016,MDA,Bronze,Canoeing, Men's C-1 1000 m
+2016,MDA,Bronze,Canoeing Men's C-1 1000 m
 2016,ROU,Bronze,Weightlifting Men's 85 kg
 2016,RUS,Silver,Boxing Men's flyweight
 2020,GBR,Silver,Athletics Men's 4x100 m relay
