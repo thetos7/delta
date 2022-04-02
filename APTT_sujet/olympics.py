@@ -21,22 +21,24 @@ class Olympic:
 
     def __init__(self, application=None):
         self.path = ""
+        self.dropdown = 1
+        self.event = ""
         summer = Olympic._make_dataframe(self, "data/summer.csv")
         winter = Olympic._make_dataframe(self, "data/winter.csv")
         stripped = Olympic._make_dataframe(self, "data/stripped.csv")
         stripped['Event'] = 'Stripped'
         stripped['Discipline'] = 'Stripped'
         self.olympic = pd.concat([summer, winter, stripped])
-
+        event = sorted(self.olympic['Event'].unique())
         self.main_layout = html.Div(children=[
             html.H3(children='Nombre de médailles olympiques par pays'),
             html.Iframe(id="map", srcDoc=open(self.path + 'map.html', 'r').read(), width='100%', height='600'),
             html.Div([
-                html.Div([html.Div('Medals'),
+                html.Div([html.Div('Évènements spécifiques:', style={'width': '20em','font-size': '25px'}),
                           dcc.RadioItems(
                               id='med-spe',
                               options=[{'label': 'Marathon', 'value': 'Marathon'},
-                                       {'label': '100M', 'value': '100M'},
+                                       {'label': 'Curling', 'value': 'Curling'},
                                        {'label': 'Médailles volées', 'value': 'Stripped'}],
                               value='Marathon',
                               labelStyle={'display': 'block'},
@@ -45,7 +47,7 @@ class Olympic:
                 html.Div([html.Div('Event'),
                           dcc.Dropdown(
                               id='med-event',
-                              options=['Marathon', '100M'],
+                              options=event,
                               value=1,
                               disabled=False,
                           )]),
@@ -79,8 +81,12 @@ class Olympic:
             [dash.dependencies.Input('med-spe', 'value'),
              dash.dependencies.Input('med-event', 'value')])(self.update_graph)
 
-    def update_graph(self, med_type, name):
-        event = self.olympic[self.olympic["Event"] == med_type]
+    def update_graph(self, spe_event, dropdown):
+        if not self.event == spe_event:
+            event, self.event = spe_event, spe_event
+        else:
+            event, self.event = dropdown, spe_event
+        event = self.olympic[self.olympic["Event"] == event]
         data = event["Country"].value_counts()
         df = pd.DataFrame.from_dict(data)
         df["ISO"] = list(df.index.values)
@@ -103,10 +109,11 @@ class Olympic:
         ).add_to(fig)
         for c in choro.geojson.data['features']:
             if c['properties']['ISO_A3'] in df['ISO']:
-                c['properties']['Medals'] = float(df.loc[c['properties']['ISO_A3'], 'Country'])
+                c['properties']['Médailles'] = float(df.loc[c['properties']['ISO_A3'], 'Country'])
             else:
-                c['properties']['Medals'] = 0
-        folium.GeoJsonTooltip(['Country', 'Medals']).add_to(choro.geojson)
+                c['properties']['Médailles'] = 0
+            c['properties']['Pays'] = c['properties']['Country']
+        folium.GeoJsonTooltip(['Pays', 'Médailles']).add_to(choro.geojson)
         folium.LayerControl().add_to(fig)
         fig.save(self.path + "map.html")
         return open(self.path + 'map.html', 'r').read()
