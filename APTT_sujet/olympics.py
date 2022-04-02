@@ -1,65 +1,43 @@
-import sys
 import dash
-import flask
 from dash import dcc
 from dash import html
 import pandas as pd
-import numpy as np
-import plotly.graph_objs as go
-import plotly.express as px
-import dateutil as du
-import matplotlib.pyplot as plt
-import seaborn as sns
 import folium
-import json
 
 
-class Olympic():
-    """mois = {'janv':1, 'févr':2, 'mars':3, 'avr':4, 'mai':5, 'juin':6, 'juil':7, 'août':8, 'sept':9, 'oct':10, 'nov':11, 'déc':12}
-
-    quoi = {"Prix d'une tonne de propane":[1000, 'Propane'], "Bouteille de butane de 13 kg":[13, 'Butane'],
-           "100 litres de FOD au tarif C1":[100, 'Fioul'], "Un litre d'essence ordinaire":[1, 'Essence'],
-           "Un litre de super carburant ARS":[1, 'Essence'], "Un litre de super sans plomb 95":[1, 'Essence'],
-           "Un litre de super sans plomb 98":[1, 'Essence'], "Un litre de gazole":[1, 'Gazole'],
-           "Un litre de GPLc":[1, 'GPL'], "1 kWh (contrat 3 kW)":[1, 'Electricité'], "1 kWh (contrat 9 kW)":[1, 'Electricité'],
-           "Une tonne de granulés de bois en vrac":[1000*4.8, 'Electricité'], "100 kWh PCI de bois en vrac":[100, 'Electricité']}
-
-    densité =  {'Essence':0.75, 'Gazole':0.85, 'Fioul':0.85, 'GPL':0.55} # kg / l
-
-    # https://fr.wikipedia.org/wiki/Pouvoir_calorifique
-    calor = {'Essence':47.3, 'Gazole':44.8, 'Fioul':42.6, 'Propane':50.35, 'Butane':49.51, 'GPL':46, 'Bois':15, 'Charbon':20 ,
-            'Electricité':3.6} # en MJ / kg sauf électicité en MJ / kWh
-    """
-    """
-    def _conv_date(d):
-        ma = d.split('-')                                      # coupe la chaine au - et ainsi ma[0] est le mois et ma[1] l'année
-        return du.parser.parse(f"15-{Energies.mois[ma[0].lower()]}-{ma[1]}")  # parfois le mois a une majuscule d'où lower()
-    """
-
-    def _make_dataframe(filename):
-        df = pd.read_csv(filename)
-        df = df.drop(["City", "Sport", "Gender", "Athlete"], axis=1)
-        df = df[df["Year"] >= 1918]
-        df.drop(df.index[(df['Country'] == 'YUG') | (df['Country'] == 'TCH') | (df['Country'] == 'AHO') | (
-                df['Country'] == 'EUN') | (df['Country'] == 'IOP') | (df['Country'] == 'IOA')], inplace=True)
+class Olympic:
+    def _make_dataframe(self, filename):
+        try:
+            df = pd.read_csv(self.path + filename)
+        except FileNotFoundError:
+            self.path = "APTT_sujet/"
+            df = pd.read_csv(self.path + filename)
+        if filename != 'data/stripped.csv':
+            df = df.drop(["City", "Sport", "Gender", "Athlete"], axis=1)
+            df = df[df["Year"] >= 1918]
+            df.drop(df.index[(df['Country'] == 'YUG') | (df['Country'] == 'TCH') | (df['Country'] == 'AHO') | (
+                    df['Country'] == 'EUN') | (df['Country'] == 'IOP') | (df['Country'] == 'IOA')], inplace=True)
         return df
 
     def __init__(self, application=None):
-        summer = Olympic._make_dataframe("data/summer.csv")
-        winter = Olympic._make_dataframe("data/winter.csv")
-
-        self.olympic = pd.concat([summer, winter])
+        self.path = ""
+        summer = Olympic._make_dataframe(self, "data/summer.csv")
+        winter = Olympic._make_dataframe(self, "data/winter.csv")
+        stripped = Olympic._make_dataframe(self, "data/stripped.csv")
+        stripped['Event'] = 'Stripped'
+        stripped['Discipline'] = 'Stripped'
+        self.olympic = pd.concat([summer, winter, stripped])
 
         self.main_layout = html.Div(children=[
             html.H3(children='Nombre de médailles olympiques par pays'),
-            # html.Div([dcc.Graph(id='med-main-graph'), ], style={'width': '100%', }),
-            html.Iframe(id="map", srcDoc=open('map.html', 'r').read(), width='100%', height='600'),
+            html.Iframe(id="map", srcDoc=open(self.path + 'map.html', 'r').read(), width='100%', height='600'),
             html.Div([
                 html.Div([html.Div('Medals'),
                           dcc.RadioItems(
                               id='med-spe',
                               options=[{'label': 'Marathon', 'value': 'Marathon'},
-                                       {'label': '100M', 'value': '100M'}],
+                                       {'label': '100M', 'value': '100M'},
+                                       {'label': 'Médailles volées', 'value': 'Stripped'}],
                               value='Marathon',
                               labelStyle={'display': 'block'},
                           )
@@ -67,7 +45,7 @@ class Olympic():
                 html.Div([html.Div('Event'),
                           dcc.Dropdown(
                               id='med-event',
-                              options=['Marathon','100M'],
+                              options=['Marathon', '100M'],
                               value=1,
                               disabled=False,
                           )]),
@@ -108,8 +86,9 @@ class Olympic():
         df["ISO"] = list(df.index.values)
         fig = folium.Map(location=[28.5736, 9.0750], tiles=None, zoom_start=2, max_bounds=True, min_zoom=1)
         folium.Rectangle([(-20000, -20000), (20000, 20000)], fill=True, fill_color="#0080ff").add_to(fig)
+        url = self.path
         choro = folium.Choropleth(
-            geo_data=f'data/countries.geojson',
+            geo_data=f'{url}data/countries.geojson',
             name='choropleth',
             data=df,
             columns=['ISO', 'Country'],
@@ -129,10 +108,10 @@ class Olympic():
                 c['properties']['Medals'] = 0
         folium.GeoJsonTooltip(['Country', 'Medals']).add_to(choro.geojson)
         folium.LayerControl().add_to(fig)
-        fig.save("map.html")
-        return open('map.html', 'r').read()
+        fig.save(self.path + "map.html")
+        return open(self.path + 'map.html', 'r').read()
 
 
 if __name__ == '__main__':
-    nrg = Olympic()
-    nrg.app.run_server(debug=True, port=8052)
+    olym = Olympic()
+    olym.app.run_server(debug=True, port=8052)
