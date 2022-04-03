@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 infl_conv = {
     'AUS': 'AU',
@@ -50,8 +51,35 @@ infl_conv = {
     'EU27_2020': 'EU27_2020'
 }
 
-def get_data():
-    wages = pd.read_csv('data/salaires.csv', usecols=['age', 'sex', 'indic_il', 'unit', 'TIME_PERIOD', 'OBS_VALUE'])
-    inflation = pd.read_csv('data/inflation.csv', usecols=['LOCATION', 'TIME', 'Value'])
+def clean_inflation(inflation):
     inflation.LOCATION = inflation.LOCATION.apply(lambda s: infl_conv[s])
-    return inflation, wages
+    inflation.rename({'LOCATION': 'country', 'TIME': 'year', 'Value': 'value'}, axis='columns', inplace=True)
+    return inflation.sort_values(by=['country', 'year'])
+
+def clean_wages(wages):
+    wages = wages[wages.indic_il == 'MED_E']
+    wages = wages[wages.unit == 'EUR']
+    wages.rename({'geo': 'country', 'TIME_PERIOD': 'year', 'OBS_VALUE': 'value'}, axis='columns', inplace=True)
+    wages.drop(['indic_il', 'unit'], axis='columns', inplace=True)
+    return wages.sort_values(by=['country', 'year'])
+
+def get_country_cumulative(inflation, min_year, country):
+    df = inflation[(inflation.country == country) & (inflation.year >= min_year)]
+    res = (df.value / 100 + 1).cumprod()
+    res /= df.iloc[0, 2] / 100 + 1
+    return res
+
+
+def compute_cumulative(inflation, wages):
+    countries = inflation.country.unique()
+    for country in countries:
+        min_year = inflation[inflation.country == country].iloc[0,1] if wages[wages.country == country].empty else max(inflation[inflation.country == country].iloc[0,1], wages[wages.country == country].iloc[0,3])
+        print(country, min_year)
+        inflation.loc[(inflation.country == country) & (inflation.year >= min_year),'cumulative_sum'] = get_country_cumulative(inflation, min_year, country)
+    return inflation
+
+def get_data():
+    wages = pd.read_csv('data/salaires.csv', usecols=['age', 'sex', 'indic_il', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE'])
+    inflation = pd.read_csv('data/inflation.csv', usecols=['LOCATION', 'TIME', 'Value'])
+    inflation, wages = clean_inflation(inflation), clean_wages(wages)
+    return compute_cumulative(inflation, wages), wages
