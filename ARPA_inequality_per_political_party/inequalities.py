@@ -20,20 +20,25 @@ class Inequalities():
         self.main_layout = html.Div(children=[
             html.H3(children='Répartition des inéqualités par parti politique en Europe'),
 
+            html.Div("L'indice (ou coefficient) de Gini est un indicateur synthétique permettant de rendre compte du niveau d'inégalité pour une variable et sur une population donnée"),
+            html.Div("Il varie entre 0 (égalité parfaite) et 1 (inégalité extrême). Entre 0 et 1, l'inégalité est d'autant plus forte que l'indice de Gini est élevé."),
+            html.Div("Nous utilisons donc cet indice afin de représenter les inégalités dans les différents pays européen."),
+            html.Br(),
+            html.Div('(Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.)'),
+
             html.Div([
                     html.Div([ dcc.Graph(id='ine-main-graph')]),
                     
                     html.Div([
                         html.Br(),
-                        html.Br(),
-                        html.Br(),
                         html.Div('Orientation Politique', style={'font-weight': 'bold'}),
                         dcc.Checklist(
                             id='ine-crossfilter-which-party',
-                            options=[{'label': " " + i, 'value': i} for i in sorted(self.color.keys())],
+                            options=[{'label': ' ' + i, 'value': i} for i in sorted(self.color.keys())],
                             value=sorted(self.color.keys()),
-                            labelStyle={'display':'block'},
                         ),
+                        html.Br(),
+                        html.Br(),
                         html.Br(),
                         html.Br(),
                         html.Br(),
@@ -45,8 +50,18 @@ class Inequalities():
                             value='Government',
                             clearable=False,
                             style={'width': '102%'}
-                        ),
+                        )
                     ], style={'margin-left':'90px', 'float':'right'}),
+
+                    html.Div([
+                        html.Br(),
+                        html.Br(),
+                        html.Span(style={'height': '19px', 'width': '19px', 'border-radius': '50%', 'display': 'inline-block', "background-color": self.color['Centre']}),
+                        html.Br(),
+                        html.Span(style={'height': '19px', 'width': '19px', 'border-radius': '50%', 'display': 'inline-block', "background-color": self.color['Droite']}),
+                        html.Br(),
+                        html.Span(style={'height': '19px', 'width': '19px', 'border-radius': '50%', 'display': 'inline-block', "background-color": self.color['Gauche']}),
+                    ]),
                 ], style={
                     'display':'flex',
                     'justifyContent':'center'
