@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from EC_DC_Mariages_et_Divorces_en_France import md
+from EC_CD_Mariages_et_Divorces_en_France import mariages_divorces as md
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -13,7 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
-md = md.Deces(app)
+md = md.Mariage(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
