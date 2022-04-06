@@ -18,7 +18,7 @@ class Inequalities():
         self.offset = 0.025
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Répartition des inéqualités par parti politique en Europe'),
+            html.H3(children='Répartition des inéqualités par parti politique en Europe depuis les années 2000'),
 
             html.Div("L'indice (ou coefficient) de Gini est un indicateur synthétique permettant de rendre compte du niveau d'inégalité pour une variable et sur une population donnée"),
             html.Div("Il varie entre 0 (égalité parfaite) et 1 (inégalité extrême). Entre 0 et 1, l'inégalité est d'autant plus forte que l'indice de Gini est élevé."),
@@ -26,8 +26,10 @@ class Inequalities():
             html.Br(),
             html.Div('(Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.)'),
 
+            html.H6('Evolution du coefficient de Gini et des partis politiques en Europe', style={'font-weight': 'bold', 'display':'flex', 'justifyContent':'center', 'margin-right': '250px'}),
+            
             html.Div([
-                    html.Div([ dcc.Graph(id='ine-main-graph')]),
+                    html.Div([ dcc.Graph(id='ine-main-graph') ]),
                     
                     html.Div([
                         html.Br(),
@@ -160,7 +162,7 @@ class Inequalities():
             showcoastlines=True, coastlinecolor="RebeccaPurple",
             showland=True, landcolor="MediumSeaGreen",
             showocean=True, oceancolor="LightSkyBlue",
-            scope='europe', projection_type='natural earth'
+            scope='europe', projection_type='natural earth',
         )
         fig.update_layout(height=500, margin={"r":0,"t":0,"l":0,"b":0}, showlegend=False)
         return fig
@@ -185,7 +187,9 @@ class Inequalities():
                           showlegend=False,
                           hovermode='closest',
                           yaxis_range=[dfg['gini'].min() - self.offset,
-                                       dfg['gini'].max() + self.offset]
+                                       dfg['gini'].max() + self.offset],
+                          xaxis_title=dict(text="Années"),
+                          yaxis_title=dict(text="Coefficient de Gini")
         )
         
         return fig
@@ -201,7 +205,9 @@ class Inequalities():
         fig.update_layout(showlegend=False,
                           hovermode='closest',
                           yaxis_range=[dfg['mean'].min() - self.offset,
-                                       dfg['mean'].max() + self.offset]
+                                       dfg['mean'].max() + self.offset],
+                          xaxis_title=dict(text="Partis politiques"),
+                          yaxis_title=dict(text="Coefficient de Gini (en moyenne)")
         )
         return fig
 
