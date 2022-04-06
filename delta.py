@@ -28,7 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
-                              dcc.Link(html.Button('Inégalité par politique', style={'width':"100%"}), href='/inequality'),
+                              dcc.Link(html.Button('Inégalités en Europe', style={'width':"100%"}), href='/inequality'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
