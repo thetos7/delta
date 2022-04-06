@@ -22,12 +22,11 @@ class Inequalities():
 
             html.Div("L'indice (ou coefficient) de Gini est un indicateur synthétique permettant de rendre compte du niveau d'inégalité pour une variable et sur une population donnée"),
             html.Div("Il varie entre 0 (égalité parfaite) et 1 (inégalité extrême). Entre 0 et 1, l'inégalité est d'autant plus forte que l'indice de Gini est élevé."),
-            html.Div("Nous utilisons donc cet indice afin de représenter les inégalités dans les différents pays européen."),
             html.Br(),
+            html.Div("Nous utilisons donc cet indice afin de représenter les inégalités dans les différents pays européen."),
             html.Div('(Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.)'),
-
+            html.Br(),
             html.H6('Evolution du coefficient de Gini et des partis politiques en Europe', style={'font-weight': 'bold', 'display':'flex', 'justifyContent':'center', 'margin-right': '250px'}),
-            
             html.Div([
                     html.Div([ dcc.Graph(id='ine-main-graph') ]),
                     
