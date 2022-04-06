@@ -23,14 +23,36 @@ class Inequalities():
             html.Div("L'indice (ou coefficient) de Gini est un indicateur synthétique permettant de rendre compte du niveau d'inégalité pour une variable et sur une population donnée"),
             html.Div("Il varie entre 0 (égalité parfaite) et 1 (inégalité extrême). Entre 0 et 1, l'inégalité est d'autant plus forte que l'indice de Gini est élevé."),
             html.Br(),
+
             html.Div("Nous utilisons donc cet indice afin de représenter les inégalités dans les différents pays européen."),
             html.Div('(Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.)'),
             html.Br(),
-            html.H6('Evolution du coefficient de Gini et des partis politiques en Europe', style={'font-weight': 'bold', 'display':'flex', 'justifyContent':'center', 'margin-right': '250px'}),
+
             html.Div([
-                    html.Div([ dcc.Graph(id='ine-main-graph') ]),
+                    html.Div([
+                        html.H6('Evolution du coefficient de Gini et des partis politiques en Europe', style={'font-weight': 'bold', 'display':'flex', 'justifyContent':'center'}),
+                        dcc.Graph(id='ine-main-graph'),
+                        html.Div(
+                            dcc.Slider(
+                                    id='ine-crossfilter-year-slider',
+                                    min=self.years[0],
+                                    max=self.years[-1],
+                                    step = 1,
+                                    value=self.years[0],
+                                    marks={str(year): str(year) for year in self.years[::3]},
+                            ), style={'width': '100%'}),
+                        dcc.Interval( # fire a callback periodically
+                            id='ine-auto-stepper',
+                            interval=750,       # in milliseconds
+                            max_intervals = -1, # start running
+                            n_intervals = 0
+                        ),
+                    ]),
                     
                     html.Div([
+                        html.Br(),
+                        html.Br(),
+                        html.Br(),
                         html.Br(),
                         html.Div('Orientation Politique', style={'font-weight': 'bold'}),
                         dcc.Checklist(
@@ -51,10 +73,24 @@ class Inequalities():
                             value='Government',
                             clearable=False,
                             style={'width': '102%'}
-                        )
-                    ], style={'margin-left':'90px', 'float':'right'}),
+                        ),
+                        html.Br(),
+                        html.Br(),
+                        html.Br(),
+                        html.Br(),
+                        html.Br(),
+                        html.Br(),
+                        html.Br(),
+                        html.Div(html.Button(
+                            self.START,
+                            id='ine-button-start-stop'
+                        ))
+                    ], style={'margin-left':'90px'}), 
 
                     html.Div([
+                        html.Br(),
+                        html.Br(),
+                        html.Br(),
                         html.Br(),
                         html.Br(),
                         html.Span(style={'height': '19px', 'width': '19px', 'border-radius': '50%', 'display': 'inline-block', "background-color": self.color['Centre']}),
@@ -68,33 +104,6 @@ class Inequalities():
                     'justifyContent':'center'
                 }),
 
-            html.Div([
-                    html.Div(
-                        dcc.Slider(
-                                id='ine-crossfilter-year-slider',
-                                min=self.years[0],
-                                max=self.years[-1],
-                                step = 1,
-                                value=self.years[0],
-                                marks={str(year): str(year) for year in self.years[::3]},
-                        ),
-                        style={'width':"60%", 'margin-right': '40px'}
-                    ),
-                    dcc.Interval( # fire a callback periodically
-                        id='ine-auto-stepper',
-                        interval=750,       # in milliseconds
-                        max_intervals = -1, # start running
-                        n_intervals = 0
-                    ),
-                    html.Button(
-                            self.START,
-                            id='ine-button-start-stop', 
-                    )
-                ], style={
-                    'display': 'flex',
-                    'justifyContent':'center',
-                    'margin-right': '110px'
-                }),
             html.Br(),
             html.Div(id='ine-div-country'),
             html.Div([
