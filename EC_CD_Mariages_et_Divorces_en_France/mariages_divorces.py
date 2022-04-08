@@ -24,10 +24,20 @@ class Mariage():
 
         mar_14 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2014.csv", sep=',', low_memory=False)
         mar_15 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2015.csv", sep=',', low_memory=False)
+        mar_16 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2016.csv", sep=',', low_memory=False)
+        mar_17 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2017.csv", sep=',', low_memory=False)
+        mar_18 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2018.csv", sep=',', low_memory=False)
+        mar_19 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2019.csv", sep=',', low_memory=False)
+        mar_20 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2020.csv", sep=',', low_memory=False)
         filter_df(mar_14)
         filter_df(mar_15)
+        filter_df(mar_16)
+        filter_df(mar_17)
+        filter_df(mar_18)
+        filter_df(mar_19)
+        filter_df(mar_20)
         
-        df = pd.concat([mar_14, mar_15])
+        df = pd.concat([mar_14, mar_15, mar_16, mar_17, mar_18, mar_19, mar_20])
        
         HH = df[(df['SEXE1'] == 'M') & (df['SEXE2'] == 'M')]
         graph = pd.DataFrame(HH.groupby('AMAR').size(), columns = ['HH'])
@@ -51,8 +61,17 @@ class Mariage():
                     id='mdf-main-graph',
                     figure=fig
                     )
-                ])
-            ])
+                ]),
+            html.Div([
+                dcc.Slider(
+                    id='mdf-crossfilter-year-slider',
+                    min=2014,
+                    max=2020,
+                    step=1,
+                    value=2014,
+                    marks={str(year): str(year) for year in range(2014, 2021)},)
+                    ]),
+            ]),
 
         if application:
             self.app = application
@@ -72,23 +91,3 @@ class Mariage():
 if __name__ == '__main__':
     mdf = Mariage()
     mdf.app.run_server(debug=True, port=8051)
-    
-    
-    #mar_15 = Dbf5('data/data mariages 2015.dbf').to_dataframe()
-    #mar_16 = Dbf5('data/data mariages 2016.dbf').to_dataframe()
-    #mar_17 = Dbf5('data/data mariages 2017.dbf').to_dataframe()
-    #mar_18 = Dbf5('data/data mariages 2018.dbf').to_dataframe()
-    #mar_19 = Dbf5('data/data mariages 2019.dbf').to_dataframe()
-    #mar_20 = Dbf5('data/data mariages 2020.dbf').to_dataframe()
-
-    
-    #filter_df(mar_14)
-    #filter_df(mar_15)
-    #filter_df(mar_16)
-    #filter_df(mar_17)
-    #filter_df(mar_18)
-    #filter_df(mar_19)
-    #filter_df(mar_20)
-
-        #pd.options.plotting.backend = "plotly"
-        #graph.plot()
