@@ -2,15 +2,12 @@ import os
 import glob
 import pandas as pd
 import plotly
-                        
+
 # Setting plotting backend to use plotly
 pd.options.plotting.backend = "plotly"
 
 # CSV databases from 2010 to 2020
-path = os.path.join(os.getcwd(), "src")
-path = os.path.join(path, "data")
-path = os.path.join(path, "*.csv")
-
+path = os.path.join(os.getcwd(), "*.csv")
 files = glob.glob(path)
 
 def loadData() -> pd.DataFrame:
