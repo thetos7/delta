@@ -22,9 +22,9 @@ print("Loaded database in " + "{:.2f}".format(t_2 - t_1) + " seconds!")
 # - Léger
 
 color = {
-	"Léger" : "#9ecbed",
-	"mortel" : "#2a6a99",
-	"grave non mortel" : "#3c97da"
+	"Léger" : "#FFFF00",
+	"mortel" : "#FF0000",
+	"grave non mortel" : "#FF7F00"
 }
 
 figure1 = px.histogram(
