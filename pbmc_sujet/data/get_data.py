@@ -7,7 +7,7 @@ import plotly
 pd.options.plotting.backend = "plotly"
 
 # CSV databases from 2010 to 2020
-path = os.path.join(os.getcwd(), "*.csv")
+path = os.path.join(os.getcwd(), "data/*.csv")
 files = glob.glob(path)
 
 def loadData() -> pd.DataFrame:
@@ -33,7 +33,7 @@ def loadData() -> pd.DataFrame:
 # If accidentType, vehicleType and age are "None", then it will only
 # select all the rows of the matching year.
 def getInfo(df : pd.DataFrame, year=None, accidentType=None, vehicleType=None, age=None) -> pd.DataFrame:
-    
+   
     if (year == None and accidentType == None and vehicleType == None and age == None):
         return df
 
