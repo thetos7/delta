@@ -1,7 +1,6 @@
 import time
 import data.get_data as dp
 import plotly.express as px
-import plotly.graph_objects as go
 
 t_1 = time.time()
 df = dp.loadData()
@@ -22,26 +21,30 @@ print("Loaded database in " + "{:.2f}".format(t_2 - t_1) + " seconds!")
 # - grave non mortel
 # - Léger
 
-figure1 = px.histogram(
-        dp.getInfo(df=df),
-        x=df["Année"],
-        color = df["Catégorie véhicule"],
-        facet_col = "Type Accident",
-        facet_col_wrap = 3,
-)
-figure1.update_layout(barmode="stack", bargap=0.2)
-figure1.show()
+color = {
+	"Léger" : "#9ecbed",
+	"mortel" : "#2a6a99",
+	"grave non mortel" : "#3c97da"
+}
 
-mdf = dp.getCounts(df=df)
-color = {"Léger": "#9ecbed", "mortel": "#2a6a99", "grave non mortel": "#3c97da"}
+figure1 = px.histogram(
+    df,
+    x=df["Année"],
+    color = df["Catégorie véhicule"],
+    facet_col = "Type Accident",
+    facet_col_wrap = 3,
+)
+
+figure1.update_layout(barmode="stack", bargap=0.2)
 
 figure2 = px.scatter_3d(
-    mdf,
+    dp.getMortality(df),
     x = 'Année',
     y = 'Age véhicule',
     z = 'Count',
     color = 'Type Accident',
     color_discrete_map=color,
-) 
+)
 
+figure1.show()
 figure2.show()

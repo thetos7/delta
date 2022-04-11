@@ -7,23 +7,23 @@ import plotly
 pd.options.plotting.backend = "plotly"
 
 # CSV databases from 2010 to 2020
-path = os.path.join(os.getcwd(), "data/*.csv")
+path = os.path.join(os.getcwd(), "pbmc_sujet/data/*.csv")
 files = glob.glob(path)
 
 def loadData() -> pd.DataFrame:
     # Read every CSV file, load it into one dataframe
     dataframe = pd.concat((pd.read_csv(f, sep=';', on_bad_lines='skip') for f in files))
-    
+
     # Remove useless columns
-    dataframe.drop(columns=["CNIT", 
-                            "Lieu Admin Actuel - Territoire Nom", 
-                            "Lettre Conventionnelle Véhicule", 
-                            "Id_accident"], 
+    dataframe.drop(columns=["CNIT",
+                            "Lieu Admin Actuel - Territoire Nom",
+                            "Lettre Conventionnelle Véhicule",
+                            "Id_accident"],
                    inplace=True)
-    
+
     # Rename column for better readability
     dataframe.rename(columns={"Type Accident - Libellé" : "Type Accident"}, inplace=True)
-    
+
     # Remove redundant "Accident" prefix in every row
     dataframe["Type Accident"].replace(to_replace="Accident *", value = "", regex=True, inplace=True)
 
@@ -33,7 +33,7 @@ def loadData() -> pd.DataFrame:
 # If accidentType, vehicleType and age are "None", then it will only
 # select all the rows of the matching year.
 def getInfo(df : pd.DataFrame, year=None, accidentType=None, vehicleType=None, age=None) -> pd.DataFrame:
-   
+
     if (year == None and accidentType == None and vehicleType == None and age == None):
         return df
 
@@ -41,7 +41,7 @@ def getInfo(df : pd.DataFrame, year=None, accidentType=None, vehicleType=None, a
 
     if (year):
         mask = (df['Année'] == year)
-    
+
     if (accidentType):
         mask = mask & (df["Type Accident"] == accidentType)
 
@@ -53,11 +53,14 @@ def getInfo(df : pd.DataFrame, year=None, accidentType=None, vehicleType=None, a
 
     return df.loc[mask].copy(deep=True)
 
-def getCounts(df: pd.DataFrame):
+def getMortality(df : pd.DataFrame):
+
     res = df.groupby(["Age véhicule", "Type Accident", "Année"])
-    mdf = pd.DataFrame({'Age véhicule': [], 'Type Accident': [], 'Année': [], 'Count': []})
+    mortality_df = pd.DataFrame({'Age véhicule': [], 'Type Accident': [], 'Année': [], 'Count': []})
+
     for i, g in enumerate(res):
         age, a_type, year = g[0]
-        mdf.loc[i] = [age, a_type, year, g[1].size]
-    return mdf
-    
+        mortality_df.loc[i] = [age, a_type, year, g[1].size]
+
+    return mortality_df
+
