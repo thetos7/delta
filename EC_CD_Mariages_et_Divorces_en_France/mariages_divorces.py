@@ -4,6 +4,7 @@ import dash
 import flask
 from dash import dcc
 from dash import html
+import json
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
@@ -49,28 +50,51 @@ class Mariage():
         graph = graph.assign(HF = HF.groupby('AMAR').size())
 
         graph = graph.assign(TOTAL = df.groupby('AMAR').size().astype(int))
+        
+        map_f = graph.copy().drop(["HH", "FF", "HF", "TOTAL"], axis=1)
+        dep_list = df.groupby("DEPMAR").size().index.tolist()
+        
+        c = 0
+        for idx in dep_list:
+            col = df[(df['DEPMAR'] == idx)]
+            map_f.insert(c, idx,col.groupby('AMAR').size())
+            c += 1
+        map_f = map_f.transpose()
+
 
         self.df = graph
-
+        self.map_f = map_f
+        self.departements = json.load(open('EC_CD_Mariages_et_Divorces_en_France/data/departements-version-simplifiee.geojson'))
+        
         fig = px.line(self.df)
+        fig_map = px.choropleth_mapbox(map_f, geojson=self.departements, locations= map_f.index, featureidkey = 'properties.code', 
+                           color=2014, color_continuous_scale="Viridis",
+                           mapbox_style="carto-positron",
+                           zoom=4.6, center = {"lat": 47, "lon": 2},
+                           opacity=0.5,
+                           labels={'2014':'Nombre de Mariages'}
+                          )
+        fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Title'),
+            html.H3(children='Mariages en France'),
             html.Div([
                 dcc.Graph(
                     id='mdf-main-graph',
                     figure=fig
-                    )
-                ]),
-            html.Div([
-                dcc.Slider(
-                    id='mdf-crossfilter-year-slider',
+                    ),
+                dcc.Graph(
+                    id='mdf-map-graph',
+                    figure=fig_map
+                ),
+                dcc.Slider(id='mdf-crossfilter-year-slider',
                     min=2014,
                     max=2020,
                     step=1,
                     value=2014,
                     marks={str(year): str(year) for year in range(2014, 2021)},)
-                    ]),
+                ]),
+            html.Div(id='slider-output-container')
             ]),
 
         if application:
@@ -80,12 +104,24 @@ class Mariage():
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
 
-        @self.app.callback(
-            dash.dependencies.Output("mdf-main-graph", "figure"),
-                [dash.dependencies.Input("mdf-main-type", "value")])
-        def update_line_chart(self, tmp):
-            fig = px.line(self.df)
-            return fig
+        self.app.callback(
+            dash.dependencies.Output('mdf-map-graph', 'figure'),
+            dash.dependencies.Input('mdf-crossfilter-year-slider', 'value'))(self.update_graph)
+
+
+    def update_graph(self, year):
+        print("test")
+        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.index, featureidkey = 'properties.code', 
+                        color=year, color_continuous_scale="Viridis",
+                        mapbox_style="carto-positron",
+                        zoom=4.6, center = {"lat": 47, "lon": 2},
+                        opacity=0.5,
+                        labels={year:'Nombre de Mariages'}
+                        )
+        return self.fig_map
+
+    def update_output(self, value):
+        return 'You have a hope : "{}"'.format(value)
 
 
 if __name__ == '__main__':
