@@ -38,14 +38,14 @@ pollution = pollution.sort_values(["Date"])
 pollution = pollution.resample('d', on='Date').mean()
 
 # drawing graphs
-O3fig = px.line(pollution, y="O3 Mean", title='O3 per day')
 COfig = px.line(pollution, y="CO Mean", title='CO per day')
-SO2fig = px.line(pollution, y="SO2 Mean", title='SO2 per day')
 NO2fig = px.line(pollution, y="NO2 Mean", title='NO2 per day')
-O3fig.show()
+O3fig = px.line(pollution, y="O3 Mean", title='O3 per day') # not produced by cars, but byproduct of NO2 under UV light
+SO2fig = px.line(pollution, y="SO2 Mean", title='SO2 per day') # not rejected by cars
 COfig.show()
-SO2fig.show()
 NO2fig.show()
+O3fig.show()
+SO2fig.show()
 
 # Prices data
 # --------------------------------------------------------------------------------------
