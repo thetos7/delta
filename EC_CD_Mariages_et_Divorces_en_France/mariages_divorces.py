@@ -22,6 +22,8 @@ class Mariage():
         def filter_df(df):
             df.drop(columns = ['ANAIS1', 'DEPNAIS1', 'INDNAT1', 'ETAMAT1', 'ANAIS2', 'DEPNAIS2', 'INDNAT2','ETAMAT2',
                     'JSEMAINE', 'DEPDOM', 'TUDOM', 'TUCOM', 'NBENFCOM'], axis=1, inplace=True)
+            
+        self.L = ['janv', 'fev', 'mars', 'avril', 'mai', 'juin', 'juillet', 'aout', 'sept', 'oct','nov','dec']    
 
         mar_14 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2014.csv", sep=',', low_memory=False)
         mar_15 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2015.csv", sep=',', low_memory=False)
@@ -37,6 +39,8 @@ class Mariage():
         filter_df(mar_18)
         filter_df(mar_19)
         filter_df(mar_20)
+        
+        self.files = [mar_14, mar_15, mar_16, mar_17, mar_18, mar_19, mar_20]
         
         df = pd.concat([mar_14, mar_15, mar_16, mar_17, mar_18, mar_19, mar_20])
        
@@ -60,6 +64,14 @@ class Mariage():
             map_f.insert(c, idx,col.groupby('AMAR').size())
             c += 1
         map_f = map_f.transpose()
+        
+        mar = mar_14.sort_values(by=['MMAR'])
+        mar['Mariage'] = mar['SEXE1'] + mar['SEXE2']
+        mar = mar.drop(['AMAR', 'SEXE1', 'SEXE2'], axis=1)
+        mar['Mariage'] =  mar['Mariage'].apply(self.str_update)
+        mar['MMAR'] =  mar['MMAR'].apply(self.update_month)
+        mar = mar.loc[mar['DEPMAR'] == '01']
+        mar = mar.drop('DEPMAR', axis=1)
 
 
         self.df = graph
@@ -74,19 +86,29 @@ class Mariage():
                            opacity=0.5,
                            labels={'2014':'Nombre de Mariages'}
                           )
-        fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-
+        fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+        fig_histo = px.bar(mar, x="MMAR", y="Mariage", title="Bla")
+               
         self.main_layout = html.Div(children=[
             html.H3(children='Mariages en France'),
             html.Div([
                 dcc.Graph(
-                    id='mdf-main-graph',
-                    figure=fig
-                    ),
-                dcc.Graph(
                     id='mdf-map-graph',
-                    figure=fig_map
-                ),
+                    figure=fig_map,
+                    style={'width':'50%', }),
+                dcc.Graph(
+                    id='mdf-main-graph',
+                    figure=fig,
+                    style={'width':'50%', 'display':'inline-block'}),
+                ], style={ 'display':'flex', 
+                       'borderTop': 'thin lightgrey solid',
+                       'borderBottom': 'thin lightgrey solid',
+                       'justifyContent':'center', }),
+            html.Div([
+                dcc.Graph(
+                    id='mdf-histo-graph',
+                    figure=fig_histo
+                    , style={'width':'100%', }),
                 dcc.Slider(id='mdf-crossfilter-year-slider',
                     min=2014,
                     max=2020,
@@ -106,20 +128,45 @@ class Mariage():
 
         self.app.callback(
             dash.dependencies.Output('mdf-map-graph', 'figure'),
+            dash.dependencies.Output('mdf-histo-graph', 'figure'),
             dash.dependencies.Input('mdf-crossfilter-year-slider', 'value'))(self.update_graph)
 
 
+    def get_file(self, year):
+           return self.files[year - 2014].sort_values(by=['MMAR'])
+        
     def update_graph(self, year):
-        print("test")
-        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.index, featureidkey = 'properties.code', 
+        fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.index, featureidkey = 'properties.code', 
                         color=year, color_continuous_scale="Viridis",
                         mapbox_style="carto-positron",
                         zoom=4.6, center = {"lat": 47, "lon": 2},
                         opacity=0.5,
                         labels={year:'Nombre de Mariages'}
                         )
-        return self.fig_map
+        
+        mar = self.get_file(year)
+        mar['Mariage'] = mar['SEXE1'] + mar['SEXE2']
+        mar = mar.drop(['AMAR', 'SEXE1', 'SEXE2'], axis=1)
+        mar['Mariage'] =  mar['Mariage'].apply(self.str_update)
+        mar['MMAR'] =  mar['MMAR'].apply(self.update_month)
+        mar = mar.loc[mar['DEPMAR'] == '01']
+        mar = mar.drop('DEPMAR', axis=1)
+        
+        fig_histo = px.bar(mar, x="MMAR", y="Mariage", title="Bla")
+        
+        return fig_map, fig_histo
+    
+    def str_update(self, s):
+        if s == 'FM':
+            return 'MF'
+        return s
 
+        
+    def update_month(self, s):
+        if s not in self.L:
+                return self.L[int(s) - 1]
+        return s
+    
     def update_output(self, value):
         return 'You have a hope : "{}"'.format(value)
 
