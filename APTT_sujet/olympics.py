@@ -66,15 +66,13 @@ class Olympic:
                           )]),
                 html.Br(),
                 dcc.Markdown("""
-                Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
-                En cliquant ou double-cliquant sur les lignes de la légende, vous choisissez les courbes à afficher.
+                Cette carte représentant tous les pays est intéractive. En passant la souris sur celle-ci, vous verrez une infobulle
+                apparaître contenant le nom du pays ainsi que le nombre de médailles obtenu par celui-ci suivant l'épreuve sélectionnée. 
                 
                 Notes :
-                   * FOD est le fioul domestique.
-                   * Pour les prix relatifs, seules les énergies fossiles sont prises en compte par manque de données pour les autres.
                    * Sources : 
-                      * [base Pégase](http://developpement-durable.bsocom.fr/Statistiques/) du ministère du développement durable
-                      * [tarifs réglementés de l'électricité](https://www.data.gouv.fr/en/datasets/historique-des-tarifs-reglementes-de-vente-delectricite-pour-les-consommateurs-residentiels/) sur data.gouv.fr
+                      * [Dataset des médailles](https://www.kaggle.com/amirba/olympic-sports-and-medals-18962021) disponible sur Kaggle
+                      * [Dataset des médailles volées](https://en.wikipedia.org/wiki/List_of_stripped_Olympic_medals) sur Wikipédia
                 """)
             ], style={
                 'backgroundColor': 'white',
