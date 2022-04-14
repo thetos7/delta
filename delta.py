@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from accidents import accidents
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+acc = accidents.Accidents(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -20,6 +22,9 @@ main_layout = html.Div([
                  html.Div(className="two columns",
                           children = [
                               html.Center(html.H2("Δelta δata")),
+                              html.Br(),
+                              dcc.Link(html.Button("Accidents de la route", style={'width':"100%"}), href='/accidents'),
+
                               dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
                               html.Br(),
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
@@ -66,6 +71,8 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/accidents':
+        return acc.main_layout
     else:
         return home_page
 
