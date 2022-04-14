@@ -3,6 +3,8 @@ from dash import dcc
 from dash import html
 import pandas as pd
 import folium
+import json
+import requests
 
 
 class Olympic:
@@ -91,13 +93,19 @@ class Olympic:
         fig = folium.Map(location=[28.5736, 9.0750], tiles=None, zoom_start=2, max_bounds=True, min_zoom=1)
         folium.Rectangle([(-20000, -20000), (20000, 20000)], fill=True, fill_color="#0080ff").add_to(fig)
         url = self.path
+
+        custom_scale = (df['Country'].quantile((0,0.5,0.8,0.99,1))).to_list()
+        #print(df['Country'])
+        #print(custom_scale)
+
         choro = folium.Choropleth(
             geo_data=f'{url}data/countries.geojson',
             name='choropleth',
             data=df,
             columns=['ISO', 'Country'],
             key_on='feature.properties.ISO_A3',
-            fill_color='RdPu',
+            threshold_scale = custom_scale,
+            fill_color= "RdPu",
             fill_opacity=1,
             line_opacity=0.8,
             Highlight=True,
