@@ -29,7 +29,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width': "100%"}), href='/deces'),
                               html.Br(),
-                              dcc.Link(html.Button('Médailles Olympique par pays', style={'width': "100%"}), href='/olympics'),
+                              dcc.Link(html.Button('Médailles Olympique', style={'width': "100%"}), href='/olympics'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),

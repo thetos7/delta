@@ -49,8 +49,9 @@ class Olympic:
                               value='Marathon',
                               labelStyle={'display': 'block'},
                           )
-                          ], style={'width': '15em'}),
-
+                          ], style={'width': '20em'}),
+                html.Br(),
+                html.Br(),
                 html.Div([html.Div('Discipline'),
                           dcc.Dropdown(
                               id='med-dis',
@@ -58,7 +59,8 @@ class Olympic:
                               value="All",
                               disabled=False,
                           )]),
-
+                html.Br(),
+                html.Br(),
                 html.Div([html.Div('Event'),
                           dcc.Dropdown(
                               id='med-event',
@@ -103,7 +105,7 @@ class Olympic:
         if discipline != "All":
             dataset = dataset[dataset["Discipline"] == self.discipline]
         events = sorted(dataset['Event'].unique())
-        events.insert(0,'All')
+        events.insert(0, 'All')
         return events
 
     def update_graph(self, spe_event, dropdown):
@@ -127,10 +129,7 @@ class Olympic:
         fig = folium.Map(location=[28.5736, 9.0750], tiles=None, zoom_start=2, max_bounds=True, min_zoom=1)
         folium.Rectangle([(-20000, -20000), (20000, 20000)], fill=True, fill_color="#0080ff").add_to(fig)
         url = self.path
-
-        custom_scale = (df['Country'].quantile((0,0.5,0.8,0.99,1))).to_list()
-        #print(df['Country'])
-        #print(custom_scale)
+        custom_scale = (df['Country'].quantile((0, 0.5, 0.6, 0.8, 0.9, 0.975, 1))).to_list()
 
         choro = folium.Choropleth(
             geo_data=f'{url}data/countries.geojson',
@@ -138,14 +137,14 @@ class Olympic:
             data=df,
             columns=['ISO', 'Country'],
             key_on='feature.properties.ISO_A3',
-            threshold_scale = custom_scale,
-            fill_color= "RdPu",
+            threshold_scale=custom_scale,
+            fill_color="RdPu",
             fill_opacity=1,
             line_opacity=0.8,
             Highlight=True,
             line_color='black',
             nan_fill_color="White",
-            legend_name="Number of medals"
+            legend_name="Nombre de médailles"
         ).add_to(fig)
         for c in choro.geojson.data['features']:
             if c['properties']['ISO_A3'] in df['ISO']:
@@ -155,6 +154,7 @@ class Olympic:
             c['properties']['Pays'] = c['properties']['Country']
         folium.GeoJsonTooltip(['Pays', 'Médailles']).add_to(choro.geojson)
         folium.LayerControl().add_to(fig)
+
         fig.save(self.path + "map.html")
         return open(self.path + 'map.html', 'r').read()
 
