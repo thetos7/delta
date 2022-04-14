@@ -25,6 +25,7 @@ class Olympic:
         self.path = ""
         self.dropdown = 1
         self.event = ""
+        self.discipline = "All"
         summer = Olympic._make_dataframe(self, "data/summer.csv")
         winter = Olympic._make_dataframe(self, "data/winter.csv")
         stripped = Olympic._make_dataframe(self, "data/stripped.csv")
@@ -32,11 +33,14 @@ class Olympic:
         stripped['Discipline'] = 'Stripped'
         self.olympic = pd.concat([summer, winter, stripped])
         event = sorted(self.olympic['Event'].unique())
+        event.insert(0, "All")
+        discipline = sorted(self.olympic['Discipline'].unique())
+        discipline.insert(0, "All")
         self.main_layout = html.Div(children=[
             html.H3(children='Nombre de médailles olympiques par pays'),
             html.Iframe(id="map", srcDoc=open(self.path + 'map.html', 'r').read(), width='100%', height='600'),
             html.Div([
-                html.Div([html.Div('Évènements spécifiques:', style={'width': '20em','font-size': '25px'}),
+                html.Div([html.Div('Évènements spécifiques:', style={'width': '20em', 'font-size': '25px'}),
                           dcc.RadioItems(
                               id='med-spe',
                               options=[{'label': 'Marathon', 'value': 'Marathon'},
@@ -45,12 +49,21 @@ class Olympic:
                               value='Marathon',
                               labelStyle={'display': 'block'},
                           )
-                          ], style={'width': '9em'}),
+                          ], style={'width': '15em'}),
+
+                html.Div([html.Div('Discipline'),
+                          dcc.Dropdown(
+                              id='med-dis',
+                              options=discipline,
+                              value="All",
+                              disabled=False,
+                          )]),
+
                 html.Div([html.Div('Event'),
                           dcc.Dropdown(
                               id='med-event',
                               options=event,
-                              value=1,
+                              value='All',
                               disabled=False,
                           )]),
                 html.Br(),
@@ -80,13 +93,34 @@ class Olympic:
             dash.dependencies.Output('map', 'srcDoc'),
             [dash.dependencies.Input('med-spe', 'value'),
              dash.dependencies.Input('med-event', 'value')])(self.update_graph)
+        self.app.callback(
+            dash.dependencies.Output('med-event', 'options'),
+            [dash.dependencies.Input('med-dis', 'value')])(self.set_discipline)
+
+    def set_discipline(self, discipline):
+        self.discipline = discipline
+        dataset = self.olympic
+        if discipline != "All":
+            dataset = dataset[dataset["Discipline"] == self.discipline]
+        events = sorted(dataset['Event'].unique())
+        events.insert(0,'All')
+        return events
 
     def update_graph(self, spe_event, dropdown):
+        dataset = self.olympic
+
         if not self.event == spe_event:
+            self.set_discipline('All')
             event, self.event = spe_event, spe_event
         else:
             event, self.event = dropdown, spe_event
-        event = self.olympic[self.olympic["Event"] == event]
+
+        if self.discipline != "All":
+            dataset = dataset[dataset["Discipline"] == self.discipline]
+        if event != 'All':
+            event = dataset[dataset["Event"] == event]
+        else:
+            event = dataset
         data = event["Country"].value_counts()
         df = pd.DataFrame.from_dict(data)
         df["ISO"] = list(df.index.values)
