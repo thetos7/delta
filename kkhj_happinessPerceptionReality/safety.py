@@ -4,7 +4,6 @@ def extract_safety(year):
     file = "data/criminality" + str(year) + ".xlsx"
     tab = pd.read_excel(file)
     df = pd.DataFrame({'Country': tab["Country"], f"{year}": tab["Safety Index"]})
-    #df = df[(df != '-').all(1)]
     return df
 
 def get_safety():
@@ -18,5 +17,3 @@ def safety_out_of_10():
     tab = get_safety()
     tab['Safety Index'] = tab['Safety Index'].div(10)
     return tab
-
-print(safety_out_of_10())
