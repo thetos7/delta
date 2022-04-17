@@ -11,7 +11,6 @@ def find_bin_idx_of_value(bins, value):
     idx = np.digitize(array, bins)
     return idx - 1
 
-
 def area_before_val(counts, bins, val):
     right_bin_edge_index = find_bin_idx_of_value(bins, val)
     bin_width = np.diff(bins)[0]
@@ -41,5 +40,3 @@ def add_gdp_value():
 
 if __name__ == "__main__":
     add_gdp_value()
-
-
