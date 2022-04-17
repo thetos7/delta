@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 
 def get_dataframe():
     df = pd.read_csv("data/PIB.csv")
+    df.rename(columns={'TIME': 'Year'}, inplace=True)
+    mask = (df['Year'] >= 2012) & (df['Year'] <= 2021)
+    df = df[mask]
     return df
 
 def find_bin_idx_of_value(bins, value):
@@ -25,7 +28,7 @@ def add_gdp_value():
     min_year = 2012
     max_year = 2020
     for year in range(min_year, max_year+1):
-        year_df = dataframe[dataframe['TIME'] == year]
+        year_df = dataframe[dataframe['Year'] == year]
         year_series = pd.Series(year_df['Value'])
         counts, bins, _ = plt.hist(year_series, bins=50, alpha=0.3, density=True, label="Data")
         total_area = sum(np.diff(bins) * counts)
@@ -34,7 +37,7 @@ def add_gdp_value():
             location = row['LOCATION']
             value = row['Value']
             gdp_value = get_gdp_value_for_single_value(counts, bins, value, total_area)
-            dataframe.loc[(dataframe['TIME'] == year) & (dataframe['LOCATION'] == location), ["GDP"]] = gdp_value
+            dataframe.loc[(dataframe['Year'] == year) & (dataframe['LOCATION'] == location), ["GDP"]] = gdp_value
     #print(dataframe[(dataframe['TIME'] >= min_year) & (dataframe['TIME'] <= max_year)])
 
 
