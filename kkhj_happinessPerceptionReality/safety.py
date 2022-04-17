@@ -6,7 +6,7 @@ def extract_safety(year):
     df = pd.DataFrame({'Country': tab["Country"], f"{year}": tab["Safety Index"]})
     return df
 
-def get_safety():
+def combine_dfs():
     tab = extract_safety(2012)
     for x in range(13, 22):
         file = str(20) + str(x)
@@ -14,6 +14,6 @@ def get_safety():
     return tab.melt(['Country'], var_name='Year', value_name='Safety Index')
 
 def safety_out_of_10():
-    tab = get_safety()
+    tab = combine_dfs()
     tab['Safety Index'] = tab['Safety Index'].div(10)
     return tab
