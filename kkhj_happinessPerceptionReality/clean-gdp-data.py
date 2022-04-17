@@ -23,6 +23,7 @@ def area_before_val(counts, bins, val):
 def get_gdp_value_for_single_value(counts, bins, val, total_area):
     return area_before_val(counts, bins, val) / total_area * 10
 
+#main function
 def add_gdp_value():
     dataframe = get_dataframe()
     min_year = 2012
@@ -38,8 +39,4 @@ def add_gdp_value():
             value = row['Value']
             gdp_value = get_gdp_value_for_single_value(counts, bins, value, total_area)
             dataframe.loc[(dataframe['Year'] == year) & (dataframe['LOCATION'] == location), ["GDP"]] = gdp_value
-    #print(dataframe[(dataframe['TIME'] >= min_year) & (dataframe['TIME'] <= max_year)])
-
-
-if __name__ == "__main__":
-    add_gdp_value()
+    return dataframe

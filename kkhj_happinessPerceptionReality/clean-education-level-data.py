@@ -1,6 +1,7 @@
 import pandas as pd
 import pycountry as pyc
 
+#main function
 def get_means():
     df = pd.read_csv("data/educationLevel.csv")
     df.rename(columns={'TIME': 'Year'}, inplace=True)
@@ -10,6 +11,3 @@ def get_means():
     df['LOCATION'] = df['LOCATION'].apply(lambda x: pyc.countries.get(alpha_3=x).name if pyc.countries.get(alpha_3=x) != None else None)
     df.rename(columns={'LOCATION': 'Country'}, inplace=True)
     return df
-
-if __name__ == "__main__":
-    get_means()
