@@ -24,10 +24,10 @@ def get_gdp_value_for_single_value(counts, bins, val, total_area):
     return area_before_val(counts, bins, val) / total_area * 10
 
 #main function
-def add_gdp_value():
+def gdp_out_of_10():
     dataframe = get_dataframe()
     min_year = 2012
-    max_year = 2020
+    max_year = 2021
     for year in range(min_year, max_year+1):
         year_df = dataframe[dataframe['Year'] == year]
         year_series = pd.Series(year_df['Value'])

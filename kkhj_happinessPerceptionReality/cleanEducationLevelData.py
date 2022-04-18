@@ -2,7 +2,7 @@ import pandas as pd
 import pycountry as pyc
 
 #main function
-def get_means():
+def education_out_of_10():
     df = pd.read_csv("data/educationLevel.csv")
     df.rename(columns={'TIME': 'Year'}, inplace=True)
     mask = (df['Year'] >= 2012) & (df['Year'] <= 2021)
@@ -12,6 +12,3 @@ def get_means():
     df.rename(columns={'LOCATION': 'Country'}, inplace=True)
     df['Value'] = df['Value'].apply(lambda x: x/10)
     return df
-
-if __name__ == "__main__":
-    get_means()
