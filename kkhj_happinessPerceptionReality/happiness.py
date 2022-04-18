@@ -8,7 +8,7 @@ import cleanUnemploymentData as unemployment
 
 def get_perceived_happiness_dataset():
     df = pd.read_csv('data/perceivedHappiness.csv')
-    df.rename(columns={'TIME': 'Year'}, inplace=True)
+    df.rename(columns={'Entity': 'Country', 'Life satisfaction in Cantril Ladder (World Happiness Report 2021)': 'Value'}, inplace=True)
     mask = (df['Year'] >= 2012) & (df['Year'] <= 2021)
     df = df[mask]
     return df
