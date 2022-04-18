@@ -15,5 +15,6 @@ def combine_dfs():
 
 def safety_out_of_10():
     tab = combine_dfs()
+    tab['Year'] = tab['Year'].astype(str).astype(int)
     tab['Safety Index'] = tab['Safety Index'].div(10)
     return tab
