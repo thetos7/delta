@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from accidents import accidents
+from SM_HB_accidents import accidents
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
