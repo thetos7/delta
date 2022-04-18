@@ -1,18 +1,19 @@
 import pandas as pd
 import cleanEducationLevelData as education
 import cleanGdpData as gdp
-import cleanSafety as safety
+import cleanSafetyData as safety
 import cleanSocialSecurityContributionData as social
 import cleanUnemploymentData as unemployment
 
 
 def get_perceived_happiness_dataset():
     df = pd.read_csv('data/perceivedHappiness.csv')
-    df.rename(columns={'Entity': 'Country', 'Life satisfaction in Cantril Ladder (World Happiness Report 2021)': 'Value'}, inplace=True)
+    df.rename(columns={'Entity': 'Country', 'Life satisfaction in Cantril Ladder (World Happiness Report 2021)': 'Happiness Index'}, inplace=True)
     mask = (df['Year'] >= 2012) & (df['Year'] <= 2021)
-    df = df[mask]
+    df = df[mask].reset_index()
+    del df['Code']
+    del df['index']
     return df
-
 
 def get_countries_list(dataset):
     list_countries = dataset['Country'].unique()
