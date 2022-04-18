@@ -47,4 +47,5 @@ def transform_rate_to_index(x):
 def unemployment_out_of_ten():
     df = get_unemployment()
     df['Unemployment rate %'] = df['Unemployment rate %'].apply(transform_rate_to_index)
+    df['Year'] = df['Year'].astype(int)
     return df.rename(columns={'Unemployment rate %': 'Unemployment index'})

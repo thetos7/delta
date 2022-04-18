@@ -9,6 +9,11 @@ import plotly.graph_objs as go
 import plotly.express as px
 import dateutil as du
 
+from cleanUnemploymentData import *
+from cleanSocialSecurityContributionData import *
+from cleanSafetyData import *
+
+
 
 def extract_safety(year):
     file = "data/criminality" + str(year) + ".xlsx"
@@ -88,3 +93,18 @@ def unemployment_out_of_ten():
     df = get_unemployment()
     df['Unemployment rate %'] = df['Unemployment rate %'].apply(transform_rate_to_index)
     return df.rename(columns={'Unemployment rate %': 'Unemployment index'})
+
+
+# print(unemployment_out_of_ten()["Year"])
+# print(safety_out_of_10()['Year'])
+safety = safety_out_of_10()
+unemployment = unemployment_out_of_ten()
+# print(safety['Year'])
+# print(unemployment['Year'])
+df = pd.merge(unemployment, safety, how="inner", on=["Country", "Year"])
+df = pd.merge(security_contribution_out_of_10(), df, how="inner", on=["Country", "Year"])
+mask2 = ((unemployment.groupby('Country')).size() >= 9)
+# # pd.set_option('display.max_rows', df.shape[0]+1)
+# # pd.set_option('display.max_columns', df.shape[1]+1)
+# df = df[df[mask2.reindex(df.index, fill_value=False)]]
+mask2.to_excel("output.xlsx")
