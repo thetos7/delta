@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from pbmc_sujet import pbmc
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+pm = pbmc.Pbmc(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -26,6 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
+                              dcc.Link(html.Button('PbCm', style={'width':"100%"}), href='/pbcm'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -65,6 +68,8 @@ def display_page(pathname):
     elif pathname == '/population':
         return pop.main_layout
     elif pathname == '/deces':
+        return dec.main_layout
+    elif pathname == '/pbcm':
         return dec.main_layout
     else:
         return home_page
