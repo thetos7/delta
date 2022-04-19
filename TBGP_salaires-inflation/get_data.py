@@ -53,19 +53,21 @@ infl_conv = {
 
 def clean_inflation(inflation):
     inflation.LOCATION = inflation.LOCATION.apply(lambda s: infl_conv[s])
-    inflation.rename({'LOCATION': 'country', 'TIME': 'year', 'Value': 'value'}, axis='columns', inplace=True)
-    return inflation.sort_values(by=['country', 'year'])
+    #inflation.LOCATION[inflation.LOCATION == 'GB'] = 'UK'
+    inflation.rename({'LOCATION': 'country', 'TIME': 'year'}, axis='columns', inplace=True)
+    return inflation
 
 def clean_wages(wages):
     wages = wages[wages.indic_il == 'MED_E']
     wages = wages[wages.unit == 'EUR']
-    wages.rename({'geo': 'country', 'TIME_PERIOD': 'year', 'OBS_VALUE': 'value'}, axis='columns', inplace=True)
+    wages.geo[wages.geo == 'UK'] = 'GB'
+    wages.rename({'geo': 'country', 'TIME_PERIOD': 'year', }, axis='columns', inplace=True)
     wages.drop(['indic_il', 'unit'], axis='columns', inplace=True)
-    return wages.sort_values(by=['country', 'year'])
+    return wages
 
 def get_country_cumulative(inflation, min_year, country):
     df = inflation[(inflation.country == country) & (inflation.year >= min_year)]
-    res = (df.value / 100 + 1).cumprod()
+    res = (df.Value / 100 + 1).cumprod()
     res /= df.iloc[0, 2] / 100 + 1
     return res
 
@@ -78,8 +80,14 @@ def compute_cumulative(inflation, wages):
         inflation.loc[(inflation.country == country) & (inflation.year >= min_year),'cumulative_sum'] = get_country_cumulative(inflation, min_year, country)
     return inflation
 
+def merge_dataframes(inflation, wages):
+    ret = pd.merge(inflation, wages, how='left', on=['year', 'country'])
+    ret.rename({'Value': 'inflation_value', 'OBS_VALUE': 'wages_value'}, axis='columns', inplace=True)
+    ret.dropna(inplace=True)
+    return ret
+
 def get_data():
     wages = pd.read_csv('data/salaires.csv', usecols=['age', 'sex', 'indic_il', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE'])
     inflation = pd.read_csv('data/inflation.csv', usecols=['LOCATION', 'TIME', 'Value'])
     inflation, wages = clean_inflation(inflation), clean_wages(wages)
-    return compute_cumulative(inflation, wages), wages
+    return merge_dataframes(compute_cumulative(inflation, wages), wages)
