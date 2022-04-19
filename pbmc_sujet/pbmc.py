@@ -66,7 +66,6 @@ class Pbmc():
             "grave non mortel" : "#FF7F00"    
         }    
         data = dp.getMortality(self.df)    
-        print(data)
 
         fig2 = px.scatter_3d(    
              data,    

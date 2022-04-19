@@ -56,11 +56,7 @@ def getInfo(df : pd.DataFrame, year=None, accidentType=None, vehicleType=None, a
 def getMortality(df : pd.DataFrame):
 
     res = df.groupby(["Age véhicule", "Type Accident", "Année"])
-    mortality_df = pd.DataFrame({'Age véhicule': [], 'Type Accident': [], 'Année': [], 'Count': []})
-
-    for i, g in enumerate(res):
-        age, a_type, year = g[0]
-        mortality_df.loc[i] = [age, a_type, year, g[1].size]
+    mortality_df = pd.DataFrame({'Count' : res.size()}).reset_index()
 
     return mortality_df
 
