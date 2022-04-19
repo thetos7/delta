@@ -31,6 +31,34 @@ class Pbmc():
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
 
+    def show_hist():    
+        color = {    
+            "Léger" : "#FFFF00",    
+            "mortel" : "#FF0000",    
+            "grave non mortel" : "#FF7F00"    
+        }    
+
+        figure1 = px.histogram(    
+            df,    
+            x=df["Année"],    
+            color = df["Catégorie véhicule"],    
+            facet_col = "Type Accident",    
+            facet_col_wrap = 3,    
+        )    
+
+    def show_scatter():    
+        figure1.update_layout(barmode="stack", bargap=0.2)    
+        data = dp.getMortality(df)    
+
+        figure2 = px.scatter_3d(    
+             data,    
+             x = 'Année',    
+             y = 'Age véhicule',    
+             z = 'Count',    
+             color = 'Type Accident',    
+             color_discrete_map=color,    
+        )    
+
 
         
 if __name__ == '__main__':
