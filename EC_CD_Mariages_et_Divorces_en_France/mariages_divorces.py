@@ -89,6 +89,13 @@ class Mariage():
                           )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
         self.fig_histo = px.bar(mar, x="MMAR", y="Mariage", title="Bla")
+        self.fig.update_layout(
+            title = 'Mariages en France depuis 2014',
+            xaxis = dict(title = 'Année du mariage'),
+            yaxis = dict(title = 'Nombre de mariages'), 
+            legend = dict(title = 'Type de mariage')
+    
+        )
                
         self.main_layout = html.Div(children=[
             html.H3(children='Mariages en France'),
