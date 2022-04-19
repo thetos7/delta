@@ -81,7 +81,7 @@ class Mariage():
         
         self.fig = px.line(self.df)
         self.fig_map = px.choropleth_mapbox(map_f, geojson=self.departements, locations= map_f.index, featureidkey = 'properties.code', 
-                           color=2014, color_continuous_scale="Viridis",
+                color=2014, range_color=[200, 10000], color_continuous_scale="Viridis",
                            mapbox_style="carto-positron",
                            zoom=4.6, center = {"lat": 47, "lon": 2},
                            opacity=0.5,
@@ -140,7 +140,6 @@ class Mariage():
     def update_map(self, year):
         self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements,
                         locations= self.map_f.index, featureidkey = 'properties.code', 
-                        color=year, range_color =[200, 10000], color_continuous_scale="Viridis",
                         mapbox_style="carto-positron",
                         zoom=4.6, center = {"lat": 47, "lon": 2},
                         opacity=0.5,
