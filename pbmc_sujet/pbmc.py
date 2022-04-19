@@ -1,8 +1,12 @@
+import sys
+import glob
+import dash
+import flask
 import time
-import pbmc_sujet.data.get_data as dp
-import plotly.express as px
 from dash import dcc
 from dash import html
+import pbmc_sujet.data.get_data as dp
+import plotly.express as px
 
 class Pbmc():     
         # Vehicle Types:
@@ -20,12 +24,22 @@ class Pbmc():
         # - Léger
 
     def __init__(self, application = None):
-        if application:
-            self.app = application
         t_1 = time.time()
         df = dp.loadData()
         t_2 = time.time()
-        print("Loaded database in " + "{:.2f}".format(t_2 - t_1) + " seconds!")
+        print(f"Loaded database in {t_2 - t_1:.2f} seconds!")
+        
+        self.main_layout = html.Div(children=[
+            html.H3(children='Nombre de décès par jour en France'),
+            html.Br(),
+        ], style={
+            'backgroundColor': 'white',
+             'padding': '10px 50px 10px 50px',
+             }
+        )
+        
+        self.app = dash.Dash(__name__)
+        self.app.layout = self.main_layout
     
     def show_hist():
         color = {

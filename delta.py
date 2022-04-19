@@ -28,7 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
-                              dcc.Link(html.Button('PbCm', style={'width':"100%"}), href='/pbcm'),
+                              dcc.Link(html.Button('PBCM', style={'width':"100%"}), href='/pbcm'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -70,7 +70,7 @@ def display_page(pathname):
     elif pathname == '/deces':
         return dec.main_layout
     elif pathname == '/pbcm':
-        return dec.main_layout
+        return pbmc.main_layout
     else:
         return home_page
 
