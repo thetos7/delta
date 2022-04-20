@@ -19,11 +19,13 @@ class Pbmc():
         self.df = dp.loadData()
         self.main_layout = html.Div(children=[
             html.H3(children='Philippe Bouchet et Michail Chatzizacharias'),
+            html.H4(children="Gravité des accidents en relation avec les catégories des véhicules"),
             html.Div([ dcc.Graph(id='pbmc-hist'), ], style={'width':'100%', }),
             html.Div([ dcc.RadioItems(id='hist-opts', 
                                      value=2,
                                      labelStyle={'display':'block'}) ,
                                      ]),
+            html.H4(children="Gravité des accidents en relation avec l'age des véhicules"),
             html.Div([ dcc.Graph(id='pbmc-scatter'), ], style={'width':'100%', }),
             html.Div([ dcc.RadioItems(id='scatter-opts', 
                                      value=2,
