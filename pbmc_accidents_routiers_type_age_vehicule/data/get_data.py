@@ -7,7 +7,7 @@ import plotly
 pd.options.plotting.backend = "plotly"
 
 # CSV databases from 2010 to 2020
-path = os.path.join(os.getcwd(), "pbmc_sujet/data/*.csv")
+path = os.path.join(os.getcwd(), "pbmc_accidents_routiers_type_age_vehicule/data/*.csv")
 files = glob.glob(path)
 
 def loadData() -> pd.DataFrame:

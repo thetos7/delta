@@ -12,21 +12,24 @@ import dateutil as du
 from scipy import stats
 from scipy import fft
 import datetime
-import pbmc_sujet.data.get_data as dp
+import pbmc_accidents_routiers_type_age_vehicule.data.get_data as dp
 
 class Pbmc():
     def __init__(self, application = None):
         self.df = dp.loadData()
         self.main_layout = html.Div(children=[
-            html.H3(children='Philippe Bouchet et Michail Chatzizacharias'),
+            html.H3(children="Mortalité des accidents routiers en France, en fonction du type et l'age du véhicule"),
+            html.H5(children='Philippe Bouchet et Michail Chatzizacharias'),
             html.H4(children="Gravité des accidents en relation avec les catégories des véhicules"),
             html.Div([ dcc.Graph(id='pbmc-hist'), ], style={'width':'100%', }),
             html.Div([ dcc.RadioItems(id='hist-opts', 
                                      value=2,
                                      labelStyle={'display':'block'}) ,
                                      ]),
+            dcc.Link('source', href='https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2020/'),
             html.H4(children="Gravité des accidents en relation avec l'age des véhicules"),
             html.Div([ dcc.Graph(id='pbmc-scatter'), ], style={'width':'100%', }),
+            dcc.Link('source', href='https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2020/'),
             html.Div([ dcc.RadioItems(id='scatter-opts', 
                                      value=2,
                                      labelStyle={'display':'block'}) ,
