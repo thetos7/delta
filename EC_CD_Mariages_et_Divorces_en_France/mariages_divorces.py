@@ -86,11 +86,11 @@ class Mariage():
         self.fig = px.line(self.df)
         self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.index,
                            featureidkey = 'properties.code', 
-                           color=2014, range_color=[200, 10000], color_continuous_scale="Viridis",
+                           color=self.year, range_color=[200, 10000], color_continuous_scale="Viridis",
                            mapbox_style="carto-positron",
                            zoom=4.6, center = {"lat": 47, "lon": 2},
                            opacity=0.5,
-                           labels={'2014':'Nombre de Mariages'}
+                           labels={self.year:'Nombre de Mariages'}
                           )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
         self.fig_histo = px.histogram(graph2, x = 'MMAR', y = ['HH', 'FF', 'HF'])
@@ -150,13 +150,14 @@ class Mariage():
            return self.files[self.year - 2014].sort_values(by=['MMAR'])
         
     def update_map(self):
-        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements,
-                        locations= self.map_f.index, featureidkey = 'properties.code', 
-                        mapbox_style="carto-positron",
-                        zoom=4.6, center = {"lat": 47, "lon": 2},
-                        opacity=0.5,
-                        labels={self.year:'Nombre de Mariages'}
-                        )
+        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.index,
+                           featureidkey = 'properties.code', 
+                           color=self.year, range_color=[200, 10000], color_continuous_scale="Viridis",
+                           mapbox_style="carto-positron",
+                           zoom=4.6, center = {"lat": 47, "lon": 2},
+                           opacity=0.5,
+                           labels={self.year:'Nombre de Mariages'}
+                          )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     
     def update_histo(self):
@@ -189,7 +190,7 @@ class Mariage():
             self.year = year
             self.update_map()
         if button_id == 'mdf-map-graph':
-            self.dep = "%02d" % (int(clickData['points'][0]['location']))
+            self.dep = clickData['points'][0]['location']
         if button_id != 'No clicks yeat':
             self.update_histo()
         
