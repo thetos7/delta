@@ -47,13 +47,10 @@ class Mariage():
        
         HH = df[(df['SEXE1'] == 'M') & (df['SEXE2'] == 'M')]
         graph = pd.DataFrame(HH.groupby('AMAR').size(), columns = ['HH'])
-
         FF = df[(df['SEXE1'] == 'F') & (df['SEXE2'] == 'F')]
         graph = graph.assign(FF = FF.groupby('AMAR').size())
-
         HF = df[((df['SEXE1'] == 'M') & (df['SEXE2'] == 'F')) | ((df['SEXE1'] == 'F') & (df['SEXE2'] == 'M'))]
         graph = graph.assign(HF = HF.groupby('AMAR').size())
-
         graph = graph.assign(TOTAL = df.groupby('AMAR').size().astype(int))
         
         map_f = graph.copy().drop(["HH", "FF", "HF", "TOTAL"], axis=1)
@@ -66,29 +63,37 @@ class Mariage():
             c += 1
         map_f = map_f.transpose()
         
-        mar = mar_14.sort_values(by=['MMAR'])
-        mar['Mariage'] = mar['SEXE1'] + mar['SEXE2']
-        mar = mar.drop(['AMAR', 'SEXE1', 'SEXE2'], axis=1)
-        mar['Mariage'] =  mar['Mariage'].apply(self.str_update)
-        mar['MMAR'] =  mar['MMAR'].apply(self.update_month)
-        mar = mar.loc[mar['DEPMAR'] == '01']
-        mar = mar.drop('DEPMAR', axis=1)
-
+        df = mar_14
+        df = df[df['DEPMAR'] == self.dep] 
+      
+        HH = df[(df['SEXE1'] == 'M') & (df['SEXE2'] == 'M')]
+        graph2 = pd.DataFrame(HH.groupby('MMAR').size(), columns = ['HH'])
+        FF = df[(df['SEXE1'] == 'F') & (df['SEXE2'] == 'F')]
+        graph2 = graph2.assign(FF = FF.groupby('MMAR').size())
+        HF = df[((df['SEXE1'] == 'M') & (df['SEXE2'] == 'F')) | ((df['SEXE1'] == 'F') & (df['SEXE2'] == 'M'))]
+        graph2 = graph2.assign(HF = HF.groupby('MMAR').size())
+        
+        graph2 = graph2.reset_index()
+        graph2 = self.check_months(graph2)
+        graph2 = graph2.sort_values(by=['MMAR'])
+        graph2['MMAR'] =  graph2['MMAR'].apply(self.update_month)
+       
         self.year = 2014
         self.df = graph
         self.map_f = map_f
         self.departements = json.load(open('EC_CD_Mariages_et_Divorces_en_France/data/departements-version-simplifiee.geojson'))
         
         self.fig = px.line(self.df)
-        self.fig_map = px.choropleth_mapbox(map_f, geojson=self.departements, locations= map_f.index, featureidkey = 'properties.code', 
-                color=2014, range_color=[200, 10000], color_continuous_scale="Viridis",
+        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.index,
+                           featureidkey = 'properties.code', 
+                           color=2014, range_color=[200, 10000], color_continuous_scale="Viridis",
                            mapbox_style="carto-positron",
                            zoom=4.6, center = {"lat": 47, "lon": 2},
                            opacity=0.5,
                            labels={'2014':'Nombre de Mariages'}
                           )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-        self.fig_histo = px.bar(mar, x="MMAR", y="Mariage", title="Bla")
+        self.fig_histo = px.histogram(graph2, x = 'MMAR', y = ['HH', 'FF', 'HF'])
         self.fig.update_layout(
             title = 'Mariages en France depuis 2014',
             xaxis = dict(title = 'Année du mariage'),
@@ -144,26 +149,34 @@ class Mariage():
     def get_file(self):
            return self.files[self.year - 2014].sort_values(by=['MMAR'])
         
-    def update_map(self, year):
+    def update_map(self):
         self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements,
                         locations= self.map_f.index, featureidkey = 'properties.code', 
                         mapbox_style="carto-positron",
                         zoom=4.6, center = {"lat": 47, "lon": 2},
                         opacity=0.5,
-                        labels={year:'Nombre de Mariages'}
+                        labels={self.year:'Nombre de Mariages'}
                         )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     
     def update_histo(self):
-        mar = self.get_file()
-        mar['Mariage'] = mar['SEXE1'] + mar['SEXE2']
-        mar = mar.drop(['AMAR', 'SEXE1', 'SEXE2'], axis=1)
-        mar['Mariage'] =  mar['Mariage'].apply(self.str_update)
-        mar['MMAR'] =  mar['MMAR'].apply(self.update_month)
-        mar = mar.loc[mar['DEPMAR'] == self.dep]
-        mar = mar.drop('DEPMAR', axis=1)
+        df = self.get_file()
+        df = df[df['DEPMAR'] == self.dep] 
+      
+        HH = df[(df['SEXE1'] == 'M') & (df['SEXE2'] == 'M')]
+        graph = pd.DataFrame(HH.groupby('MMAR').size(), columns = ['HH'])
+        FF = df[(df['SEXE1'] == 'F') & (df['SEXE2'] == 'F')]
+        graph = graph.assign(FF = FF.groupby('MMAR').size())
+        HF = df[((df['SEXE1'] == 'M') & (df['SEXE2'] == 'F')) | ((df['SEXE1'] == 'F') & (df['SEXE2'] == 'M'))]
+        graph = graph.assign(HF = HF.groupby('MMAR').size())
         
-        self.fig_histo = px.bar(mar, x="MMAR", y="Mariage", title="Mariage et divorce dans le %s en %s" % (self.dep, self.year))
+        graph = graph.reset_index()
+        graph = self.check_months(graph)
+        graph = graph.sort_values(by=['MMAR'])
+        graph['MMAR'] =  graph['MMAR'].apply(self.update_month)
+        
+        self.fig_histo = px.histogram(graph, x = 'MMAR', y = ['HH', 'FF', 'HF'],
+                                      title="Mariage et divorce dans le %s en %s" % (self.dep, self.year))
         
     def update_graph(self, year, clickData):
         ctx = dash.callback_context
@@ -173,8 +186,8 @@ class Mariage():
             button_id = ctx.triggered[0]['prop_id'].split('.')[0]
             
         if button_id == 'mdf-crossfilter-year-slider':
-            self.update_map(year)
             self.year = year
+            self.update_map()
         if button_id == 'mdf-map-graph':
             self.dep = "%02d" % (int(clickData['points'][0]['location']))
         if button_id != 'No clicks yeat':
@@ -191,6 +204,20 @@ class Mariage():
         if s not in self.L:
                 return self.L[int(s) - 1]
         return s
+    
+    def check_months(self, graph):
+        col = graph['MMAR'].unique()
+        idx = len(col)
+    
+        for i in range(1, 13):
+            if i < 10:
+                s = "0" + str(i)
+            else:
+                s = str(i)
+            if s not in col :
+                graph.loc[idx] = (int(s),0,0, 0)
+                idx += 1
+        return graph
 
 if __name__ == '__main__':
     mdf = Mariage()
