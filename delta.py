@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from pollution import pollution
+from ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant import pollution
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
