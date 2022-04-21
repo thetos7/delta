@@ -241,7 +241,7 @@ class Mariage():
             else:
                 s = str(i)
             if s not in col :
-                graph.loc[idx] = (int(s),0,0, 0)
+                graph.loc[idx] = (int(s), 0,0, 0.0001)
                 idx += 1
         return graph
     
@@ -274,8 +274,7 @@ class Mariage():
             else:
                 tmp = int(self.dep) + 1
                 self.dep = str(tmp) if tmp > 9 else "0" + str(tmp)
-                print(self.dep)
-
+                
         return self.year 
 
 if __name__ == '__main__':
