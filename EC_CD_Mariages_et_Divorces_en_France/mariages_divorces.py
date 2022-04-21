@@ -17,6 +17,8 @@ import pandas_datareader as pdr
 import numpy as np
 
 class Mariage():
+    START = 'Start'
+    STOP  = 'Stop'
     
     def __init__(self, application = None):
         def filter_df(df):
@@ -93,7 +95,7 @@ class Mariage():
                            labels={self.year:'Nombre de Mariages'}
                           )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-        self.fig_histo = px.histogram(graph2, x = 'MMAR', y = ['HH', 'FF', 'HF'])
+        self.fig_histo = px.histogram(graph2, x = 'MMAR', y = ['HH', 'FF', 'HF'], barmode='group')
         self.fig.update_layout(
             title = 'Mariages en France depuis 2014',
             xaxis = dict(title = 'Année du mariage'),
@@ -127,9 +129,21 @@ class Mariage():
                     max=2020,
                     step=1,
                     value=2014,
-                    marks={str(year): str(year) for year in range(2014, 2021)},)
-                ]),
-            html.Div(id='slider-output-container')
+                    marks={str(year): str(year) for year in range(2014, 2021)},),
+                dcc.Interval(
+                    id='mdf-auto-stepper',
+                    interval=1000,
+                    max_intervals = -1,
+                    n_intervals = 0
+                    ),
+                    ], style={
+                        'padding': '0px 50px', 
+                        'width':'100%'
+                    }),
+            html.Button(
+                self.START,
+                id='mdf-button-start-stop', 
+                style={'display':'inline-block'}),
             ]),
 
         if application:
@@ -144,6 +158,18 @@ class Mariage():
             dash.dependencies.Output('mdf-histo-graph', 'figure'),
             dash.dependencies.Input('mdf-crossfilter-year-slider', 'value'),
             dash.dependencies.Input('mdf-map-graph', 'clickData'))(self.update_graph)
+        self.app.callback(
+            dash.dependencies.Output('mdf-button-start-stop', 'children'),
+            dash.dependencies.Input('mdf-button-start-stop', 'n_clicks'),
+            dash.dependencies.State('mdf-button-start-stop', 'children'))(self.change_button)
+        self.app.callback(
+            dash.dependencies.Output('mdf-auto-stepper', 'max_interval'),
+            [dash.dependencies.Input('mdf-button-start-stop', 'children')])(self.run_movie)
+        self.app.callback(
+            dash.dependencies.Output('mdf-crossfilter-year-slider', 'value'),
+            dash.dependencies.Input('mdf-auto-stepper', 'n_intervals'),
+            [dash.dependencies.State('mdf-crossfilter-year-slider', 'value'),
+            dash.dependencies.State('mdf-button-start-stop', 'children')])(self.on_interval)
 
 
     def get_file(self):
@@ -177,7 +203,7 @@ class Mariage():
         graph['MMAR'] =  graph['MMAR'].apply(self.update_month)
         
         self.fig_histo = px.histogram(graph, x = 'MMAR', y = ['HH', 'FF', 'HF'],
-                                      title="Mariage et divorce dans le %s en %s" % (self.dep, self.year))
+                                      title="Mariage et divorce dans le %s en %s" % (self.dep, self.year), barmode='group')
         
     def update_graph(self, year, clickData):
         ctx = dash.callback_context
@@ -191,8 +217,7 @@ class Mariage():
             self.update_map()
         if button_id == 'mdf-map-graph':
             self.dep = clickData['points'][0]['location']
-        if button_id != 'No clicks yeat':
-            self.update_histo()
+        self.update_histo()
         
         return self.fig_map, self.fig_histo
     
@@ -219,6 +244,39 @@ class Mariage():
                 graph.loc[idx] = (int(s),0,0, 0)
                 idx += 1
         return graph
+    
+    def change_button(self, n_clicks, text):
+        if text == self.START:
+            return self.STOP
+        else:
+            return self.START
+    
+    def run_movie(self, text):
+        if text == self.START:
+            return 0 
+        else:
+            return -1
+        
+    def on_interval(self, n_intervals, year, text):
+        if text == self.STOP:
+            if self.dep == '19':
+                self.dep = '2A'
+            elif self.dep == '2A':
+                self.dep = '2B'
+            elif self.dep == '2B':
+                self.dep = '21'
+            elif self.dep == '95':
+                self.dep = '01'
+                if year == 2020:
+                    self.year = 2014
+                else:
+                    self.year += 1
+            else:
+                tmp = int(self.dep) + 1
+                self.dep = str(tmp) if tmp > 9 else "0" + str(tmp)
+                print(self.dep)
+
+        return self.year 
 
 if __name__ == '__main__':
     mdf = Mariage()
