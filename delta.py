@@ -70,7 +70,7 @@ def display_page(pathname):
     elif pathname == '/deces':
         return dec.main_layout
     elif pathname == '/pollution':
-        return dec.main_layout
+        return pol.main_layout
     else:
         return home_page
 
