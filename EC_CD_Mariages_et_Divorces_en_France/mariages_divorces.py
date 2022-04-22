@@ -95,13 +95,19 @@ class Mariage():
                            labels={self.year:'Nombre de Mariages'}
                           )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-        self.fig_histo = px.histogram(graph2, x = 'MMAR', y = ['HH', 'FF', 'HF'], barmode='group')
+        self.fig_histo = px.histogram(graph2, x = 'MMAR', y = ['HH', 'FF', 'HF'], barmode='group',)
         self.fig.update_layout(
             title = 'Mariages en France depuis 2014',
             xaxis = dict(title = 'Année du mariage'),
             yaxis = dict(title = 'Nombre de mariages'), 
             legend = dict(title = 'Type de mariage')
     
+        )
+        self.fig_histo.update_layout(
+            title = 'Mariage et divorce dans le %s en %s' % (self.dep, self.year),
+            xaxis = dict(title = 'Mois du mariage'),
+            yaxis = dict(title = 'Nombre de mariages'), 
+            legend = dict(title = 'Type de mariage') 
         )
                
         self.main_layout = html.Div(children=[
@@ -187,6 +193,7 @@ class Mariage():
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     
     def update_histo(self):
+        print('in histo')
         df = self.get_file()
         df = df[df['DEPMAR'] == self.dep] 
       
@@ -204,12 +211,19 @@ class Mariage():
         
         self.fig_histo = px.histogram(graph, x = 'MMAR', y = ['HH', 'FF', 'HF'],
                                       title="Mariage et divorce dans le %s en %s" % (self.dep, self.year), barmode='group')
+        self.fig_histo.update_layout(
+            title = 'Mariage et divorce dans le %s en %s' % (self.dep, self.year),
+            xaxis = dict(title = 'Mois du mariage'),
+            yaxis = dict(title = 'Nombre de mariages'), 
+            legend = dict(title = 'Type de mariage') 
+        )
         
+    #Note : self.update_histo probablement reset legende
     def update_graph(self, year, clickData):
+        print("on graph")
         ctx = dash.callback_context
-        if not ctx.triggered:
-            button_id = 'No clicks yet'
-        else:
+        button_id =""
+        if ctx.triggered:
             button_id = ctx.triggered[0]['prop_id'].split('.')[0]
             
         if button_id == 'mdf-crossfilter-year-slider':
@@ -258,6 +272,7 @@ class Mariage():
             return -1
         
     def on_interval(self, n_intervals, year, text):
+        print("in")
         if text == self.STOP:
             if self.dep == '19':
                 self.dep = '2A'
