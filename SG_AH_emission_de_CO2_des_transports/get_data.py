@@ -31,3 +31,19 @@ def get_transport_pollution_eu():
     # Rename geo columns with right names
     df = transform_countries_names(df, 'geo')
     return (df_all_eu, df[df['airpol'] == 'NMVOC'], df[df['airpol'] == 'NOX'], df[df['airpol'] == 'PM10'])
+
+def get_mean_co2_new_vehicules():
+    df = pd.read_csv("data/moyenne_emissions_CO2_vehicules_neuf_2000-2020.csv")
+
+    # Remove the useless columns
+    # Keep : geo, TIME_PERIOD, OBS_VALUE
+    columns_to_keep = ['geo', 'TIME_PERIOD', 'OBS_VALUE']
+    df = df[columns_to_keep]
+
+    # Seperate data for all EUROPE
+    df_all_eu = df.loc[(df['geo'] == 'EU27_2020')]
+    df = df[(df['geo'] != 'EU27_2020') & (df['geo'] != 'EU27_2007') & (df['geo'] != 'EU28')]
+    
+    # Rename geo columns with right names
+    df = transform_countries_names(df, 'geo')
+    return (df, df_all_eu)
