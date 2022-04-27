@@ -92,14 +92,14 @@ def get_all_datasets():
 
     #social security contribution
     social_security_contribution_dataset = social.security_contribution_out_of_10()
-    social_security_contribution_dataset.rename(columns={'Social Security Employer Contribution': 'Value'},
+    social_security_contribution_dataset.rename(columns={'Social Security Employer Contribution Index': 'Value'},
                                                 inplace=True)
     social_security_contribution_dataset['Year'] = social_security_contribution_dataset['Year'].astype(int)
     social_security_contribution_dataset['Value'] = social_security_contribution_dataset['Value'].astype(float)
 
     #unemployment
     unemployment_dataset = unemployment.unemployment_out_of_ten()
-    unemployment_dataset.rename(columns={'Unemployment index': 'Value'}, inplace=True)
+    unemployment_dataset.rename(columns={'Unemployment Index': 'Value'}, inplace=True)
 
 
     #countries included in all datasets
@@ -121,3 +121,4 @@ def get_all_datasets():
 
     return perceived_happiness_dataset, safety_dataset, gdp_dataset, social_security_contribution_dataset, unemployment_dataset
 
+get_all_datasets()
