@@ -1,7 +1,6 @@
 import pandas as pd
-import cleanEducationLevelData as education
 import cleanGdpData as gdp
-import cleanSafety as safety
+import cleanSafetyData as safety
 import cleanSocialSecurityContributionData as social
 import cleanUnemploymentData as unemployment
 
@@ -20,46 +19,105 @@ def intersection(list1, list2):
     list = [value for value in list1 if value in list2]
     return list
 
-def get_missing_values(dataset):
-    # for all countries in datset
-    # for all years in 2012, 2021
-    # if missing then look for x - 1 if >= 2012 and x + 1 if <= 2021
-    # while one missing then -1 or +1 (or both)
-    # if one take it, else mean of the two
-    # if all missing and all over boundaries --> RAISE ERROR (but not possible)
-    # copy row to dataset --> change value and date
+def get_missing_values(dataset, all_countries):
+    dataset = drop_rows_not_in_countries(dataset, all_countries)
+    list_countries = get_countries_list(dataset)
+    min_year = 2012
+    max_year = 2021
+    for country in list_countries:
+        for year in range (min_year, max_year + 1):
+            row = dataset.loc[(dataset['Country'] == country) & (dataset['Year'] == year)]
+            if (row.empty == True):
+                boolean_before = True
+                boolean_after = True
+                year_after = year + 1
+                year_before = year - 1
+                while (boolean_before or boolean_after):
+                    if (boolean_before):
+                        row_before = dataset.loc[(dataset['Country'] == country) & (dataset['Year'] == year_before)]
+                        if (not row_before.empty):
+                            boolean_before = False
+                        elif (year_before <= min_year):
+                            boolean_before = False
+                        else:
+                            year_before-=1
+                    if (boolean_after):
+                        row_after = dataset.loc[(dataset['Country'] == country) & (dataset['Year'] == year_after)]
+                        if (not row_after.empty):
+                            boolean_after = False
+                        elif (year_after >= max_year):
+                            boolean_after = False
+                        else:
+                            year_after+=1
+                if (row_before.empty and not row_after.empty):
+                    new_value = row_after.iloc[0]['Value']
+                if (not row_before.empty and row_after.empty):
+                    new_value = row_before.iloc[0]['Value']
+                if (not row_before.empty and not row_after.empty):
+                    value_after = row_after.iloc[0]['Value']
+                    value_before = row_before.iloc[0]['Value']
+                    new_value = (value_before + value_after)/2
+                if (row_before.empty and row_after.empty):
+                    print('ERROR ERROR I REPEAT ERROR')
+                new_row = pd.DataFrame({'Country': country, 'Year': year, 'Value': new_value},index=[0])
+                dataset = pd.concat([new_row, dataset.loc[:]]).reset_index(drop=True)
+    #verify
+    """for country in list_countries:
+        print(country)
+        nbr_rows = len(dataset[dataset.Country == country])
+        print(nbr_rows)"""
 
-if __name__ == "__main__":
+    return dataset
+
+
+def drop_rows_not_in_countries(dataset, countries_list):
+    dataset = dataset[dataset['Country'].isin(countries_list)]
+    return dataset
+
+def get_all_datasets():
+    #perceived_happiness
     perceived_happiness_dataset = get_perceived_happiness_dataset()
+    perceived_happiness_dataset.drop("Code", inplace=True, axis=1)
+
+    #safety
     safety_dataset = safety.safety_out_of_10()
-    education_level_dataset = education.education_out_of_10()
+    safety_dataset.rename(columns={'Safety Index': 'Value'}, inplace=True)
+
+    #gdp
     gdp_dataset = gdp.gdp_out_of_10()
+    gdp_dataset.drop("Country Code", inplace=True, axis=1)
+    gdp_dataset.drop("Value", inplace=True, axis=1)
+    gdp_dataset.rename(columns={'GDP': 'Value'}, inplace=True)
+    gdp_dataset['Year'] = gdp_dataset['Year'].astype(int)
+
+    #social security contribution
     social_security_contribution_dataset = social.security_contribution_out_of_10()
+    social_security_contribution_dataset.rename(columns={'Social Security Employer Contribution': 'Value'},
+                                                inplace=True)
+    social_security_contribution_dataset['Year'] = social_security_contribution_dataset['Year'].astype(int)
+    social_security_contribution_dataset['Value'] = social_security_contribution_dataset['Value'].astype(float)
+
+    #unemployment
     unemployment_dataset = unemployment.unemployment_out_of_ten()
+    unemployment_dataset.rename(columns={'Unemployment index': 'Value'}, inplace=True)
 
-    list = get_countries_list(perceived_happiness_dataset)
 
+    #countries included in all datasets
     perceived_happiness_countries = get_countries_list(perceived_happiness_dataset)
     safety_countries = get_countries_list(safety_dataset)
-    education_level_countries = get_countries_list(education_level_dataset)
     gdp_countries = get_countries_list(gdp_dataset)
     social_security_contribution_countries = get_countries_list(social_security_contribution_dataset)
     unemployment_countries = get_countries_list(unemployment_dataset)
 
     all_countries = intersection(intersection(intersection(intersection(perceived_happiness_countries,
-                                                                                     safety_countries), gdp_countries),
+                                                                        safety_countries), gdp_countries),
                                               social_security_contribution_countries), unemployment_countries)
 
-    print(len(all_countries))
+    perceived_happiness_dataset = get_missing_values(perceived_happiness_dataset, all_countries)
+    safety_dataset = get_missing_values(safety_dataset, all_countries)
+    gdp_dataset = get_missing_values(gdp_dataset, all_countries)
+    social_security_contribution_dataset = get_missing_values(social_security_contribution_dataset, all_countries)
+    unemployment_dataset = get_missing_values(unemployment_dataset, all_countries)
 
+    return perceived_happiness_dataset, safety_dataset, gdp_dataset, social_security_contribution_dataset, unemployment_dataset
 
-# include the mask2 when counting countries #we're going to assume it's true
-# ignore education level for now
-
-
-# form huge dataset
-# behavior for missing values
-# graph part with inputs
-# calculate real happiness with input
-# update graph
-# test all
