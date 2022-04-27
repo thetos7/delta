@@ -1,30 +1,27 @@
-from cleanSocialSecurityContributionData import *
-from cleanSafetyData import *
-from cleanUnemploymentData import *
-from cleanEducationLevelData import *
-from cleanGdpData import *
+from getDatasets import get_datasets
 from missingValues import *
+from perceivedIndex import add_perceived_index
 
 
 class happinessPerceptionReality():
     def __init__(self):
-
         # Extract datasets
-        datasets = {'safety': safety_out_of_10(), 'unemployment': unemployment_out_of_ten(),
-                    'socialContribution': security_contribution_out_of_10(), 'gdpPerCapita': extract_gdp_index(),
-                    'perceivedHappiness': get_perceived_happiness_dataset()}
-        # TODO find better dataset for educationLevel/literacy and decomment the line below
-        # datasets['educationLevel'] = education_out_of_10()
+        datasets = get_datasets()
 
-        # Merge all datasets
-        df = datasets['safety']
-        for count, key in enumerate(datasets):
-            if count == 0:
-                continue
-            df = pd.merge(datasets[key], df, on=["Country", "Year"])
+        # TODO Read importance rate entered by users
+
+        # Store importance rates
+        importanceRate = {'safety': 0.25,
+                          'unemployment': 0.25,
+                          'socialContribution': 0.25,
+                          'gdpPerCapital': 0.25,
+                          'educationLevel': 0}
+
+        # Add perceived happiness
+        datasets = add_perceived_index(datasets, importanceRate)
 
         # Initialise variables
-        self.df = df
+        self.df = datasets
         self.countries = get_countries_list(df)
 
 

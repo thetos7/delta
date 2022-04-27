@@ -4,8 +4,8 @@ import cleanSafetyData as safety
 import cleanSocialSecurityContributionData as social
 import cleanUnemploymentData as unemployment
 
-def get_perceived_happiness_dataset():
-    df = pd.read_csv('data/perceivedHappiness.csv')
+def get_real_happiness_dataset():
+    df = pd.read_csv('data/realHappiness.csv')
     df.rename(columns={'Entity': 'Country', 'Life satisfaction in Cantril Ladder (World Happiness Report 2021)': 'Value'}, inplace=True)
     mask = (df['Year'] >= 2012) & (df['Year'] <= 2021)
     df = df[mask]
@@ -75,9 +75,9 @@ def drop_rows_not_in_countries(dataset, countries_list):
     return dataset
 
 def get_all_datasets():
-    #perceived_happiness
-    perceived_happiness_dataset = get_perceived_happiness_dataset()
-    perceived_happiness_dataset.drop("Code", inplace=True, axis=1)
+    #real_happiness
+    real_happiness_dataset = get_real_happiness_dataset()
+    real_happiness_dataset.drop("Code", inplace=True, axis=1)
 
     #safety
     safety_dataset = safety.safety_out_of_10()
@@ -103,22 +103,22 @@ def get_all_datasets():
 
 
     #countries included in all datasets
-    perceived_happiness_countries = get_countries_list(perceived_happiness_dataset)
+    real_happiness_countries = get_countries_list(real_happiness_dataset)
     safety_countries = get_countries_list(safety_dataset)
     gdp_countries = get_countries_list(gdp_dataset)
     social_security_contribution_countries = get_countries_list(social_security_contribution_dataset)
     unemployment_countries = get_countries_list(unemployment_dataset)
 
-    all_countries = intersection(intersection(intersection(intersection(perceived_happiness_countries,
+    all_countries = intersection(intersection(intersection(intersection(real_happiness_countries,
                                                                         safety_countries), gdp_countries),
                                               social_security_contribution_countries), unemployment_countries)
 
-    perceived_happiness_dataset = get_missing_values(perceived_happiness_dataset, all_countries)
+    real_happiness_dataset = get_missing_values(real_happiness_dataset, all_countries)
     safety_dataset = get_missing_values(safety_dataset, all_countries)
     gdp_dataset = get_missing_values(gdp_dataset, all_countries)
     social_security_contribution_dataset = get_missing_values(social_security_contribution_dataset, all_countries)
     unemployment_dataset = get_missing_values(unemployment_dataset, all_countries)
 
-    return perceived_happiness_dataset, safety_dataset, gdp_dataset, social_security_contribution_dataset, unemployment_dataset
+    return real_happiness_dataset, safety_dataset, gdp_dataset, social_security_contribution_dataset, unemployment_dataset
 
 get_all_datasets()
