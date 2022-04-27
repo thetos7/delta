@@ -31,10 +31,4 @@ class happinessPerceptionReality():
 if __name__ == "__main__":
     res = happinessPerceptionReality()
     df = res.df
-    # df.drop(df[df['GDP Index'] == 0].index, inplace=True)
-    # df.drop(df[df['Social Security Employer Contribution'] == 0].index, inplace=True)
-    # df.drop(df[df['Unemployment index_x'] == 0].index, inplace=True)
-    # df.drop(df[df['Safety Index_y'] == 0].index, inplace=True)
-    # mask = ((df.groupby('Country')).size() >= 8)
     res.df.to_excel("output.xlsx")
-    print(len(res.countries))
