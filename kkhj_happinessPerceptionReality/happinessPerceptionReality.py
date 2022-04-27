@@ -1,6 +1,6 @@
 from getDatasets import get_datasets
 from missingValues import *
-from perceivedIndex import add_perceived_index
+from perceivedIndex import *
 
 
 class happinessPerceptionReality():
@@ -22,7 +22,7 @@ class happinessPerceptionReality():
 
         # Initialise variables
         self.df = datasets
-        self.countries = get_countries_list(df)
+        self.countries = get_countries_list(self.df)
 
 
 if __name__ == "__main__":
