@@ -193,7 +193,6 @@ class Mariage():
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     
     def update_histo(self):
-        print('in histo')
         df = self.get_file()
         df = df[df['DEPMAR'] == self.dep] 
       
@@ -220,7 +219,6 @@ class Mariage():
         
     #Note : self.update_histo probablement reset legende
     def update_graph(self, year, clickData):
-        print("on graph")
         ctx = dash.callback_context
         button_id =""
         if ctx.triggered:
@@ -272,7 +270,6 @@ class Mariage():
             return -1
         
     def on_interval(self, n_intervals, year, text):
-        print("in")
         if text == self.STOP:
             if self.dep == '19':
                 self.dep = '2A'
