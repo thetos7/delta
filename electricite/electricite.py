@@ -216,12 +216,6 @@ class Eletricite():
             html.Br(),
             
             dcc.Markdown("""
-                Sources:  
-                * https://www.data.gouv.fr/fr/datasets/historique-des-tarifs-reglementes-de-vente-delectricite-pour-les-consommateurs-residentiels/  
-                * https://www.rte-france.com/eco2mix/telecharger-les-indicateurs   
-                * https://www.rte-france.com/  
-                \n\n
-
                 Interprétation:\n
                 * Nous pouvons observer les différents pic de production d'électricité entre les saisons hivernales et estival. Avec une plus grande production en hiver. Nous pouvons notamment le remarqué avec l'oscillation de la production de nucléaire.
                 * Sur quasimment tous les 25 décembre, il y a une chute de production d'électricité dans le nucléaire.  
@@ -233,6 +227,16 @@ class Eletricite():
                 Comme nous avons pu le constater, le prix de l'électricité n'est pas lié à la production d'électricité. Cela est dû au fait 
                 que le prix de l'électricité est établie par le gouvernement Français. Néanmoins nous pouvons remarqué qu'en France, 
                 l'électricité est essentiellement produit avec du nucléaire.
+
+                #### À propos
+
+                Sources:  
+
+
+                * https://www.data.gouv.fr/fr/datasets/historique-des-tarifs-reglementes-de-vente-delectricite-pour-les-consommateurs-residentiels/  
+                * https://www.rte-france.com/eco2mix/telecharger-les-indicateurs   
+                * https://www.rte-france.com/ 
+                * (c) 2022 Arthur Fan & Hao Ye
             """)
             ], style={
                     'backgroundColor': 'white',
