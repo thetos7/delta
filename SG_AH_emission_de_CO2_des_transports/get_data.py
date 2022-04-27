@@ -47,3 +47,16 @@ def get_mean_co2_new_vehicules():
     # Rename geo columns with right names
     df = transform_countries_names(df, 'geo')
     return (df, df_all_eu)
+
+def get_air_pollution_schools():
+    df = pd.read_csv("data/ecoles-creches-idf-prepared_2012-2017.csv")
+
+    # remove useless columns
+    df = df.drop(['ID', 'ville', 'CP', 'type', 'geometry'], axis=1)
+    df.to_csv("e")
+    # Seperate according to the type of pollution
+    df_no2 = df.filter(regex="nom|departement|NO2.*")
+    df_pm10 = df.filter(regex="nom|departement|PM10.*")
+    df_pm25 = df.filter(regex="nom|departement|PM25.*")
+
+    return (df_no2, df_pm10, df_pm25)
