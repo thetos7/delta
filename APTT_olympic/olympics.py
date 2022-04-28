@@ -104,7 +104,19 @@ class Olympic:
 
                 Ainsi, par rapport à cette constatation, nous voulions à la fois la vérifier mais aussi prouver qu'il n'y a pas que ces pays là dans
                 ce monde olympique. Il y a des "exceptions". Egalement, nous voulions aussi accentuer un point d'une manière plus controversée sur le dopage
-                et donc sur les médailles dites "volées"
+                et donc sur les médailles dites "volées".
+                
+                Nous avons donc décidés de mettre en avant la discipline du Marathon dans un premier temps
+                pour montrer que ce sont l'Ethiopie et le Kenya qui sont les maîtres de cette épreuve. Il y a pas vraiment de consensus qui expliquerait ce phénomène,
+                certains parlent de culture, d'autres d'alimentation ou d'environnment.
+                
+                Ensuite, d'une manière plus logique nous avons choisi l'escrime où la France et l'Italie
+                domine cette epreuve, comme nous l'avons dit assez logiquement par rapport à une question
+                de moyens mis en place, d'infrastructure mais surtout par une histoire du duel notamment au 17-18ème siècle avec les mousquetaires.
+                
+                Enfin, nous avons décidés de mettre en avant le patinage de vitesse qui est une épreuve totalement
+                dominée par les Pays-Bas, d'une part puisque ce sport fut inventé dans ce même pays, mais aussi d'une autre
+                part parce que ce sport est comme dit au-dessus plus que important et fait partie de la culture de ce pays, avec des courses uniques au monde comme la Elfstedentocht, course d'endurance de 200km.
 
                 #### Notes :
                 
@@ -170,6 +182,8 @@ class Olympic:
         if self.discipline != "All" and self.discipline is not None:
             titre = "Discipline : " + self.discipline + "      " + titre
             dataset = dataset[dataset["Discipline"] == self.discipline]
+        if event is None:
+            event = "Marathon"
         titre = titre + event
         if event != 'All':
             event = dataset[dataset["Event"] == event]
@@ -180,7 +194,7 @@ class Olympic:
         df = pd.DataFrame.from_dict(data)
         df["ISO"] = list(df.index.values)
         fig = folium.Map(location=[28.5736, 9.0750], tiles=None, zoom_start=2, max_bounds=True, min_zoom=1)
-        folium.Rectangle([(-20000, -20000), (20000, 20000)], fill=True, fill_color="#0080ff").add_to(fig)
+        folium.Rectangle([(-20000, -20000), (20000, 20000)], fill=True, fill_color="#29c5ff").add_to(fig)
         url = self.path
         custom_scale = get_custom_scale(df)
 
