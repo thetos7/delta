@@ -1,0 +1,10 @@
+Updates 
+
+1. 26 November 2018. 
+Following the agreement of the registry, the data from the Czech National Cancer registry have been included into the two CI5plus databases.
+
+
+2. 26 April 2019. 
+The data from China, Hong Kong for the period 1978-1982 were incorrect and have been removed from the CI5plus summary database.
+
+
