@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from jcwg_naissance_deces import
+from jcwg_naissance_deces import naissance_deces
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -13,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+jcwg_nd = naissance_deces.Naissance(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -26,6 +27,8 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
+                              html.Br(),
+                              dcc.Link(html.Button('Naissances et décès', style={'width':"100%"}), href='/jcwg_naissance_deces'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -68,7 +71,7 @@ def display_page(pathname):
     elif pathname == '/deces':
         return dec.main_layout
     elif pathname == '/jcwg_naissance_deces':
-        return
+        return jcwg_nd.main_layout
     else:
         return home_page
 
