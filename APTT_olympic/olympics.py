@@ -91,6 +91,21 @@ class Olympic:
                 Cette carte représentant tous les pays est intéractive. En passant la souris sur celle-ci, vous verrez une infobulle
                 apparaître contenant le nom du pays ainsi que le nombre de médailles obtenu par celui-ci suivant l'épreuve sélectionnée. 
                 
+                #### Introduction :
+                
+                Nous avons décidés de mettre en avant quelques épreuves qui nous semblait intéressantes. Plus particulierement, de montrer
+                l'importance de certains pays dans des épreuves spécifiques. De plus, il nous semblait indispensable d'afficher a l'échelle mondiale
+                le nombre de médailles olympiques volées par pays.
+
+                Vous découvrirez par vous mêmes que dans la plus part des épreuves olympiques, certains pays sont tout le temps présents. On peut
+                penser aux Etats-Unis, à la Russie, la Chine et aussi aux pays de l'Europe de l'Ouest (France, Royaume-Unis, Allemagne, Italie, ...)
+                La raison peut être plutot simple à expliquer qui serait une question d'argent mis en place dans ces sports olympiques, des infrastructures
+                établies, au final des moyens mis en place pour le développement de ces sports.
+
+                Ainsi, par rapport à cette constatation, nous voulions à la fois la vérifier mais aussi prouver qu'il n'y a pas que ces pays là dans
+                ce monde olympique. Il y a des "exceptions". Egalement, nous voulions aussi accentuer un point d'une manière plus controversée sur le dopage
+                et donc sur les médailles dites "volées"
+
                 #### Notes :
                 
                 Le menu déroulant 'Discipline' permet choisir une discipline en particulier pour affiner la recherche par épreuves.
@@ -99,9 +114,8 @@ class Olympic:
                 Le menu déroulant 'Épreuve' permet de choisir une épreuve en particulier que vous souhaitez afficher.
                 
                 Si vous souhaitez afficher toutes les médailles d'une discipline ou simplement toutes les médailles,
-                il suffit de choisir l'épreuve 'all'. 
+                il suffit de choisir l'épreuve 'all'.
                     
-                
                 #### À propos
                    * Sources : 
                       * [Dataset des médailles](https://www.kaggle.com/amirba/olympic-sports-and-medals-18962021) disponible sur Kaggle
