@@ -1,6 +1,23 @@
 # Here is the script to get all the data needed in our project
 import pandas as pd
 
+def transform_energ_names(df,col):
+    energ_name = {'ES ': 'Essence',
+                  'GO ': 'Gazole',
+                  'ES/GP ': 'Essence ou Gaz de Pétrole Liquéfié',
+                  'GP/ES ': 'Essence ou Gaz de Pétrole Liquéfié',
+                  'EE ': 'Essence Hybride rechargeable',
+                  'EL ': 'Electricité',
+                  'EH ': 'Essence Hybride non rechargeable',
+                  'GH ': 'Gazole Hybride non rechargeable',
+                  'ES/GN ': 'Essence ou Gaz Naturel',
+                  'GN/ES ': 'Essence ou Gaz Naturel',
+                  'FE ': 'Superéthanol',
+                  'GN ': 'Gaz Naturel',
+                  'GL ': 'Gazole Hybride rechargeable'}
+    df[col].replace(energ_name, inplace = True)
+    return df
+
 def transform_countries_names(df, col):
     countries_name = { 'AT': 'Autriche', 'BE' : 'Belgique', 'BG' : 'Bulgarie',
                        'CH' : 'Suisse', 'CY': 'Chypre', 'CZ': 'République Tchèque',
@@ -62,3 +79,19 @@ def get_air_pollution_schools():
     df_pm25 = df.filter(regex="nom|departement|PM25.*")
 
     return (df_no2, df_pm10, df_pm25)
+
+def get_pollution_per_vehicules_in_france():
+    df = pd.read_csv("data/vehicules_polluant_france_2015.csv",sep=";",encoding="latin1")
+
+    # Remove the useless columns
+    # Keep : geo, TIME_PERIOD, OBS_VALUE
+    columns_to_keep = ['lib_mrq_doss', 'hc', 'nox', 'hcnox', 'ptcl', 'co2_mixte', 'co_typ_1','hybride','energ']
+    df = df[columns_to_keep]
+    df.columns = ['Marque', 'Emission HC', 'Emission NOx', 'Emission HC et NOx', 'Emission de Particules', 'Emission CO2', 'Emission CO type1', 'Hybride', 'Carburant']
+    # Seperate data for all EUROPE
+    #df_all_eu = df.loc[(df['geo'] == 'EU27_2020')]
+    #df = df[(df['geo'] != 'EU27_2020') & (df['geo'] != 'EU27_2007') & (df['geo'] != 'EU28')]
+    # Rename geo columns with right names
+    df = transform_energ_names(df, "Carburant")
+    df["Hybride"].replace({"non ": False,"oui ": True}, inplace = True)
+    return df
