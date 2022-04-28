@@ -19,9 +19,11 @@ pd.options.plotting.backend = "plotly"
 #
 # ========================================================================================
 
-data = pd.read_csv('data/transformedData/energy_per_source.csv').drop(columns=['Unnamed: 0'])
-energy_per_area = pd.read_csv('data/transformedData/energy_per_area.csv').drop(columns=['Unnamed: 0'])
-data_per_year = {str(year): data[data['Year'] == year]
+data = pd.read_csv(
+    'data/transformedData/energy_per_source.csv').drop(columns=['Unnamed: 0'])
+energy_per_area = pd.read_csv(
+    'data/transformedData/energy_per_area.csv').drop(columns=['Unnamed: 0'])
+data_per_year = {str(year):     data[data['Year'] == year]
                  for year in range(2000, 2021)}
 
 areas = data['Area'].unique()
@@ -33,7 +35,8 @@ area_minus_europe = [
 columns = energy_per_area.columns.to_numpy()[2:]
 dropdown_options = [{'label': columns[i], 'value': i}
                     for i in range(len(columns)) if '(log_10)' not in columns[i]]
-(dropdown_options[0], dropdown_options[4]) = (dropdown_options[4], dropdown_options[0])
+(dropdown_options[0], dropdown_options[4]) = (
+    dropdown_options[4], dropdown_options[0])
 y_axis = {str(i): columns[i] for i in range(len(columns))}
 
 fossil_energies = ['Fossil', 'Coal', 'Hard Coal',
@@ -88,27 +91,27 @@ class EuropeEnergyGeneration():
                         value=4,
                         id='y-axis',
                         searchable=True,
-                        style = {
+                        style={
                             'backgroundColor': self.colors['thirdly'],
                             'color': self.colors['text']
                         }
                     ),
                     style={'width': '35%',
                            'display': 'inline flow-root',
-                          }
+                           }
                 ),
 
                 html.Div(
-                        dcc.RadioItems(options=[
-                            {'label': 'Linear', 'value': 0},
-                            {'label': 'Log', 'value': 1}
-                        ],
-                            value=0,
-                            id='scale',
-                            style={
-                                    'display': 'flex'
-                                  }
-                        ),
+                    dcc.RadioItems(options=[
+                        {'label': 'Linear', 'value': 0},
+                        {'label': 'Log', 'value': 1}
+                    ],
+                        value=0,
+                        id='scale',
+                        style={
+                        'display': 'flex'
+                    }
+                    ),
                     style={
                         'paddingLeft': '4%',
                         'width': '33%',
@@ -117,10 +120,10 @@ class EuropeEnergyGeneration():
                         'alignItems': 'center'
                     }
                 )],
-                     style={
-                        'paddingLeft': '30%',
-                        'display': 'flex'
-                     }
+                style={
+                'paddingLeft': '30%',
+                'display': 'flex'
+            }
             ),
 
             html.Div(children=[
@@ -128,18 +131,18 @@ class EuropeEnergyGeneration():
                     html.Div(
                         dcc.Graph(id='country-sunburst',
                                   style={
-                                    'display': 'inline-block'
-                                    })
+                                      'display': 'inline-block'
+                                  })
                     ),
                     html.Div(
                         dcc.Graph(
                             id='europe27+1-sunburst',
                             style={
-                                 'display': 'inline flow-root list-item'
+                                'display': 'inline flow-root list-item'
                             })
                     ),
                 ],
-                style={}
+                    style={}
                 ),
                 html.Div(children=[
                     html.Div(
@@ -168,11 +171,11 @@ class EuropeEnergyGeneration():
                     ),
                 ])
             ],
-            style={
+                style={
                 'backgroundColor': self.colors['secondary'],
                 'color': self.colors['text'],
                 'display':'flex',
-                'alignItems':'center' 
+                'alignItems':'center'
             }),
 
             html.Div(children=[
@@ -196,7 +199,7 @@ class EuropeEnergyGeneration():
                         ),
                         style={'display': 'inline-block',
                                'width': "90%",
-                              }
+                               }
                     ),
                     dcc.Interval(            # fire a callback periodically
                         id='wps-auto-stepper',
@@ -206,38 +209,37 @@ class EuropeEnergyGeneration():
                         n_intervals=0
                     ),
                 ],
-                style={
-                    'display':'flex'
+                    style={
+                    'display': 'flex'
                 }),
                 html.Div(children=[
                     html.H5("Click on a the cross next to a country to unselect it from the map/ select it from the dropdown",
-                    style={
-                        'textAlign':'center'
-                    }),
+                            style={
+                                'textAlign': 'center'
+                            }),
                     dcc.Dropdown(
                         area_minus_europe, area_minus_europe, multi=True, id='selected-areas-for-map',
-                        style = {
+                        style={
                             'backgroundColor': self.colors['secondary'],
                             'color': self.colors['text']
                         }
                     )],
                     style={
-                        'display':'flex',
-                        'flexDirection':'column'
-                    }
+                        'display': 'flex',
+                        'flexDirection': 'column'
+                }
                 ),
                 dcc.Markdown("""
    #### À propos
 
-   * Inspiration initiale : [Conférence de Hans Rosling](https://www.ted.com/talks/hans_rosling_new_insights_on_poverty)
    * [Version Plotly](https://plotly.com/python/v3/gapminder-example/)
-   * Données : [DataWorld, d'après les données de Ember-Climate](https://data.world/makeovermonday/2021w5)
+   * Données : [DataWorld, d'après les données de Ember-Climate](https://   data.world/makeovermonday/2021w5)
    * (c) 2022 Yacine Anane && Charli De Luca
    """),
 
             ])
         ],
-        style={
+            style={
             'backgroundColor': self.colors['background'],
             'color': self.colors['text']})
 
@@ -301,10 +303,9 @@ class EuropeEnergyGeneration():
             selected_areas)]
 
         world_data = world_data[world_data['Year'] == year]
-        world_data['iso_alpha3'] = world_data['Area'].apply(
-            lambda x: pc.country_name_to_country_alpha3(x))
 
-        color_column = self.y_axis[str(y_axis_value)] if scale == 0 else (self.y_axis[str(y_axis_value)] + ' (log_10)')
+        color_column = self.y_axis[str(y_axis_value)] if scale == 0 else (
+            self.y_axis[str(y_axis_value)] + ' (log_10)')
         zmax = world_data[color_column].max()
         zmin = world_data[color_column].min()
 
@@ -331,18 +332,18 @@ class EuropeEnergyGeneration():
 
         fig.update_layout(
             title_x=0.5,
-            
+
             width=1200,
             height=500,
             legend={
                 "borderwidth": 0
             },
-            
-            plot_bgcolor = self.colors['secondary'],
-            paper_bgcolor = self.colors['secondary'],
-            font_color = self.colors['text'],
 
-            title_text= self.y_axis[str(y_axis_value)] + ' in EU countries in ' + str(year) +
+            plot_bgcolor=self.colors['secondary'],
+            paper_bgcolor=self.colors['secondary'],
+            font_color=self.colors['text'],
+
+            title_text=self.y_axis[str(y_axis_value)] + ' in EU countries in ' + str(year) +
             "<br><sup>(Click a country to display a pie chart of it's energy generation distribution)</sup>",
             geo=dict(
                 showframe=False,
@@ -353,23 +354,24 @@ class EuropeEnergyGeneration():
         return fig
 
     def update_line_plot(self, y_axis_value, scale):
-        value_column = self.y_axis[str(y_axis_value)] if scale == 0 else (self.y_axis[str(y_axis_value)] + ' (log_10)')
-        fig = px.line(self.energy_per_area, x="Year", y=value_column, color='Area')
-        
+        value_column = self.y_axis[str(y_axis_value)] if scale == 0 else (
+            self.y_axis[str(y_axis_value)] + ' (log_10)')
+        fig = px.line(self.energy_per_area, x="Year",
+                      y=value_column, color='Area')
+
         fig.update_layout(
-            title_text = "Evolution of '" + value_column.lower() + "' in EU countries" +
-            "<br><sup>(Double click on a country to isolate it's data)</sup>",
+            title_text="Evolution of '" + value_column.lower() + "' in EU countries" +
+            "<br><sup>(Double click on a country to isolate it's    data)</sup>",
             title_x=0.5,
-            
+
             width=1200,
             height=300,
-            plot_bgcolor = self.colors['secondary'],
-            paper_bgcolor = self.colors['secondary'],
-            font_color = self.colors['text']
+            plot_bgcolor=self.colors['secondary'],
+            paper_bgcolor=self.colors['secondary'],
+            font_color=self.colors['text']
         )
-        
-        return fig
 
+        return fig
 
     def update_sunburst_country(self, clickData, year):
         area = 'France' if clickData == None else clickData['points'][0]['text']
@@ -385,16 +387,17 @@ class EuropeEnergyGeneration():
                           hover_name='Variable',
                           hover_data=['Generation (TWh)'],
                           width=450, height=400,
-                          color_discrete_map={'Nuclear':'gold', 'Renewables': '#32CD32'}
-                         )
+                          color_discrete_map={
+            'Nuclear': 'gold', 'Renewables': '#32CD32'}
+        )
 
         fig.update_layout(
-            title_text = 'Energy generation in ' + area + ' ' + 'in ' + str(year) +
+            title_text='Energy generation in ' + area + ' ' + 'in ' + str(year) +
             "<br><sup>(Click another country on the map to display it's energy generation distribution)</sup>",
             title_x=0.5,
-            plot_bgcolor = self.colors['secondary'],
-            paper_bgcolor = self.colors['secondary'],
-            font_color = self.colors['text']
+            plot_bgcolor=self.colors['secondary'],
+            paper_bgcolor=self.colors['secondary'],
+            font_color=self.colors['text']
         )
 
         return fig
@@ -411,16 +414,17 @@ class EuropeEnergyGeneration():
                           values='Generation (TWh)',
                           hover_name='Variable',
                           hover_data=['Generation (TWh)'],
-                          title = 'Energy generation in EU in ' + str(year),
+                          title='Energy generation in EU in ' + str(year),
                           width=450, height=400,
-                          color_discrete_map={'Fossil':'gold', 'Renewables': '#32CD32'}
-                         )
+                          color_discrete_map={
+            'Fossil': 'gold', 'Renewables': '#32CD32'}
+        )
 
         fig.update_layout(
             title_x=0.5,
-            plot_bgcolor = self.colors['secondary'],
-            paper_bgcolor = self.colors['secondary'],
-            font_color = self.colors['text']
+            plot_bgcolor=self.colors['secondary'],
+            paper_bgcolor=self.colors['secondary'],
+            font_color=self.colors['text']
         )
         return fig
 
