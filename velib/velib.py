@@ -26,7 +26,8 @@ class Velib:
 
         csv_day_usage["hour"] = csv_day_usage["hour"].apply(convert_date)
         fig_day_usage = px.line(
-            csv_day_usage, x="hour", y="avail. bike", title="Hourly available bikes"
+            csv_day_usage, x="hour", y="avail. bike", title="Disponibilité des vélibs (24h)",
+            labels={"hour": "Horaire", "avail. bike": "Vélo(s) disponible(s)"}
         )
         fig_day_usage.update_xaxes(tickformat=f"%{{hour}}", nticks=6)
         return fig_day_usage
@@ -41,7 +42,8 @@ class Velib:
 
         csv_diff["hour"] = csv_diff["hour"].apply(convert_date)
         fig_day_usage = px.line(
-            csv_diff, x="hour", y="diff", title="Hourly usage peaks"
+            csv_diff, x="hour", y="diff", title="Évolution d'usage (24h)",
+            labels={"hour": "Horaire", "diff": "Variations(s) en vélo"}
         )
         fig_day_usage.update_xaxes(tickformat=f"%{{hour}}", nticks=6)
         return fig_day_usage
@@ -95,7 +97,7 @@ class Velib:
                 colorscale="Viridis",
                 zmin=zmin,
                 zmax=zmax,
-                colorbar=dict(title="Vélibs' par habitant"),
+                colorbar=dict(title="Disponibilité station en %"),
                 marker_opacity=0.5,
                 marker_line_width=0,
             )
@@ -248,7 +250,7 @@ class Velib:
                     # Notes
                     * Différentes étapes ont été nécessaires au processus de récupération et d'interprétation des données, tout d'abord avec sa collecte.
                     * La Ville de Paris propose un accès à de nombreuses données des stations Vélib, dont leur capacité, leur utilisation, les vélos disponibles, etc.
-                    * Plusieurs scripts ont été nécessaires afin de *nettoyer* ces données, que nous avons récupéré continuellement sur une période de 2 jours à 1 minute d'intervalle (~1,3Go).
+                    * Plusieurs scripts ont été nécessaires afin de *nettoyer* ces données, que nous avons récupéré continuellement sur une période de 2 jours à 1 minute d'intervalle (~850Mo).
                     * Pour chacune des stations Vélib, nous avons fait correspondre les coordonnées géographiques avec celles issues de GeoJSON pour les localiser sur le viewer.
                     * Enfin, il a fallu à partir d'une autre API récupérer la superficie et population totale de ces communes pour les mettre en lien avec les données des stations Vélib.
 
@@ -257,6 +259,10 @@ class Velib:
                     * Hugo BOIS (<hugo.bois@epita.fr>)
                     """
                 ),
+                html.Br(),
+                html.Br(),
+                dcc.Markdown("© 2022 Erwan Vivien & Hugo Bois")
+
             ],
             style={
                 "backgroundColor": "white",
