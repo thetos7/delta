@@ -17,7 +17,16 @@ class EuropeanEnvironmentStudies():
         self.years = sorted(set(self.df.Time.values))
         self.pays = list(self.df.Pays.unique())
         self.main_layout = html.Div(children=[
-            html.H3(children='Évolution des émissions de gaz à effet de serre selon les recettes fiscales environnementales'),
+            html.H3(children='Évolution des émissions de gaz à effet de serre et politiques environnementales en Europe'),
+
+            html.Div('Les graphiques suivant ont pour objectif de montrer l\'évolution des émissions de gaz à effet de serre selon les politiques \
+                environnementales menées en Europe depuis 1995.'),
+
+            html.Div('La comparaison se base notamment sur les pourcentage respectifs du PIB de chaque pays européen utilisé pour l\'environnement et sur leurs \
+                    recettes fiscales, donc l\'argent récolté par les différentes taxes environnementales. \
+                        La quantité de gaz à effet de serre est exprimée en Tonnes par Habitant'),
+
+            html.Br(),
 
             html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'), 
 
