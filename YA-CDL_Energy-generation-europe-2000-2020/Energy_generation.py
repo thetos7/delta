@@ -230,11 +230,11 @@ class EuropeEnergyGeneration():
                 }
                 ),
                 dcc.Markdown("""
-   #### À propos
+   #### About
 
-   * [Version Plotly](https://plotly.com/python/v3/gapminder-example/)
-   * Données : [DataWorld, d'après les données de Ember-Climate](https://   data.world/makeovermonday/2021w5)
-   * (c) 2022 Yacine Anane && Charli De Luca
+   * [Plotly version](https://plotly.com/python/v3/gapminder-example/)
+   * Data : [DataWorld, from data of Ember-Climate](https://data.world/makeovermonday/2021w5)
+   * (c) 2022 Yacine Anane & Charli De Luca
    """),
 
             ])
@@ -313,7 +313,6 @@ class EuropeEnergyGeneration():
             locations=world_data['iso_alpha3'],
             z=world_data[color_column],
             text=world_data['Area'],
-            #             colorscale = colorscale[self.y_axis[str(y_axis_value)]],
             colorscale=self.colorscales[color_column],
             autocolorscale=False,
             reversescale=False,
