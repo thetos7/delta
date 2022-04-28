@@ -88,35 +88,35 @@ class Olympic:
                           )]),
                 html.Br(),
                 dcc.Markdown("""
-                Cette carte représentant tous les pays est intéractive. En passant la souris sur celle-ci, vous verrez une infobulle
+                Cette carte, représentant tous les pays, est interactive. En passant la souris sur celle-ci, vous verrez une infobulle
                 apparaître contenant le nom du pays ainsi que le nombre de médailles obtenu par celui-ci suivant l'épreuve sélectionnée. 
                 
                 #### Introduction :
                 
-                Nous avons décidés de mettre en avant quelques épreuves qui nous semblait intéressantes. Plus particulierement, de montrer
+                Nous avons décidé de mettre en avant quelques épreuves qui nous semblaient intéressantes. Plus particulièrement, de montrer
                 l'importance de certains pays dans des épreuves spécifiques. De plus, il nous semblait indispensable d'afficher a l'échelle mondiale
                 le nombre de médailles olympiques volées par pays.
 
-                Vous découvrirez par vous mêmes que dans la plus part des épreuves olympiques, certains pays sont tout le temps présents. On peut
-                penser aux Etats-Unis, à la Russie, la Chine et aussi aux pays de l'Europe de l'Ouest (France, Royaume-Unis, Allemagne, Italie, ...)
-                La raison peut être plutot simple à expliquer qui serait une question d'argent mis en place dans ces sports olympiques, des infrastructures
+                Vous découvrirez par vous-mêmes que dans la plupart des épreuves olympiques, certains pays sont tout le temps présents. On peut
+                penser aux Etats-Unis, à la Russie, la Chine et aussi aux pays de l'Europe de l'Ouest (France, Royaume-Uni, Allemagne, Italie, ...)
+                La raison peut être plutôt simple à expliquer qui serait une question d'argent mis en place dans ces sports olympiques, des infrastructures
                 établies, au final des moyens mis en place pour le développement de ces sports.
 
-                Ainsi, par rapport à cette constatation, nous voulions à la fois la vérifier mais aussi prouver qu'il n'y a pas que ces pays là dans
-                ce monde olympique. Il y a des "exceptions". Egalement, nous voulions aussi accentuer un point d'une manière plus controversée sur le dopage
+                Ainsi, par rapport à cette constatation, nous voulions à la fois la vérifier, mais aussi prouver qu'il n'y a pas que ces pays-là dans
+                ce monde olympique. Il y a des "exceptions". Également, nous voulions aussi accentuer un point d'une manière plus controversée sur le dopage
                 et donc sur les médailles dites "volées".
                 
-                Nous avons donc décidés de mettre en avant la discipline du Marathon dans un premier temps
-                pour montrer que ce sont l'Ethiopie et le Kenya qui sont les maîtres de cette épreuve. Il y a pas vraiment de consensus qui expliquerait ce phénomène,
-                certains parlent de culture, d'autres d'alimentation ou d'environnment.
+                Nous avons donc décidé de mettre en avant la discipline du Marathon dans un premier temps
+                pour montrer que ce sont l'Ethiopie et le Kenya qui sont les maîtres de cette épreuve. Il n'y a pas vraiment de consensus qui expliquerait ce phénomène,
+                certains parlent de culture, d'autres d'alimentation ou d'environnement.
                 
                 Ensuite, d'une manière plus logique nous avons choisi l'escrime où la France et l'Italie
-                domine cette epreuve, comme nous l'avons dit assez logiquement par rapport à une question
-                de moyens mis en place, d'infrastructure mais surtout par une histoire du duel notamment au 17-18ème siècle avec les mousquetaires.
+                dominent cette épreuve, comme nous l'avons dit assez logiquement par rapport à une question
+                de moyens mis en place, d'infrastructure, mais surtout par une histoire du duel notamment au 17-18ème siècle avec les mousquetaires.
                 
-                Enfin, nous avons décidés de mettre en avant le patinage de vitesse qui est une épreuve totalement
+                Enfin, nous avons décidé de mettre en avant le patinage de vitesse qui est une épreuve totalement
                 dominée par les Pays-Bas, d'une part puisque ce sport fut inventé dans ce même pays, mais aussi d'une autre
-                part parce que ce sport est comme dit au-dessus plus que important et fait partie de la culture de ce pays, avec des courses uniques au monde comme la Elfstedentocht, course d'endurance de 200km.
+                part parce que ce sport est comme dit au-dessus plus qu'important et fait partie de la culture de ce pays, avec des courses uniques au monde comme l'Elfstedentocht, course d'endurance de 200 km.
 
                 #### Notes :
                 
