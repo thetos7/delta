@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from TBGT_population_vs_train_speed import TBGT_population_vs_train_speed as tbgt
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+tbgt = tbgt.TBGT(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -25,6 +27,8 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
+                              html.Br(),
+                              dcc.Link(html.Button('Population vs Train Speed', style={'width':"100%", 'margin':0, 'padding': 0}), href='/population_vs_train_speed'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -66,6 +70,8 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/population_vs_train_speed':
+        return tbgt.main_layout
     else:
         return home_page
 
