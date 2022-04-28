@@ -8,11 +8,14 @@ from dash import dcc
 from dash import html
 import glob
 
-START = "Start"
-STOP = "Stop"
+
+print("zbruh")
 
 
 class Velib:
+    START = "Start"
+    STOP = "Stop"
+
     def left_axis(self):
         csv_day_usage = pd.read_csv("velib/data/velib/col_sum_velib.csv", sep=";")
 
@@ -59,17 +62,17 @@ class Velib:
         return self.fig_map
 
     def on_interval(self, n_intervals, hour, text):
-        if text == STOP:
+        if text == self.STOP:
             if hour >= 24:
                 return 0
             return hour + 0.5
         return hour
 
     def button_on_click(self, n_clicks, text):
-        if text == START:
-            return STOP
+        if text == self.START:
+            return self.STOP
         else:
-            return START
+            return self.START
 
     def __init__(self, application=None):
         with open("velib/data/communes.json") as f:
@@ -106,23 +109,19 @@ class Velib:
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
         )
 
-        fig_day_usage = self.left_axis()
-        fig_day_update = self.right_axis()
-
         self.len_map = len_map
         self.map_df = map_df
         self.fig_map = fig_map
-        self.fig_day_usage = fig_day_usage
-        self.fig_day_update = fig_day_update
+        self.fig_day_usage = self.left_axis()
+        self.fig_day_update = self.right_axis()
 
         if application:
             self.app = application
             # application should have its own layout and use self.main_layout as a page or in a component
         else:
             self.app = dash.Dash(__name__)
-            self.app.layout = self.main_layout
 
-        # # Auto stepper
+        # Auto stepper
         self.app.callback(
             dash.dependencies.Output("velib-button-start-stop", "children"),
             dash.dependencies.Input("velib-button-start-stop", "n_clicks"),
@@ -132,10 +131,8 @@ class Velib:
         self.app.callback(
             dash.dependencies.Output("velib-crossfilter-year-slider", "value"),
             dash.dependencies.Input("velib-auto-stepper", "n_intervals"),
-            [
-                dash.dependencies.State("velib-crossfilter-year-slider", "value"),
-                dash.dependencies.State("velib-button-start-stop", "children"),
-            ],
+            dash.dependencies.Input("velib-crossfilter-year-slider", "value"),
+            dash.dependencies.Input("velib-button-start-stop", "children"),
         )(self.on_interval)
 
         # # Slider
@@ -183,7 +180,7 @@ class Velib:
                 html.Div(
                     [
                         html.Button(
-                            START,
+                            self.START,
                             id="velib-button-start-stop",
                             style={"display": "inline-block"},
                         ),
@@ -216,7 +213,7 @@ class Velib:
                         dcc.Graph(
                             id="wps-income-time-series",
                             style={"width": "50%", "display": "inline-block"},
-                            figure=fig_day_usage,
+                            figure=self.fig_day_usage,
                         ),
                         dcc.Graph(
                             id="wps-fertility-time-series",
@@ -225,7 +222,7 @@ class Velib:
                                 "display": "inline-block",
                                 "paddingLeft": "0.5%",
                             },
-                            figure=fig_day_update,
+                            figure=self.fig_day_update,
                         ),
                     ],
                     style={
@@ -260,13 +257,14 @@ class Velib:
                     * Hugo BOIS (<hugo.bois@epita.fr>)
                     """
                 ),
-                dcc.Location(id="url", refresh=False),
             ],
             style={
                 "backgroundColor": "white",
                 "padding": "10px 50px 10px 50px",
             },
         )
+        if not application:
+            self.app.layout = self.main_layout
 
 
 if __name__ == "__main__":
