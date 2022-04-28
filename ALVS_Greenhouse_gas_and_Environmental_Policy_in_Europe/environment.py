@@ -158,10 +158,10 @@ class EuropeanEnvironmentStudies():
         fig.update_layout(
                  xaxis = dict(title='Pourcentage du PIB utilisé pour l\'environnement',
                               type= 'linear' if xaxis_type == 'Linéaire' else 'log',
-                              range=(0,10) if xaxis_type == 'Linéaire' 
+                              range=(0,6) if xaxis_type == 'Linéaire' 
                                               else (np.log10(50), np.log10(100000)) 
                              ),
-                 yaxis = dict(title="Pourcentage des taxes pour l'environnement", range=(0,20)),
+                 yaxis = dict(title="Pourcentage des taxes pour l'environnement", range=(0,17)),
                  margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
                  hovermode='closest',
                  showlegend=False,
