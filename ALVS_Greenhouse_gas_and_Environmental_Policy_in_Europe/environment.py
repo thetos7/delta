@@ -26,12 +26,13 @@ class EuropeanEnvironmentStudies():
 
                     html.Div([
                         html.Div('Pays'),
+                        html.Div([
                         dcc.Checklist(
                             id='wps-crossfilter-which-pays',
                             options=[{'label': self.pays[i], 'value': self.pays[i]} for i in range(len(self.pays))],
                             value=sorted(self.pays),
                             labelStyle={'display':'block'},
-                        ),
+                        )], style={'maxHeight':'300px', 'overflow':'scroll','width':'10em'}),
                         html.Br(),
                         html.Div('Échelle en X'),
                         dcc.RadioItems(
