@@ -13,7 +13,7 @@ class EuropeanEnvironmentStudies():
     STOP  = 'Stop'
 
     def __init__(self, application = None):
-        self.df = pd.read_csv('data/europeanEnvTaxesPIB.csv')
+        self.df = pd.read_csv('ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe/data/europeanEnvTaxesPIB.csv')
         self.years = sorted(set(self.df.Time.values))
         self.pays = list(self.df.Pays.unique())
         self.main_layout = html.Div(children=[
@@ -22,7 +22,7 @@ class EuropeanEnvironmentStudies():
             html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'), 
 
             html.Div([
-                    html.Div([ dcc.Graph(id='wps-main-graph'), ], style={'width':'90%', }),
+                    html.Div([ dcc.Graph(id='wps-main-graph-our'), ], style={'width':'90%', }),
 
                     html.Div([
                         html.Div('Pays'),
@@ -47,7 +47,7 @@ class EuropeanEnvironmentStudies():
                         html.Br(),
                         html.Button(
                             self.START,
-                            id='wps-button-start-stop', 
+                            id='wps-button-start-stop-our', 
                             style={'display':'inline-block'}
                         ),
                     ], style={'margin-left':'15px', 'width': '7em', 'float':'right'}),
@@ -60,7 +60,7 @@ class EuropeanEnvironmentStudies():
             html.Div([
                 html.Div(
                     dcc.Slider(
-                            id='wps-crossfilter-year-slider',
+                            id='wps-crossfilter-year-slider-our',
                             min=self.years[0],
                             max=self.years[-1],
                             step = 1,
@@ -70,7 +70,7 @@ class EuropeanEnvironmentStudies():
                     style={'display':'inline-block', 'width':"90%"}
                 ),
                 dcc.Interval(            # fire a callback periodically
-                    id='wps-auto-stepper',
+                    id='wps-auto-stepper-our',
                     interval=500,       # in milliseconds
                     max_intervals = -1,  # start running
                     n_intervals = 0
@@ -81,14 +81,14 @@ class EuropeanEnvironmentStudies():
                 }),
 
             html.Br(),
-            html.Div(id='wps-div-country'),
+            html.Div(id='wps-div-country-our'),
 
             html.Div([
-                dcc.Graph(id='wps-income-time-series', 
+                dcc.Graph(id='wps-income-time-series-our', 
                           style={'width':'33%', 'display':'inline-block'}),
-                dcc.Graph(id='wps-fertility-time-series',
+                dcc.Graph(id='wps-fertility-time-series-our',
                           style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
-                dcc.Graph(id='wps-pop-time-series',
+                dcc.Graph(id='wps-pop-time-series-our',
                           style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
             ], style={ 'display':'flex', 
                        'borderTop': 'thin lightgrey solid',
@@ -113,38 +113,38 @@ class EuropeanEnvironmentStudies():
         # I link callbacks here since @app decorator does not work inside a class
         # (somhow it is more clear to have here all interaction between functions and components)
         self.app.callback(
-            dash.dependencies.Output('wps-main-graph', 'figure'),
+            dash.dependencies.Output('wps-main-graph-our', 'figure'),
             [ dash.dependencies.Input('wps-crossfilter-which-pays', 'value'),
               dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value'),
-              dash.dependencies.Input('wps-crossfilter-year-slider', 'value')])(self.update_graph)
+              dash.dependencies.Input('wps-crossfilter-year-slider-our', 'value')])(self.update_graph)
         self.app.callback(
-            dash.dependencies.Output('wps-div-country', 'children'),
-            dash.dependencies.Input('wps-main-graph', 'hoverData'))(self.country_chosen)
+            dash.dependencies.Output('wps-div-country-our', 'children'),
+            dash.dependencies.Input('wps-main-graph-our', 'hoverData'))(self.country_chosen)
         self.app.callback(
-            dash.dependencies.Output('wps-button-start-stop', 'children'),
-            dash.dependencies.Input('wps-button-start-stop', 'n_clicks'),
-            dash.dependencies.State('wps-button-start-stop', 'children'))(self.button_on_click)
+            dash.dependencies.Output('wps-button-start-stop-our', 'children'),
+            dash.dependencies.Input('wps-button-start-stop-our', 'n_clicks'),
+            dash.dependencies.State('wps-button-start-stop-our', 'children'))(self.button_on_click)
         # this one is triggered by the previous one because we cannot have 2 outputs for the same callback
         self.app.callback(
-            dash.dependencies.Output('wps-auto-stepper', 'max_interval'),
-            [dash.dependencies.Input('wps-button-start-stop', 'children')])(self.run_movie)
+            dash.dependencies.Output('wps-auto-stepper-our', 'max_interval'),
+            [dash.dependencies.Input('wps-button-start-stop-our', 'children')])(self.run_movie)
         # triggered by previous
         self.app.callback(
-            dash.dependencies.Output('wps-crossfilter-year-slider', 'value'),
-            dash.dependencies.Input('wps-auto-stepper', 'n_intervals'),
-            [dash.dependencies.State('wps-crossfilter-year-slider', 'value'),
-             dash.dependencies.State('wps-button-start-stop', 'children')])(self.on_interval)
+            dash.dependencies.Output('wps-crossfilter-year-slider-our', 'value'),
+            dash.dependencies.Input('wps-auto-stepper-our', 'n_intervals'),
+            [dash.dependencies.State('wps-crossfilter-year-slider-our', 'value'),
+             dash.dependencies.State('wps-button-start-stop-our', 'children')])(self.on_interval)
         self.app.callback(
-            dash.dependencies.Output('wps-income-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graph', 'hoverData'),
+            dash.dependencies.Output('wps-income-time-series-our', 'figure'),
+            [dash.dependencies.Input('wps-main-graph-our', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_income_timeseries)
         self.app.callback(
-            dash.dependencies.Output('wps-fertility-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graph', 'hoverData'),
+            dash.dependencies.Output('wps-fertility-time-series-our', 'figure'),
+            [dash.dependencies.Input('wps-main-graph-our', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_fertility_timeseries)
         self.app.callback(
-            dash.dependencies.Output('wps-pop-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graph', 'hoverData'),
+            dash.dependencies.Output('wps-pop-time-series-our', 'figure'),
+            [dash.dependencies.Input('wps-main-graph-our', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_pop_timeseries)
 
     def update_graph(self, pays, xaxis_type, year):

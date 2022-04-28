@@ -1,9 +1,12 @@
+import re
 import dash
 from dash import dcc
 from dash import html
 from energies import energies
 from population import population
 from deces import deces
+
+from ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe import environment
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +15,8 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+
+alvs = environment.EuropeanEnvironmentStudies(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -22,9 +27,11 @@ main_layout = html.Div([
                               html.Center(html.H2("Δelta δata")),
                               dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
                               html.Br(),
-                              dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
+                              dcc.Link(html.Button('Population', style={'width':"100%"}), href='/pop'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
+                              html.Br(),
+                              dcc.Link(html.Button('ALED', style={'width':"100%"}), href='/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -49,23 +56,18 @@ to_be_done_page = html.Div([
 
 app.layout = main_layout
 
-# "complete" layout (not sure that I need that)
-app.validation_layout = html.Div([
-    main_layout,
-    to_be_done_page,
-    pop.main_layout,
-])
-
 # Update the index
 @app.callback(dash.dependencies.Output('page_content', 'children'),
               [dash.dependencies.Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/energies':
         return nrg.main_layout
-    elif pathname == '/population':
+    elif pathname == '/pop':
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe':
+        return alvs.main_layout
     else:
         return home_page
 
