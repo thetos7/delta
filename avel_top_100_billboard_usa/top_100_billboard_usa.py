@@ -17,10 +17,13 @@ class Top100BillboardUSA:
 
         # Creating the Dash application
         self.app = Dash(__name__) if application is None else application
-        self.app.layout = self.get_app_layout()
+        self.app.layout = self.main_layout
+
+        # Adding callbacks
         self.callbacks()
 
-    def get_app_layout(self) -> html.Div:
+    @property
+    def main_layout(self) -> html.Div:
         """
         Returns the default layout for the Dash application.
         :return: html.Div
@@ -38,6 +41,12 @@ class Top100BillboardUSA:
 
     @staticmethod
     def generate_table(dataframe: pd.DataFrame, max_rows: int = 10) -> html.Table:
+        """
+        Generates a dash table from a dataframe.
+        :param dataframe: the dataframe to generate the table from
+        :param max_rows: the number of rows to display
+        :return: html.Table
+        """
         return html.Table([
             html.Thead(
                 html.Tr([html.Th(col) for col in dataframe.columns])
@@ -50,6 +59,11 @@ class Top100BillboardUSA:
         ])
 
     def callbacks(self) -> None:
+        """
+        Adds callbacks to the Dash application.
+        :return: None
+        """
+
         # Example callback
         @self.app.callback(Output("foo", "children"), Input('my-input', 'value'))
         def update_graph(input_value):
