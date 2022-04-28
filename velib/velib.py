@@ -53,9 +53,9 @@ class Velib:
 
         idx = int(self.len_map * (min(time, 24) / 24))
 
-        self.fig_map["data"][0]["z"] = self.map_df[idx][key]
+        self.fig_map["data"][0]["z"] = self.map_df[idx][key] * 100
         self.fig_map.update_traces(
-            hovertemplate=f"{key}: <b>%{{z:.5f}}</b><br>avail: %{{customdata}}",
+            hovertemplate=f"Disponibilité station: <b>%{{z:.2f}}%</b><br>Vélo(s) disponilible(s): %{{customdata}}",
             customdata=self.map_df[idx]["avail. bike"],
         )
 
@@ -84,8 +84,8 @@ class Velib:
         )
         map_df = [pd.read_csv(f, sep=";", dtype={"arrond": str}) for f in sorted_files]
         len_map = len(map_df) - 1
-        zmin = min(map(lambda x: x[key].sort_values()[2:-2].min(), map_df))
-        zmax = max(map(lambda x: x[key].sort_values()[2:-2].max(), map_df))
+        zmin = min(map(lambda x: x[key].sort_values()[2:-2].min(), map_df)) * 100
+        zmax = max(map(lambda x: x[key].sort_values()[2:-2].max(), map_df)) * 100
 
         fig_map = go.Figure(
             go.Choroplethmapbox(
