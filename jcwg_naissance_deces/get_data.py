@@ -13,16 +13,18 @@ def save_data_as_pkl(data, filename):
     with zipfile as f:
         for name in f.namelist():
             with f.open(name) as zd:
-                files.append(pd.read_csv(zd, delimiter=';'))
+                files.append(pd.read_csv(zd, delimiter=';', dtype={
+                    'DEPDOM':str}))
     db, _ = files
-    df = db[['ANAIS', 'MNAIS', 'AGEMERE', 'AGEPERE', ]]
+    df = db[['ANAIS', 'MNAIS', 'AGEMERE', 'AGEPERE', 'DEPDOM' ]].copy()
 
     # df.groupby(['ANAIS', 'MNAIS']).mean()
     df['date'] = df.apply(lambda x: convert_date(x.ANAIS, x.MNAIS), axis=1)
     df = df.set_index('date')
-    d_date = df.groupby('date').mean()
+    df.to_pickle('data/naissance-2019.pkl')
+    # d_date = df.groupby('date').mean()
     # print(d_date[['AGEMERE', 'AGEPERE']])
-    d_date[['AGEMERE', 'AGEPERE']].plot()
+    # d_date[['AGEMERE', 'AGEPERE']].plot()
 
 
 def convert_date(y, m):
