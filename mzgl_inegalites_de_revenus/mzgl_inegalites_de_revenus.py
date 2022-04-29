@@ -52,9 +52,7 @@ class Inegalites_de_revenus:
             [
                 html.Div(
                     className="row",
-                    children=[
-                        html.H2("Inégalités de revenus dans le monde")
-                    ],
+                    children=[html.H2("Inégalités de revenus dans le monde")],
                 ),
                 html.Div(
                     className="row",
@@ -90,7 +88,6 @@ class Inegalites_de_revenus:
                                                     style={
                                                         "width": "50%",
                                                         "display": "inline-block",
-                                                        "padding-left": "0.5%",
                                                     },
                                                 ),
                                             ],
@@ -104,7 +101,7 @@ class Inegalites_de_revenus:
                                     ]
                                 ),
                                 dcc.Markdown(
-                                """
+                                    """
                                 #### À propos
                                 Données :
                                 - [Population, Banque mondiale](https://data.worldbank.org/indicator/SP.POP.TOTL?name_desc=false)
@@ -114,32 +111,38 @@ class Inegalites_de_revenus:
                                 - [Index de démocratie, Gapminder](https://www.gapminder.org/data/documentation/democracy-index/)
                                 * (c) 2022 Gauthier Lombard, Mathieu Zimmermann
                                 """
-                                        ),
+                                ),
                             ],
                         ),
                         html.Div(
                             className="two columns",
                             children=[
-                                html.Div("Percentile"),
+                                html.Div("Percentile (Ordonnée)"),
                                 dcc.RadioItems(
                                     id="select-percentile",
                                     options=[
                                         {
-                                            "label": "Part des 1% les plus riches",
+                                            "label": "1% les plus riches",
                                             "value": "p99p100",
                                         },
                                         {
-                                            "label": "Part des 10% les plus riches",
+                                            "label": "10% les plus riches",
                                             "value": "p90p100",
                                         },
-                                        {"label": "Part des 50% les plus pauvres", "value": "p0p50"},
-                                        {"label": "Part des 10% les plus pauvres", "value": "p0p10"},
+                                        {
+                                            "label": "50% les plus pauvres",
+                                            "value": "p0p50",
+                                        },
+                                        {
+                                            "label": "10% les plus pauvres",
+                                            "value": "p0p10",
+                                        },
                                     ],
                                     value="p99p100",
                                     labelStyle={"display": "block"},
                                 ),
                                 html.Br(),
-                                html.Div("Indicateurs"),
+                                html.Div("Indicateurs (Abscisse)"),
                                 dcc.RadioItems(
                                     id="select-X",
                                     options=[
@@ -159,7 +162,6 @@ class Inegalites_de_revenus:
                                     value="C",
                                     labelStyle={"display": "block"},
                                 ),
-                                html.Br(),
                                 html.Br(),
                                 html.Div("Continents"),
                                 html.Div(
@@ -218,7 +220,7 @@ class Inegalites_de_revenus:
             [
                 dash.dependencies.Input("select-percentile", "value"),
                 dash.dependencies.Input("select-X", "value"),
-            ]
+            ],
         )(self.update_title)
         self.app.callback(
             dash.dependencies.Output("div-country", "children"),
@@ -247,12 +249,14 @@ class Inegalites_de_revenus:
             yaxis = "les 50% les plus pauvres"
         elif percentile == "p90p100":
             yaxis = "les 10% les plus riches"
-        title = " ".join(["Évolution par pays de la part des revenus détenus par", yaxis, "vs "])
+        title = " ".join(
+            ["Évolution par pays de la part des revenus détenus par", yaxis, "vs "]
+        )
         if xaxis == "C":
             title += "Indice de corruption"
         elif xaxis == "P":
             title += "Produit intérieur brut par habitant"
-        else :
+        else:
             title += "Indice de démocratie"
         return title
 
@@ -263,54 +267,67 @@ class Inegalites_de_revenus:
         return hoverData["points"][0]["hovertext"]
 
     def create_left_graph(self, hoverData, year):
-        country_name = self.get_country(hoverData), 
+        country_name = (self.get_country(hoverData),)
         code = (
             self.countries_df.reset_index()
             .set_index(["Country_Name"])
             .loc[country_name]["alpha2"]
         )
-        tmp = (
-            self.ine_df.reset_index(level=1)
-            .sort_index()
-            .loc[(code, year), :]
-        )
+        tmp = self.ine_df.reset_index(level=1).sort_index().loc[(code, year), :]
         tmp = tmp[tmp["Percentile"].isin(list_percentile)]
-        data, layout =  [
+        cumsum = list(np.cumsum(np.sort(tmp["value"].array)) * 100)
+        cumsum[-1] = 100.0
+        data, layout = [
             go.Scatter(
-                    x=np.arange(1, 101, 1),
-                    y=np.cumsum(np.sort(tmp["value"].array)) * 100,
-                    hovertemplate="%{x}% des adultes les moins aisées se partagent %{y:.2f}% des revenues avant taxes<extra></extra>",
-                    mode="lines",
-                ),
-                go.Scatter(
-                    name="Ligne d'égalité",
-                    x=[0, 100],
-                    y=[0, 100],
-                    mode="lines",
-                    hoverinfo=["skip", "y"],
-                ),
-            ], {
-                "title": f"Indice de Gini - {year}",
-                "xaxis": {
-                    "title": "Part cumulée des plus de 20 ans avec les revenus du plus faible au plus élevé"
-                },
-                "yaxis": {
-                    "title": f"Partage cumulé des revenus en {year}",
-                    "type": "linear",
-                },
-                "autosize": True,
-                "showlegend": False,
-                "margin": {"l": 40, "b": 40, "r": 20, "t": 30},
-            }
+                x=np.arange(1, 101, 1),
+                y=cumsum,
+                hovertemplate="%{x}% des adultes les moins aisées se partagent %{y:.2f}% des revenues avant taxes<extra></extra>",
+                mode="lines",
+            ),
+            go.Scatter(
+                name="Ligne d'égalité",
+                x=[0, 100],
+                y=[0, 100],
+                mode="lines",
+                hoverinfo=["skip", "skip"],
+            ),
+        ], {
+            "title": f"Indice de Gini - {year}",
+            "xaxis": {
+                "title": "Part cumulée des plus de 20 ans avec les revenus du plus faible au plus élevé",
+                "fixedrange": True,
+            },
+            "yaxis": {
+                "title": f"Partage cumulé des revenus en {year}",
+                "type": "linear",
+                "fixedrange": True,
+            },
+            "autosize": True,
+            "showlegend": False,
+            "margin": {"l": 40, "b": 40, "r": 20, "t": 30},
+        }
         fig = go.Figure(data=data, layout=layout)
         gini = round(self.gini_df.loc[(code, year)].gini, 4)
         fig.add_annotation(
             xref="paper",
             yref="paper",
-            x=0.2,
-            y=0.7,
-            text=f"Gini Coefficient: {gini}",
+            bordercolor="black",
+            font=dict(color="black", size=18),
+            x=0.1,
+            y=0.8,
+            text=f"Coefficient de Gini: {gini}",
             showarrow=False,
+        )
+        fig.add_annotation(
+            xref="paper",
+            yref="paper",
+            bordercolor="red",
+            font=dict(color="black", size=18),
+            x=0.5,
+            y=0.55,
+            text=f"Ligne d'égalité",
+            showarrow=False,
+            textangle=-31.5,
         )
         return fig
 
@@ -340,6 +357,7 @@ class Inegalites_de_revenus:
                     x=x_axis_df.index.get_level_values(level=0).array,
                     y=x_axis_df["score"].array,
                     mode="lines",
+                    hovertemplate="Année: %{x}<br>Indice de corruption: %{y}<extra></extra>",
                 )
             ]
         elif xaxis == "P":
@@ -358,6 +376,7 @@ class Inegalites_de_revenus:
                     x=x_axis_df.index.array,
                     y=x_axis_df.values,
                     mode="lines",
+                    hovertemplate="Année: %{x}<br>PIB par habitant: %{y}<extra></extra>",
                 )
             ]
         else:
@@ -368,6 +387,7 @@ class Inegalites_de_revenus:
                     x=x_axis_df.index.get_level_values(level=0).array,
                     y=x_axis_df["score"].array,
                     mode="lines",
+                    hovertemplate="Année: %{x}<br>Indice de démocratie: %{y}<extra></extra>",
                 )
             ]
         return {
@@ -402,7 +422,7 @@ class Inegalites_de_revenus:
         )
 
     def update_main_graph(self, percentile, xaxis, year, regions):
-        x_axis_df, yaxis = self.dem_df, "10% les plus pauvres"
+        x_axis_df, yaxis, xmax = self.dem_df, "10% les plus pauvres", 100
         tmp = self.ine_df.loc[(slice(None), percentile, year), :]
         tmp = (
             tmp.join(self.countries_df, sort=False)
@@ -415,7 +435,7 @@ class Inegalites_de_revenus:
         if xaxis == "C":
             x_axis_df, xaxis = self.cpi_df, "Indice de corruption"
         elif xaxis == "P":
-            x_axis_df = self.gdp_df.loc[slice(None), [str(year)]]
+            xmax, x_axis_df = -1, self.gdp_df.loc[slice(None), [str(year)]]
             x_axis_df["Year"], xaxis = (
                 year,
                 "Produit intérieur brut par habitant (en US $ de 2021)",
@@ -434,12 +454,6 @@ class Inegalites_de_revenus:
             )
             .dropna()
         )
-        if percentile == "p99p100":
-            yaxis = "1% les plus riches"
-        elif percentile == "p0p50":
-            yaxis = "50% les plus pauvres"
-        elif percentile == "p90p100":
-            yaxis = "10% les plus riches"
         res["value"] *= 100
         fig = px.scatter(
             res,
@@ -450,16 +464,36 @@ class Inegalites_de_revenus:
             hover_name="Country_Name",
             color="region",
             color_discrete_map=self.continent_colors,
-            custom_data=['Country_Name', 'population']
+            custom_data=["Country_Name", "population"],
         )
+        if xmax != -1:
+            fig.update_xaxes(range=[0, xmax])
+        fig.update_yaxes(range=[0, 0.7])
+        if percentile == "p99p100":
+            fig.update_yaxes(range=[0, 35.0])
+            yaxis = "1% les plus riches"
+        elif percentile == "p0p50":
+            fig.update_yaxes(range=[0, 30.0])
+            yaxis = "50% les plus pauvres"
+        elif percentile == "p90p100":
+            fig.update_yaxes(range=[25.0, 70.0])
+            yaxis = "10% les plus riches"
         fig.update_layout(
-            xaxis=dict(title=xaxis, type="log"),
-            yaxis=dict(title=yaxis, type="log"),
+            xaxis=dict(title=xaxis, type="linear"),
+            yaxis=dict(title=yaxis, type="linear"),
             margin={"l": 0, "b": 1, "t": 1, "r": 0},
             hovermode="closest",
             showlegend=False,
         )
-        fig.update_traces(hovertemplate="".join(['<b>%{customdata[0]}</b><br><br>Part des revenus: %{y} %<br>Population: %{customdata[1]:,}<br>', xaxis, ': %{x}<extra></extra>']))
+        fig.update_traces(
+            hovertemplate="".join(
+                [
+                    "<b>%{customdata[0]}</b><br><br>Part des revenus: %{y} %<br>Population: %{customdata[1]:,}<br>",
+                    xaxis,
+                    ": %{x}<extra></extra>",
+                ]
+            )
+        )
         return fig
 
     def run(self, debug=False, port=8050):

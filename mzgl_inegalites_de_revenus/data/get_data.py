@@ -77,10 +77,18 @@ def get_countries_df():
     return (
         pd.read_csv("".join([path, "Countries.csv"]), sep=";", index_col=False)
         .set_index(["alpha2"])
-        .replace({"Africa": "Afrique", "Asia": "Asie", "Oceania": "Océanie", "Americas": "Amérique"})
+        .replace(
+            {
+                "Africa": "Afrique",
+                "Asia": "Asie",
+                "Oceania": "Océanie",
+                "Americas": "Amérique",
+            }
+        )
         .sort_index()
     )
-    
+
+
 def get_population_df():
     """
     Read population dataset, load it into one dataframe
@@ -93,6 +101,7 @@ def get_population_df():
         .sort_index()
     )
 
+
 def get_gdp_df():
     """
     Read Gross domestic product per capita dataset, load it into one dataframe
@@ -104,6 +113,4 @@ def get_gdp_df():
         .replace("..", np.nan)
         .sort_index()
     )
-    return gdp_df.loc[
-        (slice(None), "GDP per capita (current US$)", slice(None))
-    ] 
+    return gdp_df.loc[(slice(None), "GDP per capita (current US$)", slice(None))]
