@@ -77,6 +77,7 @@ def get_countries_df():
     return (
         pd.read_csv("".join([path, "Countries.csv"]), sep=";", index_col=False)
         .set_index(["alpha2"])
+        .replace({"Africa": "Afrique", "Asia": "Asie", "Oceania": "Océanie", "Americas": "Amérique"})
         .sort_index()
     )
     

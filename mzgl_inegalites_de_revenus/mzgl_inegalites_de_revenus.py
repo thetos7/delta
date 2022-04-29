@@ -23,11 +23,11 @@ def gini(array):
 class Inegalites_de_revenus:
     def __init__(self, application=None):
         self.continent_colors = {
-            "Africa": "brown",
-            "Americas": "navy",
-            "Asia": "gold",
+            "Afrique": "brown",
+            "Amérique": "navy",
+            "Asie": "gold",
             "Europe": "green",
-            "Oceania": "red",
+            "Océanie": "red",
         }
         self.percentile_colors = {
             "p0p10": "red",
@@ -53,7 +53,7 @@ class Inegalites_de_revenus:
                 html.Div(
                     className="row",
                     children=[
-                        html.H2("Inégalités de revenus dans le monde", id="title-graph")
+                        html.H2("Inégalités de revenus dans le monde")
                     ],
                 ),
                 html.Div(
@@ -64,6 +64,7 @@ class Inegalites_de_revenus:
                             children=[
                                 html.Center(
                                     [
+                                        html.H4(children=[], id="title-main-graph"),
                                         html.Div([dcc.Graph(id="main-graph")]),
                                         html.Br(),
                                         html.Div(
@@ -124,15 +125,15 @@ class Inegalites_de_revenus:
                                     id="select-percentile",
                                     options=[
                                         {
-                                            "label": "1% des plus aisés",
+                                            "label": "Part des 1% les plus riches",
                                             "value": "p99p100",
                                         },
                                         {
-                                            "label": "10% des plus aisés",
+                                            "label": "Part des 10% les plus riches",
                                             "value": "p90p100",
                                         },
-                                        {"label": "50% du bas", "value": "p0p50"},
-                                        {"label": "10% du bas", "value": "p0p10"},
+                                        {"label": "Part des 50% les plus pauvres", "value": "p0p50"},
+                                        {"label": "Part des 10% les plus pauvres", "value": "p0p10"},
                                     ],
                                     value="p99p100",
                                     labelStyle={"display": "block"},
@@ -151,7 +152,7 @@ class Inegalites_de_revenus:
                                             "value": "Indice de démocratie",
                                         },
                                         {
-                                            "label": "Produit intérieur brut par habitant",
+                                            "label": "PIB par habitant",
                                             "value": "P",
                                         },
                                     ],
@@ -213,6 +214,13 @@ class Inegalites_de_revenus:
             ],
         )(self.update_main_graph)
         self.app.callback(
+            dash.dependencies.Output("title-main-graph", "children"),
+            [
+                dash.dependencies.Input("select-percentile", "value"),
+                dash.dependencies.Input("select-X", "value"),
+            ]
+        )(self.update_title)
+        self.app.callback(
             dash.dependencies.Output("div-country", "children"),
             dash.dependencies.Input("main-graph", "hoverData"),
         )(self.get_country)
@@ -231,17 +239,34 @@ class Inegalites_de_revenus:
             ],
         )(self.create_right_graph)
 
+    def update_title(self, percentile, xaxis):
+        yaxis = "les 10% les plus pauvres"
+        if percentile == "p99p100":
+            yaxis = "les 1% les plus riches"
+        elif percentile == "p0p50":
+            yaxis = "les 50% les plus pauvres"
+        elif percentile == "p90p100":
+            yaxis = "les 10% les plus riches"
+        title = " ".join(["Évolution par pays de la part des revenus détenus par", yaxis, "vs "])
+        if xaxis == "C":
+            title += "Indice de corruption"
+        elif xaxis == "P":
+            title += "Produit intérieur brut par habitant"
+        else :
+            title += "Indice de démocratie"
+        return title
+
     def get_country(self, hoverData):
         if hoverData is None:
             country = self.countries_df.iloc[np.random.randint(len(self.countries_df))]
-            return country["Country Name"]
+            return country["Country_Name"]
         return hoverData["points"][0]["hovertext"]
 
     def create_left_graph(self, hoverData, year):
         country_name = self.get_country(hoverData), 
         code = (
             self.countries_df.reset_index()
-            .set_index(["Country Name"])
+            .set_index(["Country_Name"])
             .loc[country_name]["alpha2"]
         )
         tmp = (
@@ -254,7 +279,7 @@ class Inegalites_de_revenus:
             go.Scatter(
                     x=np.arange(1, 101, 1),
                     y=np.cumsum(np.sort(tmp["value"].array)) * 100,
-                    hovertemplate="%{x}% des adultes les moins aisées se partagent %{y:.4f}% des revenues avant taxes<extra></extra>",
+                    hovertemplate="%{x}% des adultes les moins aisées se partagent %{y:.2f}% des revenues avant taxes<extra></extra>",
                     mode="lines",
                 ),
                 go.Scatter(
@@ -267,7 +292,7 @@ class Inegalites_de_revenus:
             ], {
                 "title": f"Indice de Gini - {year}",
                 "xaxis": {
-                    "title": "Part cumulée des adultes avec les revenus du plus faible au plus élevé"
+                    "title": "Part cumulée des plus de 20 ans avec les revenus du plus faible au plus élevé"
                 },
                 "yaxis": {
                     "title": f"Partage cumulé des revenus en {year}",
@@ -298,7 +323,7 @@ class Inegalites_de_revenus:
         )
         code, data = (
             self.countries_df.reset_index()
-            .set_index(["Country Name"])
+            .set_index(["Country_Name"])
             .loc[country_name]["alpha3"],
             None,
         )
@@ -377,7 +402,7 @@ class Inegalites_de_revenus:
         )
 
     def update_main_graph(self, percentile, xaxis, year, regions):
-        x_axis_df, yaxis = self.dem_df, "10% du bas"
+        x_axis_df, yaxis = self.dem_df, "10% les plus pauvres"
         tmp = self.ine_df.loc[(slice(None), percentile, year), :]
         tmp = (
             tmp.join(self.countries_df, sort=False)
@@ -410,20 +435,22 @@ class Inegalites_de_revenus:
             .dropna()
         )
         if percentile == "p99p100":
-            yaxis = "1% des plus aisés"
+            yaxis = "1% les plus riches"
         elif percentile == "p0p50":
-            yaxis = "50% du bas"
+            yaxis = "50% les plus pauvres"
         elif percentile == "p90p100":
-            yaxis = "10% des plus aisés"
+            yaxis = "10% les plus riches"
+        res["value"] *= 100
         fig = px.scatter(
             res,
             x="score",
             y="value",
             size="population",
             size_max=60,
-            hover_name="Country Name",
+            hover_name="Country_Name",
             color="region",
             color_discrete_map=self.continent_colors,
+            custom_data=['Country_Name', 'population']
         )
         fig.update_layout(
             xaxis=dict(title=xaxis, type="log"),
@@ -432,6 +459,7 @@ class Inegalites_de_revenus:
             hovermode="closest",
             showlegend=False,
         )
+        fig.update_traces(hovertemplate="".join(['<b>%{customdata[0]}</b><br><br>Part des revenus: %{y} %<br>Population: %{customdata[1]:,}<br>', xaxis, ': %{x}<extra></extra>']))
         return fig
 
     def run(self, debug=False, port=8050):
