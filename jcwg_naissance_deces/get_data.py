@@ -1,9 +1,9 @@
-from zipfile import ZipFile
 from io import BytesIO
 from urllib.request import urlopen
-import matplotlib as plt
-import pandas as pd
+from zipfile import ZipFile
+
 import dateutil as du
+import pandas as pd
 
 
 def save_data_as_pkl(data, filename):
@@ -14,9 +14,11 @@ def save_data_as_pkl(data, filename):
         for name in f.namelist():
             with f.open(name) as zd:
                 files.append(pd.read_csv(zd, delimiter=';', dtype={
-                    'DEPDOM':str}))
+                    'DEPDOM': str}))
     db, _ = files
-    df = db[['ANAIS', 'MNAIS', 'AGEMERE', 'AGEPERE', 'DEPDOM' ]].copy()
+    df = db[
+        ['ANAIS', 'MNAIS', 'AGEMERE', 'AGEPERE', 'DEPNAIS', 'NBENF', 'ORIGINOM',
+         'SEXE']].copy()
 
     # df.groupby(['ANAIS', 'MNAIS']).mean()
     df['date'] = df.apply(lambda x: convert_date(x.ANAIS, x.MNAIS), axis=1)

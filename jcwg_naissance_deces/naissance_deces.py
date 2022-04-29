@@ -2,6 +2,7 @@ import glob
 import json
 
 import dash
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -19,12 +20,37 @@ class Naissance():
             [pd.read_pickle(f) for f in glob.glob(
                 'data/naissance-2019.pkl')])
         df.sort_index(inplace=True)
-        self.dep2 = df.groupby('DEPDOM').size().reset_index()
+
+        self.date_axis = [pd.to_datetime(d) for d in sorted(set(
+            df.index.values))]
+        self.date = df.groupby(['DEPNAIS', 'date']).aggregate({
+            'AGEMERE': np.mean,
+            'AGEPERE': np.mean,
+            'NBENF': np.mean,
+            'SEXE': lambda x: sum(x == 1) / len(x),
+        })
+        self.date['SEXEG'] = 1 - self.date['SEXE']
+        self.date['size'] = df.groupby(['DEPNAIS', 'date']).size()
+
+        self.depnais = df.groupby('DEPNAIS').aggregate({
+            'AGEMERE': np.mean,
+            'AGEPERE': np.mean,
+            'NBENF': np.mean,
+            'SEXE': lambda x: sum(x == 1) / len(x),
+        })
+        self.depnais['size'] = df.groupby('DEPNAIS').size()
+
+        agemere = df.groupby(['DEPNAIS', 'AGEMERE']).size().rename(
+            'SIZEMERE')
+        agepere = df.groupby(['DEPNAIS', 'AGEPERE']).size().rename(
+            'SIZEPERE')
+
+        self.age_pere_mere = pd.concat([agemere, agepere], axis=1)
 
         self.fig = go.Figure(go.Choroplethmapbox(
             geojson=dep,
-            locations=self.dep2.DEPDOM,
-            z=self.dep2[0]
+            locations=self.depnais.index,
+            z=self.depnais['size']
         ))
 
         self.fig.update_layout(mapbox_style="carto-positron",
@@ -34,39 +60,29 @@ class Naissance():
                                hovermode='closest',
                                )
 
-        self.df_naissance = df.groupby('date').size()
-        self.df_age_pere_mere = df.groupby('date').mean()[
-            ['AGEMERE', 'AGEPERE']]
-
-        d_mere = df.groupby('AGEMERE').size().rename('AGEMERE')
-        d_pere = df.groupby('AGEPERE').size().rename('AGEPERE')
-        self.df_evolution_age = pd.concat([d_mere, d_pere], axis=1)
-
         self.main_layout = html.Div(children=[
             html.H3(children='Nombre de naissance par mois en France'),
-            html.Div(
-                dcc.Graph(id='main-graph',
-                          style={'width': '100%', 'display': 'inline-block'}),
-            ),
             html.Div([
-                dcc.Graph(id='wps-income-time-series',
+                dcc.Graph(id='map_france',
                           style={'width': '100%', 'display': 'inline-block'},
                           figure=self.fig)]),
-            html.Div(
-                dcc.Graph(id='second_graph',
+
+            html.Br(),
+            html.Div(id='sub_graph_department'),
+
+            html.Div([
+                dcc.Graph(id='number_of_child',
                           style={'width': '33%', 'display': 'inline-block'}),
-            ),
-            html.Div([dcc.RadioItems(id='mpj-choice',
-                                     options=[
-                                         {'label': 'Naissance par mois',
-                                          'value': 0},
-                                         {'label': 'Age moyen pere/mere',
-                                          'value': 1},
-                                         {'label': 'Evolution age parents',
-                                          'value': 2}],
-                                     value=0,
-                                     labelStyle={'display': 'block'}),
-                      ]),
+                dcc.Graph(id='mean_parent_age',
+                          style={'width': '33%', 'display': 'inline-block',
+                                 'padding-left': '0.5%'}),
+                dcc.Graph(id='child_sex',
+                          style={'width': '33%', 'display': 'inline-block',
+                                 'padding-left': '0.5%'}),
+            ], style={'display': 'flex',
+                      'borderTop': 'thin lightgrey solid',
+                      'borderBottom': 'thin lightgrey solid',
+                      'justifyContent': 'center', }),
             html.Br(),
             dcc.Markdown("""
             Some text.
@@ -84,29 +100,76 @@ class Naissance():
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
 
+        # Subgraph of the map
         self.app.callback(
-            dash.dependencies.Output('main-graph', 'figure'),
-            dash.dependencies.Input('mpj-choice', 'value'))(self.update_graph)
+            dash.dependencies.Output('number_of_child', 'figure'),
+            [dash.dependencies.Input('map_france', 'hoverData'),
+             ])(self.update_number_of_child)
+        self.app.callback(
+            dash.dependencies.Output('mean_parent_age', 'figure'),
+            [dash.dependencies.Input('map_france', 'hoverData'),
+             ])(self.update_mean_parent_age)
+        self.app.callback(
+            dash.dependencies.Output('child_sex', 'figure'),
+            [dash.dependencies.Input('map_france', 'hoverData'),
+             ])(self.update_child_sex)
 
-        self.app.callback(
-            dash.dependencies.Output('second_graph', 'figure'),
-            [dash.dependencies.Input('wps-income-time-series', 'hoverData'),
-             ])(self.update_subgraph)
+    def get_department(self, hoverData):
+        if hoverData is None:
+            return '75'
+        return hoverData['points'][0]['location']
+
+    def update_number_of_child(self, hoverData):
+        department = self.get_department(hoverData)
+        return self.create_time_series(self.date, self.date_axis, department,
+                                       [('size',
+                                         '')],
+                                       "Nombre d'enfants par mois")
+
+    def update_mean_parent_age(self, hoverData):
+        department = self.get_department(hoverData)
+        return self.create_time_series(self.date, self.date_axis, department,
+                                       [('AGEMERE', 'Age de la mère'),
+                                        ('AGEPERE', 'Age du père')],
+                                       "Age des parents à la naissance")
+
+    def update_child_sex(self, hoverData):
+        department = self.get_department(hoverData)
+        return self.create_time_series(self.age_pere_mere, list(range(20, 46)),
+                                       department,
+                                       [('SIZEMERE', 'Mère'),
+                                        ('SIZEPERE', 'Père')],
+                                       "Nombre d'enfant par tranche d'age")
+
+    def create_time_series(self, dataframe, x_axis, department, what, title):
+
+        scatters = []
+        for w, name in what:
+            scatters.append(go.Scatter(
+                x=x_axis,
+                y=dataframe.loc[str(department)][w],
+                name=name,
+                mode='lines+markers',
+            ))
+
+        return {
+            'data': scatters,
+            'layout': {
+                'height': 300,
+                'margin': {'l': 50, 'b': 20, 'r': 10, 't': 20},
+                'yaxis': {'title': title,
+                          'type': 'linear'},
+                'xaxis': {'showgrid': False}
+            }
+        }
 
     def update_subgraph(self, hoverData):
-        print(hoverData)
-        return None
-
-    def update_graph(self, choice):
         tit = 'Nombre de naissance par jour'
-        if choice == 1:
-            fig = px.line(self.df_age_pere_mere, template='plotly_white')
-            tit = 'Difference d\'age entre le pere et la mere lors d\'une naissance'
-        elif choice == 2:
-            fig = px.line(self.df_evolution_age, template='plotly_white')
-            tit = 'Evolution du nombre d\'enfant en fonction de l\'age des parents'
-        else:
-            fig = px.line(self.df_naissance, template='plotly_white')
+        fig = px.line(self.df_age_pere_mere, template='plotly_white')
+        tit = 'Difference d\'age entre le pere et la mere lors d\'une naissance'
+        fig = px.line(self.df_evolution_age, template='plotly_white')
+        tit = 'Evolution du nombre d\'enfant en fonction de l\'age des parents'
+        fig = px.line(self.df_naissance, template='plotly_white')
 
         fig.update_traces(hovertemplate='%{y} naissance le %{x:%d/%m/%y}',
                           name='')
@@ -118,8 +181,8 @@ class Naissance():
             showlegend=False,
         )
 
-        print("Done3", choice)
         return fig
+
 
 if __name__ == '__main__':
     mpj = Naissance()
