@@ -1,4 +1,5 @@
 import dash
+from matplotlib.pyplot import legend, title
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as go
@@ -18,19 +19,19 @@ class Inequalities():
         self.offset = 0.025
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Répartition des inéqualités par parti politique en Europe depuis les années 2000'),
+            html.H3(children='Répartition des inégalités par parti politique en Europe depuis les années 2000', style={'font-weight': 'bold'}),
 
             html.Div("L'indice (ou coefficient) de Gini est un indicateur synthétique permettant de rendre compte du niveau d'inégalité pour une variable et sur une population donnée"),
             html.Div("Il varie entre 0 (égalité parfaite) et 1 (inégalité extrême). Entre 0 et 1, l'inégalité est d'autant plus forte que l'indice de Gini est élevé."),
             html.Br(),
 
-            html.Div("Nous utilisons donc cet indice afin de représenter les inégalités dans les différents pays européen."),
             html.Div('(Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.)'),
             html.Br(),
 
             html.Div([
                     html.Div([
-                        html.H6('Evolution du coefficient de Gini et des partis politiques en Europe', style={'font-weight': 'bold', 'display':'flex', 'justifyContent':'center'}),
+                        html.H6('Evolution du coefficient de Gini et des partis politiques en Europe',
+                                style={'font-weight': 'bold', 'display':'flex', 'justifyContent':'center', 'font-size':'22px'}),
                         dcc.Graph(id='ine-main-graph'),
                         html.Div(
                             dcc.Slider(
@@ -54,7 +55,7 @@ class Inequalities():
                         html.Br(),
                         html.Br(),
                         html.Br(),
-                        html.Div('Orientation Politique', style={'font-weight': 'bold'}),
+                        html.Div('Orientations Politiques', style={'font-weight': 'bold'}),
                         dcc.Checklist(
                             id='ine-crossfilter-which-party',
                             options=[{'label': ' ' + i, 'value': i} for i in sorted(self.color.keys())],
@@ -101,20 +102,30 @@ class Inequalities():
                     ]),
                 ], style={
                     'display':'flex',
-                    'justifyContent':'center'
+                    'justifyContent':'center',
+                    'borderTop': 'thin lightgrey solid',
                 }),
 
             html.Br(),
-            html.Div(id='ine-div-country'),
+            html.Div(id='ine-div-country', style={'font-size': '20px', 'borderBottom': 'thin lightgrey solid'}),
+            html.Br(),
+
             html.Div([
-                    dcc.Graph(id='ine-gini-evolution',
-                              style={'width':'50%', 'display':'inline-block'}),
-                    dcc.Graph(id='ine-mean-gini-per-party',
-                              style={'width':'50%', 'display':'inline-block'}),
+                    dcc.Graph(id='ine-gini-evolution', style={'width':'50%', 'display':'inline-block'}),
+                    dcc.Graph(id='ine-mean-gini-per-party', style={'width':'50%', 'display':'inline-block'}),
                 ], style={ 'display':'flex', 
-                           'borderTop': 'thin lightgrey solid',
                            'borderBottom': 'thin lightgrey solid',
-                           'justifyContent':'center' }),
+                           'align-content':'center' }),
+            
+            dcc.Markdown("""
+            ##### À propos
+
+                * Dans le cadre d'un projet de Python pour le Big Data (PYBD), encadré par Olivier Ricou à l'EPITA
+                * [Version Plotly](https://plotly.com/python/v3/gapminder-example/)
+                * Données : - [World Inequality Database](https://wid.world/fr/donnees/)
+                            - [Comparative Political Data Set](https://www.cpds-data.org/index.php/data)
+                * (c) 2022 Philippe Aymard, Alexandre Rulleau
+            """),
         ], style={'padding': '10px 50px 10px 50px'})
         
         if application:
@@ -178,7 +189,6 @@ class Inequalities():
     def update_gini_evolution(self, hover_data, parameter):
         country = self.get_country(hover_data)
         dfg = self.df[self.df.country == country]
-        offset = 0.025
 
         fig = go.Figure()
         for index, row in dfg.reset_index().iterrows():
@@ -197,7 +207,9 @@ class Inequalities():
                           yaxis_range=[dfg['gini'].min() - self.offset,
                                        dfg['gini'].max() + self.offset],
                           xaxis_title=dict(text="Années"),
-                          yaxis_title=dict(text="Coefficient de Gini")
+                          yaxis_title=dict(text="Coefficient de Gini"),
+                          title="<b>Courbe d'évolution du coefficient de Gini selon l'année coloré en fonction des partis",
+                          title_x=0.0,
         )
         
         return fig
@@ -210,12 +222,15 @@ class Inequalities():
         fig = px.bar(dfg, x=f'Main {parameter} Party', y='mean',
                      color=f'Main {parameter} Party', color_discrete_map=self.color)
         
-        fig.update_layout(showlegend=False,
+        fig.update_layout(showlegend=True,
                           hovermode='closest',
                           yaxis_range=[dfg['mean'].min() - self.offset,
                                        dfg['mean'].max() + self.offset],
-                          xaxis_title=dict(text="Partis politiques"),
-                          yaxis_title=dict(text="Coefficient de Gini (en moyenne)")
+                          xaxis_title=dict(text="Orientations politiques"),
+                          yaxis_title=dict(text="Coefficient de Gini (en moyenne)"),
+                          legend={'title': 'Orientations Politiques'},
+                          title='<b>Coefficient de Gini moyen par orientation politique',
+                          title_x=0.5,
         )
         return fig
 
