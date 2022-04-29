@@ -23,26 +23,25 @@ class Cancer():
                                  'North-america', 'South-america']
         self.cancers = sorted(['Lip','Tongue','Mouth','Salivary glands','Tonsil','Oropharynx','Nasopharynx','Pyriform sinus','Hypopharynx','Oesophagus','Stomach','Small intestine','Colon','Rectosigmoid junction','Rectum','Anus','Liver','Gallbladder','Pancreas','Ill-defined digestive organs','Nasal cavity and middle ear','Accessory sinuses','Larynx','Trachea','Lung','Thymus','Heart, mediastinum and pleura','Bone','Skin','Mesothelioma','Kaposi sarcoma','Peripheral nerves', 'Peritoneum and retroperitoneum','Connective and soft tissue','Breast','Vulva','Vagina','Cervix uteri','Corpus uteri','Ovary','Other female genital organs','Placenta','Penis','Prostate','Other male genital organs','Kidney','Renal pelvis','Ureter','Bladder','Other urinary organs','Eye','Meninges', 'Central nervous system','Brain','Other parts of central nervous system','Thyroid','Adrenal gland','Other endoctrine','Non-Hodgkin lymphoma','Hodgkin disease',  'Immunoproliferative diseases','Multiple myeloma','Lymphoid leukaemia','Myeloid leukaemia','Leukaemia and unspecified','Myeloproliferative disorders','Myelodysplastic syndromes'])
         self.age_group=[
-                        '0 to 4',
-                        '5 to 9',
-                        '10 to 14',
-                        '15 to 19',
-                        '20 to 24',
-                        '25 to 29',
-                        '30 to 34',
-                        '35 to 39',
-                        '40 to 44',
-                        '45 to 49',
-                        '50 to 54',
-                        '55 to 59',
-                        '60 to 64',
-                        '65 to 69',
-                        '70 to 74',
-                        '75 to 79',
-                        '80 to 84',
+                        '0-4',
+                        '5-9',
+                        '10-14',
+                        '15-19',
+                        '20-24',
+                        '25-29',
+                        '30-34',
+                        '35-39',
+                        '40-44',
+                        '45-49',
+                        '50-54',
+                        '55-59',
+                        '60-64',
+                        '65-69',
+                        '70-74',
+                        '75-79',
+                        '80-84',
                         '85+',
-                        'Age Uknown'
-        ]
+                        'Uknown']
         #Insérer la valeur du main layout représentant la page html elle même.
         #self.main_layout = None
         
@@ -54,39 +53,36 @@ class Cancer():
             #self.app.layout = self.main_layout
 
         app = Dash(__name__)
-            
+        self.df =px.data.tips()
+        self.df1 = px.data.tips()
         self.main_layout = html.Div(children=[
             html.H3(children='Répartition des Cancers entre les pays'),
             html.Div([dcc.Graph(id='cancer-main-graph'), ], style={'width':'100%', }),
-            dcc.Dropdown(
-                            id='cancer-dropdown-id',
-                            options=[{'label': i, 'value': i} for i in (self.cancers)],
-                            value=['Lung','Breast','Brain','Stomach','Liver'],
-                            multi=True
-            ),
-            dcc.RadioItems(
-                            id='marginal-option-id',
-                            options=[{'label': i, 'value': i} for i in ['violin', 'box']],
-                            value='violin',
-                            labelStyle={'display':'block'}
-                        ),
             dcc.Checklist(
                             id='continent-id',
                             options=[{'label': i, 'value': i} for i in sorted(self.continent)],
                             value=['Asia','Europe','North-america'],
                             labelStyle={'display':'block'},
-                            style={'display': 'inline-block','margin-top':'-47px','margin-left': '80px'}),
+                            style={'display': 'inline-block'}),
+            dcc.Dropdown(
+                            id='cancer-dropdown-id',
+                            options=[{'label': i, 'value': i} for i in (self.cancers)],
+                            value=['Lung','Breast','Brain','Stomach','Liver'],
+                            multi=True,
+                            style={verticalAlign="middle"}
+            ),
             html.Div([
                 html.Div([
                     dcc.Graph(id='cancer-by-sex',
-                            style={'width':'33%', 'display':'inline-block'}),
+                            style={'width':'100%', 'display':'inline-block'}),
                     dcc.RangeSlider(
                             id='cancer-by-sex-slider',
                             min=0,
                             max=18,
-                            marks={0:'0 to 4',1:'5 to 9',2:'10 to 14',3:'15 to 19',4:'20 to 24',5:'25 to 29',6:'30 to 34',7:'35 to 39',8:'40 to 44',9:'45 to 49',10:'50 to 54',11:'55 to 59',12:'60 to 64',13:'65 to 69',14:'70 to 74',15:'75 to 79',16:'80 to 84',17:'85+',18:'Age Uknown'},
-                            value=[4,7],
-                            allowCross=False)]),
+                            step=1,
+                            marks={0:'0-4',1:'5-9',2:'10-14',3:'15-19',4:'20-24',5:'25-29',6:'30-34',7:'35-39',8:'40-44',9:'45-49',10:'50-54',11:'55-59',12:'60-64',13:'65-69',14:'70 -74',15:'75-79',16:'80-84',17:'85+',18:'Unnown'},
+                            value=[4,7])],
+                style={'display':'inline-block', 'width':"50%"}),
                 dcc.Graph(id='cancer-by-age',
                             style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
                 dcc.Graph(id='cancer-by-country-selected-continent',
@@ -101,7 +97,6 @@ class Cancer():
         self.app.callback(dash.dependencies.Output('cancer-main-graph','figure'),
                           dash.dependencies.Input('continent-id', 'value'),
                           dash.dependencies.Input('cancer-dropdown-id','value'),
-                          dash.dependencies.Input('marginal-option-id','value'),
                           )(self.update_main_graph)
         
         self.app.callback(dash.dependencies.Output('cancer-by-sex','figure'),
@@ -122,24 +117,18 @@ class Cancer():
 #                           dash.dependencies.Input('marginal-option-id','value'),
 #                           )(self.update_graph)
         
-    def update_main_graph(self,continent_id,column_x,marginal_option):
-        df = px.data.tips()
+    def update_main_graph(self,continent_id,column_x):
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
-        if marginal_option == 'violin' or marginal_option == 'box':
-            fig = px.histogram(df, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Continent'],marginal=marginal_option,text_auto=True)
-        else:
-            fig = px.histogram(df, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Continent'],text_auto=True)
+        fig = px.histogram(self.df, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Continent'],text_auto=True)
         return fig
     
     def update_graph_sex(self,continent_id,column_x,selected_age_group):
-        df1 = px.data.tips()
-        temp = [elem for elem in selected_age_group]
-        selected_age_group_l = [self.age_group[i] for i in range(temp[0], temp[-1])]
+        selected_age_group_l = [self.age_group[i] for i in range(selected_age_group[0], selected_age_group[1])]
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
         sub_df = sub_df[sub_df['Age group'].isin(selected_age_group_l)]
-        fig = px.histogram(df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Age group'],text_auto=True)
+        fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Age group'],text_auto=True)
         return fig
     
     # def update_graph(self, current_df, column_x, column_y, marginal_option):
