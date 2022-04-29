@@ -1,5 +1,4 @@
 import dash
-import pandas as pd
 import numpy as np
 from dash import html, dcc
 import plotly.graph_objects as go
@@ -13,12 +12,12 @@ def gini(array):
     """
     Calculate the Gini coefficient
     """
-    array, cumul = np.sort(array), 0
+    array, cumul = np.sort(array), 0.0
     sum = array[0]
     for i in range(1, array.shape[0]):
         sum += cumul * 0.01 + ((0.01 * array[i]) / 2)
         cumul += array[i]
-    return (0.5 - sum) * 2
+    return (0.5 - sum) * 2.0
 
 
 class Inegalites_de_revenus:
@@ -43,11 +42,8 @@ class Inegalites_de_revenus:
         self.dem_df = gd.get_democratie_index_df()
         self.ine_df = gd.get_inegalities_df()
 
-        self.gini_df = self.ine_df.loc[
-            (slice(None), "sptinc992j", slice(None), slice(None)), :
-        ].droplevel("Variable")
         self.gini_df = (
-            self.gini_df[self.gini_df.index.isin(list_percentile, level="Percentile")]
+            self.ine_df[self.ine_df.index.isin(list_percentile, level="Percentile")]
             .groupby(level=[0, 2])["value"]
             .agg([gini])
         )
@@ -115,7 +111,7 @@ class Inegalites_de_revenus:
                                 - [Inégalités de revenus, World inegalities database](https://wid.world/data/)
                                 - [Index de corruption, Transparency International](https://www.transparency.org/en/cpi/2021)
                                 - [Index de démocratie, Gapminder](https://www.gapminder.org/data/documentation/democracy-index/)
-                                (c) 2022 Gauthier Lombard, Mathieu Zimmermann
+                                * (c) 2022 Gauthier Lombard, Mathieu Zimmermann
                                 """
                                         ),
                             ],
@@ -123,23 +119,6 @@ class Inegalites_de_revenus:
                         html.Div(
                             className="two columns",
                             children=[
-                                html.Div("Indicateurs d'inégalité"),
-                                dcc.RadioItems(
-                                    id="select-main-indicator",
-                                    options=[
-                                        {
-                                            "label": "Inégalités de Revenu",
-                                            "value": "sptinc992j",
-                                        },
-                                        {
-                                            "label": "Inégalités de Capital",
-                                            "value": "shweal992j",
-                                        },
-                                    ],
-                                    value="sptinc992j",
-                                    labelStyle={"display": "block"},
-                                ),
-                                html.Br(),
                                 html.Div("Percentile"),
                                 dcc.RadioItems(
                                     id="select-percentile",
@@ -227,7 +206,6 @@ class Inegalites_de_revenus:
         self.app.callback(
             dash.dependencies.Output("main-graph", "figure"),
             [
-                dash.dependencies.Input("select-main-indicator", "value"),
                 dash.dependencies.Input("select-percentile", "value"),
                 dash.dependencies.Input("select-X", "value"),
                 dash.dependencies.Input("Year-Slider", "value"),
@@ -242,7 +220,6 @@ class Inegalites_de_revenus:
             dash.dependencies.Output("left-graph", "figure"),
             [
                 dash.dependencies.Input("main-graph", "hoverData"),
-                dash.dependencies.Input("select-main-indicator", "value"),
                 dash.dependencies.Input("Year-Slider", "value"),
             ],
         )(self.create_left_graph)
@@ -260,23 +237,21 @@ class Inegalites_de_revenus:
             return country["Country Name"]
         return hoverData["points"][0]["hovertext"]
 
-    def create_left_graph(self, hoverData, main_indicator, year):
-        country_name = self.get_country(hoverData)
+    def create_left_graph(self, hoverData, year):
+        country_name = self.get_country(hoverData), 
         code = (
             self.countries_df.reset_index()
             .set_index(["Country Name"])
             .loc[country_name]["alpha2"]
         )
         tmp = (
-            self.ine_df.reset_index(level=2)
+            self.ine_df.reset_index(level=1)
             .sort_index()
-            .loc[(code, main_indicator, year), :]
+            .loc[(code, year), :]
         )
         tmp = tmp[tmp["Percentile"].isin(list_percentile)]
-        data, layout = None, None
-        if main_indicator == "sptinc992j":
-            data = [
-                go.Scatter(
+        data, layout =  [
+            go.Scatter(
                     x=np.arange(1, 101, 1),
                     y=np.cumsum(np.sort(tmp["value"].array)) * 100,
                     hovertemplate="%{x}% des adultes les moins aisées se partagent %{y:.4f}% des revenues avant taxes<extra></extra>",
@@ -289,8 +264,7 @@ class Inegalites_de_revenus:
                     mode="lines",
                     hoverinfo=["skip", "y"],
                 ),
-            ]
-            layout = {
+            ], {
                 "title": f"Indice de Gini - {year}",
                 "xaxis": {
                     "title": "Part cumulée des adultes avec les revenus du plus faible au plus élevé"
@@ -303,38 +277,16 @@ class Inegalites_de_revenus:
                 "showlegend": False,
                 "margin": {"l": 40, "b": 40, "r": 20, "t": 30},
             }
-        else:
-            data = [
-                go.Scatter(
-                    x=np.arange(0.01, 1.01, 0.01),
-                    y=np.cumsum(np.sort(tmp["value"].array)),
-                    mode="lines",
-                )
-            ]
-            layout = {
-                "title": f"Répartition du partrimoine net en {year}",
-                "xaxis": {
-                    "title": "Part cumulée des adultes du patrimoine le plus faible au plus élevé"
-                },
-                "yaxis": {
-                    "title": f"Partage cumulé du patrimoine en {year}",
-                    "type": "linear",
-                },
-                "autosize": True,
-                "showlegend": False,
-                "margin": {"l": 40, "b": 40, "r": 20, "t": 30},
-            }
         fig = go.Figure(data=data, layout=layout)
-        if main_indicator == "sptinc992j":
-            gini = round(self.gini_df.loc[(code, year)].gini, 4)
-            fig.add_annotation(
-                xref="paper",
-                yref="paper",
-                x=0.2,
-                y=0.7,
-                text=f"Gini Coefficient: {gini}",
-                showarrow=False,
-            )
+        gini = round(self.gini_df.loc[(code, year)].gini, 4)
+        fig.add_annotation(
+            xref="paper",
+            yref="paper",
+            x=0.2,
+            y=0.7,
+            text=f"Gini Coefficient: {gini}",
+            showarrow=False,
+        )
         return fig
 
     def create_right_graph(self, hoverData, xaxis):
@@ -424,9 +376,9 @@ class Inegalites_de_revenus:
             {str(year): str(year) for year in range(min_year, max_year + 1, 5)},
         )
 
-    def update_main_graph(self, main_indicator, percentile, xaxis, year, regions):
+    def update_main_graph(self, percentile, xaxis, year, regions):
         x_axis_df, yaxis = self.dem_df, "10% du bas"
-        tmp = self.ine_df.loc[(slice(None), main_indicator, percentile, year), :]
+        tmp = self.ine_df.loc[(slice(None), percentile, year), :]
         tmp = (
             tmp.join(self.countries_df, sort=False)
             .reset_index()

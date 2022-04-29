@@ -13,13 +13,13 @@ def get_inegalities_df():
     df = pd.concat(
         [
             pd.read_csv(filename, index_col=False, sep=";")
-            for filename in glob.glob("".join([path, "WID_dataset_country/WID_data_*.csv"]))
+            for filename in glob.glob("".join([path, "wid_data/WID_data_*.csv"]))
         ]
     )
     return (
-        df.drop(["pop", "age"], axis=1)
-        .set_index(["country", "variable", "percentile", "year"])
-        .rename_axis(["alpha2", "Variable", "Percentile", "Year"], axis=0)
+        df.drop(["pop", "age", "variable"], axis=1)
+        .set_index(["country", "percentile", "year"])
+        .rename_axis(["alpha2", "Percentile", "Year"], axis=0)
         .sort_index()
     )
 
