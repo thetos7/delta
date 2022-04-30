@@ -3,7 +3,7 @@ from dash import dcc
 from dash import html
 from energies import energies
 from population import population
-from polution import polution
+from SG_AH_emission_de_CO2_des_transports import polution
 from deces import deces
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']

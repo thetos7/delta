@@ -3,20 +3,20 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 
-col = "Emission HC"
-df = func()
-agg = (
-    df[["Marque", col]]
-    .groupby(["Marque"])
-    .mean()
-    .reset_index()
-    .sort_values(by=[col, "Marque"])
-    # .replace(np.NaN,0)
-)
+def update_graph(self, name="HC et Nox"):
+    col = f"Emission {name}"
+    df = func()
+    agg = (
+        df[["Marque", col]]
+        .groupby(["Marque"])
+        .mean()
+        .reset_index()
+        .sort_values(by=[col, "Marque"])
+        # .replace(np.NaN,0)
+    )
 
-fig = px.bar(agg, y=col, x="Marque", title=f"Moyenne d'{col} pour les modèles par marque")
-fig.update_traces(
-    textfont_size=12, textangle=0, textposition="outside", cliponaxis=False
-)
-
-fig.show()
+    fig = px.bar(agg, y=col, x="Marque", title=f"Moyenne d'{col} pour les modèles par marque")
+    fig.update_traces(
+        textfont_size=12, textangle=0, textposition="outside", cliponaxis=False
+    )
+    fig.show()
