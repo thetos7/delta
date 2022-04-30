@@ -13,7 +13,6 @@ class SalaryInflation():
         self.df = get_data.get_data()
         self.years = self.df.year.unique()
         self.geodata = json.load(open('data/europe.geojson'))
-        print(self.years)
         self.app = dash.Dash()
         self.app.layout = html.Div(children=[
             html.H3(children='Comparaison salaire / inflation',
@@ -31,14 +30,16 @@ class SalaryInflation():
             ),
             # dcc.Markdown(id='md'),
             html.Div([
-                dcc.Graph(id='men-graph',
-                          style={'width': '33%', 'display': 'inline-block'}),
-                dcc.Graph(id='total-graph',
-                          style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
-                dcc.Graph(id='women-graph',
-                          style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
-            ], style={'display': 'flex', 'justifyContent': 'center', }),
-
+                html.Div([
+                    dcc.Graph(id='men-graph',
+                        style={'width': '33%', 'display': 'inline-block'}),
+                    dcc.Graph(id='total-graph',
+                        style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
+                    dcc.Graph(id='women-graph',
+                        style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
+                    ], style={'display': 'flex', 'justifyContent': 'center', }),
+                html.Div('* Salaire attendu si on prend uniquement l\'évolution de l\'inflation en compte')
+            ]),
         ])
 
         self.app.callback(
@@ -79,13 +80,13 @@ class SalaryInflation():
             self.df.sex == 'T')][['country', 'cumulative_sum']]
         fig = px.choropleth_mapbox(data, geojson=self.geodata,
                                    locations='country', featureidkey='properties.ISO2',  # join keys
-                                   color='cumulative_sum', color_continuous_scale="Viridis",
-                                   mapbox_style="carto-positron",
-                                   zoom=3, center={"lat": 52, "lon": 10},
+                                   color='cumulative_sum', color_continuous_scale='Viridis',
+                                   mapbox_style='carto-positron',
+                                   zoom=3, center={'lat': 52, 'lon': 10},
                                    opacity=0.5,
                                    )
         fig.update_layout(
-            title=f"{year}",
+            title=f'{year}',
             margin={'l': 0, 'b': 0, 't': 0, 'r': 0},
             hovermode='closest',
             showlegend=False,
@@ -99,14 +100,14 @@ class SalaryInflation():
         w = country_df.wages_value.iloc[0]
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=country_df.year, y=country_df.wages_value, mode='lines', name='Salaire réel'))
-        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation'))
+        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation*'))
         fig.update_layout(
             title = 'Évolution du salaire médian en comparaison avec l\'inflation.<br>Lieu : ' + country_name[country] + '<br><sup>Au total</sup>',
             title_font_size = 12,
             title_xanchor = 'auto',
             title_pad = { 't': 0, 'b': 0, 'l': 0, 'r': 0},
             height=450,
-            hovermode='closest',
+            hovermode='x unified',
             legend = {'title': 'Courbes'},
             xaxis_title='Année',
             yaxis_title='Valeur médiane',
@@ -120,14 +121,14 @@ class SalaryInflation():
         w = country_df.wages_value.iloc[0]
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=country_df.year, y=country_df.wages_value, mode='lines', name='Salaire réel'))
-        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation'))
+        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation*'))
         fig.update_layout(
             title = 'Évolution du salaire médian en comparaison avec l\'inflation.<br>Lieu : ' + country_name[country] + '<br><sup>Chez les hommes</sup>',
             title_font_size = 11,
             title_xanchor = 'auto',
             title_pad = { 't': 0, 'b': 0, 'l': 0, 'r': 0},
             height=450,
-            hovermode='closest',
+            hovermode='x unified',
             legend = {'title': 'Courbes'},
             xaxis_title='Année',
             yaxis_title='Valeur médiane',
@@ -141,14 +142,14 @@ class SalaryInflation():
         w = country_df.wages_value.iloc[0]
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=country_df.year, y=country_df.wages_value, mode='lines', name='Salaire réel'))
-        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation'))
+        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation*'))
         fig.update_layout(
             title = 'Évolution du salaire médian en comparaison avec l\'inflation.<br>Lieu : ' + country_name[country] + '<br><sup>Chez les femmes</sup>',
             title_font_size = 11,
             title_xanchor = 'auto',
             title_pad = { 't': 0, 'b': 0, 'l': 0, 'r': 0},
             height=450,
-            hovermode='closest',
+            hovermode='x unified',
             legend = {'title': 'Courbes'},
             xaxis_title='Année',
             yaxis_title='Valeur médiane',
