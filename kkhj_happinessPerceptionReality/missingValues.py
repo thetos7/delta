@@ -119,6 +119,9 @@ def get_all_datasets():
     social_security_contribution_dataset = get_missing_values(social_security_contribution_dataset, all_countries)
     unemployment_dataset = get_missing_values(unemployment_dataset, all_countries)
 
-    return real_happiness_dataset, safety_dataset, gdp_dataset, social_security_contribution_dataset, unemployment_dataset
+    safety_dataset.rename(columns={'Value': 'Safety Index'}, inplace=True)
+    gdp_dataset.rename(columns={'Value': 'GDP Index'}, inplace=True)
+    social_security_contribution_dataset.rename(columns={'Value': 'Social Security Employer Contribution Index'}, inplace=True)
+    unemployment_dataset.rename(columns={'Value': 'Unemployment Index'}, inplace=True)
 
-get_all_datasets()
+    return real_happiness_dataset, safety_dataset, gdp_dataset, social_security_contribution_dataset, unemployment_dataset

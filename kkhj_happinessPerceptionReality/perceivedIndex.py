@@ -1,7 +1,3 @@
-from cleanSafetyData import safety_out_of_10
-from happinessPerceptionReality import happinessPerceptionReality
-
-
 def apply_importance_rate(index, rate):
     newIndex = index * rate
     return newIndex
