@@ -19,5 +19,4 @@ def get_datasets():
         if count == 0:
             continue
         df = pd.merge(datasets[key], df, on=["Country", "Year"])
-
-    return df
+    return df.set_index('Year')

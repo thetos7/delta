@@ -13,11 +13,11 @@ import plotly.graph_objs as go
 import plotly.express as px
 
 
-class happinessPerceptionReality():
+class happinessPerceptionReality:
     START = 'Start'
     STOP = 'Stop'
 
-    def __init__(self, application = None):
+    def __init__(self, application=None):
         # Extract datasets
         datasets = get_datasets()
 
@@ -42,20 +42,21 @@ class happinessPerceptionReality():
             'EU': 'Europe'
         }
 
-        datasets['Country_code'] = datasets['Country'].apply(lambda x : pc.country_name_to_country_alpha2(x, cn_name_format="default"))
-        datasets['Continent'] = datasets['Country_code'].apply(lambda x : continents[pc.country_alpha2_to_continent_code(x)])
+        datasets['Country_code'] = datasets['Country'].apply(
+            lambda x: pc.country_name_to_country_alpha2(x, cn_name_format="default"))
+        datasets['Continent'] = datasets['Country_code'].apply(
+            lambda x: continents[pc.country_alpha2_to_continent_code(x)])
         datasets.drop("Country_code", inplace=True, axis=1)
-
 
         # Initialise variables
         self.df = datasets
         self.countries = get_countries_list(self.df)
 
-        self.continent_colors = {'Asia': 'gold', 'Europe': 'green', 'Africa': 'brown', 'Oceania': 'red',
-                                 'North America': 'navy', 'South America': 'pink'}
+        self.continent_colors = {'Asia': 'gold', 'Europe': 'green', 'Africa': 'red', 'Oceania': 'purple',
+                                 'North America': 'blue', 'South America': 'pink'}
         self.french = {'Asia': 'Asie', 'Europe': 'Europe', 'Africa': 'Afrique', 'Oceania': 'Océanie',
                        'North America': 'Amérique du Nord', 'South America': 'Amérique du Sud'}
-        self.years = sorted(set(self.df['Year']))
+        self.years = sorted(set(self.df.index.values))
 
         self.main_layout = html.Div(children=[
             html.H3(children='Vrai Bonheur VS. Fake Bonheur'),
@@ -124,7 +125,7 @@ class happinessPerceptionReality():
             html.Div(id='wps-div-country'),
 
             html.Div([
-                dcc.Graph(id='wps-gdb-time-series',
+                dcc.Graph(id='wps-gdp-time-series',
                           style={'width': '33%', 'display': 'inline-block'}),
                 dcc.Graph(id='wps-safety-time-series',
                           style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
@@ -174,38 +175,46 @@ class happinessPerceptionReality():
             [dash.dependencies.State('wps-crossfilter-year-slider', 'value'),
              dash.dependencies.State('wps-button-start-stop', 'children')])(self.on_interval)
         self.app.callback(
-            dash.dependencies.Output('wps-income-time-series', 'figure'),
+            dash.dependencies.Output('wps-gdp-time-series', 'figure'),
             [dash.dependencies.Input('wps-main-graph', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_income_timeseries)
+             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_gdp_timeseries)
         self.app.callback(
-            dash.dependencies.Output('wps-fertility-time-series', 'figure'),
+            dash.dependencies.Output('wps-safety-time-series', 'figure'),
             [dash.dependencies.Input('wps-main-graph', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_fertility_timeseries)
+             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_safety_timeseries)
         self.app.callback(
-            dash.dependencies.Output('wps-pop-time-series', 'figure'),
+            dash.dependencies.Output('wps-unemployment-time-series', 'figure'),
             [dash.dependencies.Input('wps-main-graph', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_pop_timeseries)
+             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_unemployment_timeseries)
 
-    def update_graph(self, continent, xaxis_type, year):
-        dfg = self.df['Year']
-        dfg = dfg[dfg['Continent'].isin(continent)]
-        fig = px.scatter(dfg, x="incomes", y="fertility",
+    def update_graph(self, continents, xaxis_type, year):
+        dfg = self.df.loc[year]
+        dfg = dfg[dfg['Continent'].isin(continents)]
+        fig = px.scatter(dfg, x="Value", y="Perceived Happiness",
                          # title = f"{year}", cliponaxis=False,
-                         size="population", size_max=60,
-                         color="region", color_discrete_map=self.continent_colors,
+                         size=None,
+                         color="Continent", color_discrete_map=self.continent_colors,
                          hover_name="Country", log_x=True)
         fig.update_layout(
-            xaxis=dict(title='Revenus net par personnes (en $ US de 2020)',
+            xaxis=dict(title='Bonheur recueilli dans un sondage',
                        type='linear' if xaxis_type == 'Linéaire' else 'log',
-                       range=(0, 100000) if xaxis_type == 'Linéaire'
-                       else (np.log10(50), np.log10(100000))
+                       range=(0, 10) if xaxis_type == 'Linéaire'
+                       else (np.log10(1), np.log10(10))
                        ),
-            yaxis=dict(title="Nombre d'enfants par femme", range=(0, 9)),
+            yaxis=dict(title="Bonheur calculé", range=(0, 10)),
             margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
             hovermode='closest',
             showlegend=False,
         )
         return fig
+
+    def get_country(self, hoverData):
+        if hoverData == None:  # init value
+            return self.df['Country'].iloc[np.random.randint(len(self.df))]
+        return hoverData['points'][0]['hovertext']
+
+    def country_chosen(self, hoverData):
+        return self.get_country(hoverData)
 
     def create_time_series(self, country, what, axis_type, title):
         return {
@@ -223,31 +232,31 @@ class happinessPerceptionReality():
             }
         }
 
-    def get_country(self, hoverData):
-        if hoverData == None:  # init value
-            return self.df['Country'].iloc[np.random.randint(len(self.df))]
-        return hoverData['points'][0]['hovertext']
+    # graph gdp vs years
+    def update_gdp_timeseries(self, hoverData, xaxis_type):
+        country = self.get_country(hoverData)
+        return self.create_time_series(country, 'GDP Index', xaxis_type, 'PIB par habitant (noté sur 10)')
 
-    def country_chosen(self, hoverData):
-        return self.get_country(hoverData)
+    # graph safety vs years
+    def update_safety_timeseries(self, hoverData, xaxis_type):
+        country = self.get_country(hoverData)
+        return self.create_time_series(country, 'Safety Index', xaxis_type, "Sécurité (notée sur 10)")
 
-    """
-        # graph incomes vs years
-        def update_income_timeseries(self, hoverData, xaxis_type):
-            country = self.get_country(hoverData)
-            return self.create_time_series(country, 'incomes', xaxis_type, 'PIB par personne (US $)')
+    # graph unemployment vs years
+    def update_unemployment_timeseries(self, hoverData, xaxis_type):
+        country = self.get_country(hoverData)
+        return self.create_time_series(country, 'Unemployment Index', xaxis_type, 'Chômage (noté sur 10)')
 
-        # graph children vs years
-        def update_fertility_timeseries(self, hoverData, xaxis_type):
-            country = self.get_country(hoverData)
-            return self.create_time_series(country, 'fertility', xaxis_type, "Nombre d'enfants par femme")
+    # graph social contribution vs years
+    def update_contribution_timeseries(self, hoverData, xaxis_type):
+        country = self.get_country(hoverData)
+        return self.create_time_series(country, 'Social Security Employer Contribution Index', xaxis_type, 'Contribution sociale (notée sur 10)')
 
-        # graph population vs years
-        def update_pop_timeseries(self, hoverData, xaxis_type):
-            country = self.get_country(hoverData)
-            return self.create_time_series(country, 'population', xaxis_type, 'Population')
-    """
-
+    # TODO if education, decomment the line below
+    # # graph education vs years
+    # def update_education_timeseries(self, hoverData, xaxis_type):
+    #     country = self.get_country(hoverData)
+    #     return self.create_time_series(country, 'Education Level Index', xaxis_type, 'Niveau d'éducation (noté sur 10)')
 
     # start and stop the movie
     def button_on_click(self, n_clicks, text):
@@ -259,7 +268,7 @@ class happinessPerceptionReality():
     # this one is triggered by the previous one because we cannot have 2 outputs
     # in the same callback
     def run_movie(self, text):
-        if text == self.START:    # then it means we are stopped
+        if text == self.START:  # then it means we are stopped
             return 0
         else:
             return -1
@@ -280,7 +289,6 @@ class happinessPerceptionReality():
 
 if __name__ == "__main__":
     res = happinessPerceptionReality()
-    df = res.df
-    res.df.to_excel("output.xlsx")
+    # df = res.df
+    # res.df.to_excel("output.xlsx")
     res.run(port=8055)
-

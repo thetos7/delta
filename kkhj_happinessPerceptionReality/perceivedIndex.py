@@ -20,7 +20,7 @@ def add_perceived_index(datasets, rates):
     # ,
     #                      apply_importance_rate(datasets[''])
 
-    datasets['Percieved Happiness'] = modifiedIndex[0] + modifiedIndex[1] + modifiedIndex[2] + modifiedIndex[3]
+    datasets['Perceived Happiness'] = modifiedIndex[0] + modifiedIndex[1] + modifiedIndex[2] + modifiedIndex[3]
 
     # TODO if educationLevel then append line below to the prev
     # + modifiedIndex[4]
