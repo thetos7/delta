@@ -12,6 +12,7 @@ class SalaryInflation():
     def __init__(self):
         self.df = get_data.get_data()
         self.years = self.df.year.unique()
+        print(self.df.age.unique())
         self.geodata = json.load(open('data/europe.geojson'))
         self.app = dash.Dash()
         self.app.layout = html.Div(children=[
@@ -33,7 +34,7 @@ class SalaryInflation():
             html.Div([
                 html.Div([
                     dcc.Graph(id='total-graph',
-                        style={'width': '90%', 'display': 'inline-block'}),
+                        style={'width': '85%', 'display': 'inline-block'}),
                     html.Div([
                         html.Div('Sexe :'),
                         dcc.RadioItems(id='sex', options=[
@@ -41,7 +42,15 @@ class SalaryInflation():
                             {'label': 'Hommes', 'value': 'M'},
                             {'label': 'Femmes', 'value': 'F'},
                         ], value='T', labelStyle={'display': 'block'}),
-                    ], style={'width': '10%', 'display': 'block', 'padding-left': '1%' }),
+                        html.Div('Age :', style={'padding-top': '5%'}),
+                        dcc.RadioItems(id='age', options=[
+                            {'label': 'Total', 'value': 'TOTAL'},
+                            {'label': 'Plus de 65 ans', 'value': 'Y_GE65'},
+                            {'label': '50-64 ans', 'value': 'Y50-64'},
+                            {'label': '25-49 ans', 'value': 'Y25-49'},
+                            {'label': '16-24 ans', 'value': 'Y16-24'},
+                        ], value='TOTAL', labelStyle={'display': 'block'}),
+                    ], style={'width': '15%', 'display': 'block', 'padding-left': '1%' }),
                 ], style={'display': 'flex', 'justifyContent': 'center', }),
                 html.Div('* Salaire attendu si on prend uniquement l\'évolution de l\'inflation en compte')
             ]),
@@ -62,7 +71,7 @@ class SalaryInflation():
         self.app.callback(
             dash.dependencies.Output('total-graph', 'figure'),
             [dash.dependencies.Input('europe-map', 'clickData'),
-             dash.dependencies.Input('sex', 'value')])(self.update_total_graph)
+             dash.dependencies.Input('sex', 'value'), dash.dependencies.Input('age', 'value')])(self.update_total_graph)
         self.app.callback(
             dash.dependencies.Output('men-graph', 'figure'),
             [dash.dependencies.Input('europe-map', 'clickData'),
@@ -98,10 +107,10 @@ class SalaryInflation():
         )
         return fig
 
-    def update_total_graph(self, hover, sex):
+    def update_total_graph(self, hover, sex, age):
         country = self.print_hover(hover)
         country_df = self.df[(self.df.country == country) & (
-            self.df.sex == sex) & (self.df.age == 'TOTAL')]
+            self.df.sex == sex) & (self.df.age == age)]
         w = country_df.wages_value.iloc[0]
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=country_df.year, y=country_df.wages_value, mode='lines', name='Salaire réel'))
