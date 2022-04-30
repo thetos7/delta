@@ -16,6 +16,7 @@ def get_inegalities_df():
             for filename in glob.glob("".join([path, "wid_data/WID_data_*.csv"]))
         ]
     )
+    df = df.loc[df["year"] >= 1995]
     return (
         df.drop(["pop", "age", "variable"], axis=1)
         .set_index(["country", "percentile", "year"])

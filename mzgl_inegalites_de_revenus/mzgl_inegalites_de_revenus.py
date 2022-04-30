@@ -17,7 +17,7 @@ def gini(array):
     for i in range(1, array.shape[0]):
         sum += cumul * 0.01 + ((0.01 * array[i]) / 2)
         cumul += array[i]
-    return (0.5 - sum) * 2.0
+    return round((0.5 - sum) * 2.0, 4)
 
 
 class Inegalites_de_revenus:
@@ -117,9 +117,9 @@ class Inegalites_de_revenus:
                         html.Div(
                             className="two columns",
                             children=[
-                                html.Div("Percentile (Ordonnée)"),
+                                html.Div("Indicateurs en ordonnée"),
                                 dcc.RadioItems(
-                                    id="select-percentile",
+                                    id="select-Y",
                                     options=[
                                         {
                                             "label": "1% les plus riches",
@@ -137,12 +137,16 @@ class Inegalites_de_revenus:
                                             "label": "10% les plus pauvres",
                                             "value": "p0p10",
                                         },
+                                        {
+                                            "label": "Coefficient de Gini",
+                                            "value": "G",
+                                        },
                                     ],
                                     value="p99p100",
                                     labelStyle={"display": "block"},
                                 ),
                                 html.Br(),
-                                html.Div("Indicateurs (Abscisse)"),
+                                html.Div("Indicateurs en abscisse"),
                                 dcc.RadioItems(
                                     id="select-X",
                                     options=[
@@ -185,10 +189,9 @@ class Inegalites_de_revenus:
                 ),
             ]
         )
-
+        # application should have its own layout and use self.main_layout as a page or in a component
         if application:
             self.app = application
-            # application should have its own layout and use self.main_layout as a page or in a component
         else:
             self.app = dash.Dash(
                 __name__, title="Les inégalités de revenus dans le monde"
@@ -209,7 +212,7 @@ class Inegalites_de_revenus:
         self.app.callback(
             dash.dependencies.Output("main-graph", "figure"),
             [
-                dash.dependencies.Input("select-percentile", "value"),
+                dash.dependencies.Input("select-Y", "value"),
                 dash.dependencies.Input("select-X", "value"),
                 dash.dependencies.Input("Year-Slider", "value"),
                 dash.dependencies.Input("checklist-continent", "value"),
@@ -218,7 +221,7 @@ class Inegalites_de_revenus:
         self.app.callback(
             dash.dependencies.Output("title-main-graph", "children"),
             [
-                dash.dependencies.Input("select-percentile", "value"),
+                dash.dependencies.Input("select-Y", "value"),
                 dash.dependencies.Input("select-X", "value"),
             ],
         )(self.update_title)
@@ -231,6 +234,7 @@ class Inegalites_de_revenus:
             [
                 dash.dependencies.Input("main-graph", "hoverData"),
                 dash.dependencies.Input("Year-Slider", "value"),
+                dash.dependencies.Input("select-Y", "value"),
             ],
         )(self.create_left_graph)
         self.app.callback(
@@ -266,13 +270,57 @@ class Inegalites_de_revenus:
             return country["Country_Name"]
         return hoverData["points"][0]["hovertext"]
 
-    def create_left_graph(self, hoverData, year):
+    def percentile_graph(self, code, yaxis):
+        title, y_axis_title = (
+            "Évolution de la part des revenus des 1% les plus riches",
+            "Pourcentage des revenus des 1% les plus riches",
+        )
+        df = self.ine_df.loc[(code, yaxis, slice(None)), :].sort_index()
+        if yaxis == "p0p50":
+            title, y_axis_title = (
+                "Évolution de la part des revenus des 50% les plus pauvres",
+                "Pourcentage des revenus des 50% les plus pauvres",
+            )
+        elif yaxis == "p0p10":
+            title, y_axis_title = (
+                "Évolution de la part des revenus des 10% les plus pauvres",
+                "Pourcentage des revenus des 10% les plus pauvres",
+            )
+        elif yaxis == "p90p100":
+            title, y_axis_title = (
+                "Évolution de la part des revenus des 10% les plus riches",
+                "Pourcentage des revenus des 10% les plus riches",
+            )
+        data = [
+            go.Scatter(
+                name="Indice de corruption",
+                x=df.index.get_level_values(level=2).array,
+                y=df["value"].array,
+                mode="lines",
+                hovertemplate="Année: %{x}<br>Part des revenus: %{y}%<extra></extra>",
+            )
+        ]
+        fig = go.Figure(
+            data=data,
+            layout={
+                "title": title,
+                "xaxis": {"title": "Années"},
+                "yaxis": {"title": y_axis_title, "type": "linear"},
+                "autosize": True,
+                "showlegend": False,
+            },
+        )
+        return fig
+
+    def create_left_graph(self, hoverData, year, yaxis):
         country_name = (self.get_country(hoverData),)
         code = (
             self.countries_df.reset_index()
             .set_index(["Country_Name"])
             .loc[country_name]["alpha2"]
         )
+        if yaxis != "G":
+            return self.percentile_graph(code, yaxis)
         tmp = self.ine_df.reset_index(level=1).sort_index().loc[(code, year), :]
         tmp = tmp[tmp["Percentile"].isin(list_percentile)]
         cumsum = list(np.cumsum(np.sort(tmp["value"].array)) * 100)
@@ -307,25 +355,22 @@ class Inegalites_de_revenus:
             "margin": {"l": 40, "b": 40, "r": 20, "t": 30},
         }
         fig = go.Figure(data=data, layout=layout)
-        gini = round(self.gini_df.loc[(code, year)].gini, 4)
         fig.add_annotation(
             xref="paper",
             yref="paper",
-            bordercolor="black",
-            font=dict(color="black", size=18),
-            x=0.1,
-            y=0.8,
-            text=f"Coefficient de Gini: {gini}",
+            font=dict(color="black", size=14),
+            x=0.05,
+            y=0.95,
+            text=f"Coefficient de Gini: {self.gini_df.loc[(code, year)].gini}",
             showarrow=False,
         )
         fig.add_annotation(
             xref="paper",
             yref="paper",
-            bordercolor="red",
-            font=dict(color="black", size=18),
+            font=dict(color="black", size=14),
             x=0.5,
             y=0.55,
-            text=f"Ligne d'égalité",
+            text="Ligne d'égalité",
             showarrow=False,
             textangle=-31.5,
         )
@@ -390,16 +435,17 @@ class Inegalites_de_revenus:
                     hovertemplate="Année: %{x}<br>Indice de démocratie: %{y}<extra></extra>",
                 )
             ]
-        return {
-            "data": data,
-            "layout": {
+        fig = go.Figure(
+            data=data,
+            layout={
                 "title": title,
                 "xaxis": {"title": "Années"},
                 "yaxis": {"title": y_axis_title, "type": "linear"},
                 "autosize": True,
                 "showlegend": False,
             },
-        }
+        )
+        return fig
 
     def update_year_slider(self, xaxis):
         x_axis_df = self.dem_df
