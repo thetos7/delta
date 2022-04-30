@@ -1,6 +1,7 @@
 from getDatasets import get_datasets
 from missingValues import *
 from perceivedIndex import *
+import pycountry_convert as pc
 
 
 class happinessPerceptionReality():
@@ -19,6 +20,20 @@ class happinessPerceptionReality():
 
         # Add perceived happiness
         datasets = add_perceived_index(datasets, importanceRate)
+
+        continents = {
+            'NA': 'North America',
+            'SA': 'South America',
+            'AS': 'Asia',
+            'OC': 'Australia',
+            'AF': 'Africa',
+            'EU': 'Europe'
+        }
+
+        datasets['Country_code'] = datasets['Country'].apply(lambda x : pc.country_name_to_country_alpha2(x, cn_name_format="default"))
+        datasets['Continent'] = datasets['Country_code'].apply(lambda x : continents[pc.country_alpha2_to_continent_code(x)])
+        datasets.drop("Country_code", inplace=True, axis=1)
+
 
         # Initialise variables
         self.df = datasets
