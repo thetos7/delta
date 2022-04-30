@@ -3,24 +3,29 @@ import matplotlib.pyplot as plt
 
 def get_data():
     usecols = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE']
-    prod_cons = pd.read_csv('data/resources/conso_production_petrole.csv', usecols=usecols)
-    prod_cons = df[df.unit != "NR"]
-    prod_cons = df[df.OBS_VALUE != 0]
-    export = pd.read_csv('data/resources/export_petrole.csv', usecols=usecols)
-    export = df[df.unit != "NR"]
-    export = df[df.OBS_VALUE != 0]
-    impor = pd.read_csv('data/resources/import_petrole.csv', usecols=usecols)
-    impor = df[df.unit != "NR"]
-    impor = df[df.OBS_VALUE != 0]
+    prod_cons = pd.read_csv('resources/conso_production_petrole.csv', usecols=usecols)
+    prod_cons = prod_cons[prod_cons.unit != "NR"]
+    prod_cons = prod_cons[prod_cons.OBS_VALUE != 0]
+    export = pd.read_csv('resources/export_petrole.csv', usecols=usecols)
+    export = export[export.unit != "NR"]
+    export = export[export.OBS_VALUE != 0]
+    impor = pd.read_csv('resources/import_petrole.csv', usecols=usecols)
+    impor = impor[impor.unit != "NR"]
+    impor = impor[impor.OBS_VALUE != 0]
     return prod_cons, export, impor
 
 
 def get_by_country(data, country):
     return data[data.geo == country]
 
-def get_by_energy(data, energy):
-    return data[data.siec == energy]
 
+def get_by_year(data, year):
+    return data[data.TIME_PERIOD == year]
+
+def list_years(data):
+    ret = data['TIME_PERIOD'].unique()
+    ret.sort()
+    return ret
 
 def list_countries(data):
     return data['geo'].unique()
