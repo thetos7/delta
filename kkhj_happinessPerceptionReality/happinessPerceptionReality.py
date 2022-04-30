@@ -126,11 +126,13 @@ class happinessPerceptionReality:
 
             html.Div([
                 dcc.Graph(id='wps-gdp-time-series',
-                          style={'width': '33%', 'display': 'inline-block'}),
+                          style={'width': '25%', 'display': 'inline-block'}),
                 dcc.Graph(id='wps-safety-time-series',
-                          style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
+                          style={'width': '25%', 'display': 'inline-block', 'padding-left': '0.5%'}),
                 dcc.Graph(id='wps-unemployment-time-series',
-                          style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
+                          style={'width': '25%', 'display': 'inline-block', 'padding-left': '0.5%'}),
+                dcc.Graph(id='wps-contribution-time-series',
+                          style={'width': '25%', 'display': 'inline-block', 'padding-left': '0.5%'}),
                 # TODO add contribution and educationLevel
             ], style={'display': 'flex',
                       'borderTop': 'thin lightgrey solid',
@@ -186,6 +188,10 @@ class happinessPerceptionReality:
             dash.dependencies.Output('wps-unemployment-time-series', 'figure'),
             [dash.dependencies.Input('wps-main-graph', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_unemployment_timeseries)
+        self.app.callback(
+            dash.dependencies.Output('wps-contribution-time-series', 'figure'),
+            [dash.dependencies.Input('wps-main-graph', 'hoverData'),
+             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_contribution_timeseries)
 
     def update_graph(self, continents, xaxis_type, year):
         dfg = self.df.loc[year]
