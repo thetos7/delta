@@ -12,7 +12,6 @@ class SalaryInflation():
     def __init__(self):
         self.df = get_data.get_data()
         self.years = self.df.year.unique()
-        print(self.df.age.unique())
         self.geodata = json.load(open('data/europe.geojson'))
         self.app = dash.Dash()
         self.app.layout = html.Div(children=[
@@ -36,13 +35,13 @@ class SalaryInflation():
                     dcc.Graph(id='total-graph',
                         style={'width': '85%', 'display': 'inline-block'}),
                     html.Div([
-                        html.Div('Sexe :'),
+                        html.U('Sexe :'),
                         dcc.RadioItems(id='sex', options=[
                             {'label': 'Total', 'value': 'T'},
                             {'label': 'Hommes', 'value': 'M'},
                             {'label': 'Femmes', 'value': 'F'},
                         ], value='T', labelStyle={'display': 'block'}),
-                        html.Div('Age :', style={'padding-top': '5%'}),
+                        html.Div(html.U('Age :'), style={'padding-top': '5%'}),
                         dcc.RadioItems(id='age', options=[
                             {'label': 'Total', 'value': 'TOTAL'},
                             {'label': 'Plus de 65 ans', 'value': 'Y_GE65'},
