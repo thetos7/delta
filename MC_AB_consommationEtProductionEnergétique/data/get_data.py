@@ -3,10 +3,16 @@ import matplotlib.pyplot as plt
 
 def get_data():
     usecols = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE']
-    df = pd.read_csv('conso_energie_renouvelable.csv', usecols=usecols)
-    df = df[df.unit != "NR"]
-    df = df[df.OBS_VALUE != 0]
-    return df
+    prod_cons = pd.read_csv('data/resources/conso_production_petrole.csv', usecols=usecols)
+    prod_cons = df[df.unit != "NR"]
+    prod_cons = df[df.OBS_VALUE != 0]
+    export = pd.read_csv('data/resources/export_petrole.csv', usecols=usecols)
+    export = df[df.unit != "NR"]
+    export = df[df.OBS_VALUE != 0]
+    impor = pd.read_csv('data/resources/import_petrole.csv', usecols=usecols)
+    impor = df[df.unit != "NR"]
+    impor = df[df.OBS_VALUE != 0]
+    return prod_cons, export, impor
 
 
 def get_by_country(data, country):
@@ -15,8 +21,6 @@ def get_by_country(data, country):
 def get_by_energy(data, energy):
     return data[data.siec == energy]
 
-def list_energies(data):
-    return data['siec'].unique()
 
 def list_countries(data):
     return data['geo'].unique()
@@ -36,7 +40,6 @@ def clear_unique_values(data):
 
 if __name__ == '__main__':
     data = get_data()
-    print(list_energies(data))
     FR = get_by_country(data, "FR")
     FR_RA000 = get_by_energy(FR, "RA000")
     unit = FR_RA000['unit'].unique()[0]
