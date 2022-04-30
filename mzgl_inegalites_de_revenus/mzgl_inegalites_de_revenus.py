@@ -54,7 +54,9 @@ class Inegalites_de_revenus:
             [
                 html.Div(
                     className="row",
-                    children=[html.H2("Inégalités de revenus dans le monde")],
+                    children=[
+                        html.H2("Inégalités de revenus dans le monde"),
+                    ],
                 ),
                 html.Div(
                     className="row",
@@ -64,7 +66,9 @@ class Inegalites_de_revenus:
                             children=[
                                 html.Center(
                                     [
-                                        html.H4(children=[], id="title-main-graph"),
+                                        html.H4([], id="title-main-graph"),
+                                        html.H6([], id="def-axis1"),
+                                        html.H6([], id="def-axis2"),
                                         html.Div([dcc.Graph(id="main-graph")]),
                                         html.Br(),
                                         html.Div(
@@ -110,7 +114,15 @@ class Inegalites_de_revenus:
                                 ),
                                 dcc.Markdown(
                                     """
-                                #### À propos
+                                ### Formatage des axes:
+                                Pour l'indicateur "Produit intérieur brut par habitant", un autoscaling sur l'axe des abscisses est appliqué afin de suivre l'augmentation du PIB.
+                                #### Observations sur les résultats
+                                * En moyenne, les inégalités de répartition de revenus ont augmenté à travers le monde depuis 1995.
+                                * On remarque, qu'une mauvaise répartition des richesses n'est pas liée à un problème de corruption ou de démocratie. Des pays démocratiques et peu corrompus, comme les USA ou le japon, sont tout aussi inégalitaires que des pays peu démocratiques et corrompus, comme Haïti ou la Russie.
+                                * De même, le PIB n'est pas indicateur de l'inégalité : en Afrique on a une grande variance dans les inégalités avec des pays ayant un PIB similaire.
+                                * L'Europe et l'Océanie ont des inégalités de revenus bien plus faible que les autres et possèdent tous deux l'indice de démocratie / de corruption moyen le plus faible.
+                                * On en conclut que l'importance de l'inégalité dans un pays ne semble pas être lié au niveau de démocratie, de corruption ou de développement de celui-ci. Il semble plutôt que dans le cas de l'Europe et de l'Océanie, les pays sont en moyennes plus égalitaire et que c'est donc la "manière" européenne de gérer un pays qui fait la différence.
+                                ### À propos
                                 Données :
                                 - [Population, Banque mondiale](https://data.worldbank.org/indicator/SP.POP.TOTL?name_desc=false)
                                 - [PIB par personnes, Banque mondiale](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD)
@@ -229,6 +241,16 @@ class Inegalites_de_revenus:
         )(self.update_year_slider)
 
         self.app.callback(
+            [
+                dash.dependencies.Output("def-axis1", "children"),
+                dash.dependencies.Output("def-axis2", "children"),
+            ],
+            [
+                dash.dependencies.Input("select-X", "value"),
+                dash.dependencies.Input("select-Y", "value"),
+            ],
+        )(self.get_definition_xaxis)
+        self.app.callback(
             dash.dependencies.Output("main-graph", "figure"),
             [
                 dash.dependencies.Input("select-Y", "value"),
@@ -274,6 +296,23 @@ class Inegalites_de_revenus:
             dash.dependencies.Output("ine-auto-stepper", "max_interval"),
             [dash.dependencies.Input("ine-button-start-stop", "children")],
         )(self.run_movie)
+
+    def get_definition_xaxis(self, xaxis, yaxis):
+        text = "Le coefficient de Gini est entre 0 et 1. Il permet de rendre compte des inégalités de répartition des revenus dans un pays. Plus ce coefficient est proche de 0, plus on se rapproche de l'égalité parfaite."
+        if yaxis != "G":
+            text = ""
+        if xaxis == "C":
+            return (
+                "Un indice de corruption élevé indique qu'il y a PEU de corruption dans le pays.",
+                text,
+            )
+        elif xaxis == "P":
+            return "", text
+        else:
+            return (
+                "Un indice de démocratie faible indique que le pays est PEU démocratique.",
+                text,
+            )
 
     def update_title(self, yaxis, xaxis):
         yaxis_title = "les 10% les plus pauvres"
