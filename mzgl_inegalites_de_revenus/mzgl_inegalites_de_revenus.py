@@ -482,16 +482,6 @@ class Inegalites_de_revenus:
         )
         return fig
 
-    # see if it should move the slider for simulating a movie
-    def on_interval(self, n_intervals, year, text):
-        if text == self.STOP:  # then we are running
-            if year == self.years[-1]:
-                return self.years[0]
-            else:
-                return year + 1
-        else:
-            return year  # nothing changes
-
     def update_year_slider(self, xaxis, n_intervals, year, text):
         is_running = 0
         if text == self.STOP:
