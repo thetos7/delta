@@ -12,8 +12,9 @@ from MDMR_NYPDCallsMeteoNY.helpers.design import (
     color_green,
 )
 
+import numpy as np
 import plotly.express as px
-#import plotly.graph_objects as go
+
 calls = load_calls_correlation_data()
 weather = load_weather_data()
 
@@ -26,16 +27,26 @@ def display_correlation_scatter(freq="M", size_value=0):
 
     size_values = [prcp, wspd]
     hover_text = ["mm de précipitation", "km/h de vent"]
-    #fig = go.Figure()
 
-    fig = go.scatter(
+    A = np.vstack([tavg, np.ones(len(tavg))]).T
+    m, c = np.linalg.lstsq(A, nb_calls, rcond=None)[0]
+    fig = px.scatter(
         x=tavg,
         y=nb_calls,
-        trendline="ols",
+        #trendline="ols",
+        #line=(m * tavg + c),
         size=size_values[size_value],
         color_discrete_sequence=[color_blue],
         trendline_color_override=color_green,
     )
+
+ #   fig.update_layout(shapes=[
+ #       dict(
+ #       type= 'line',
+ #       yref= 'paper', y0= 0, y1= 1,
+ #       xref= 'x', x0= 5, x1= 5
+ #       )
+ #   ])
 
     fig.update_traces(
         hovertemplate="Température: %{x}°C<br>%{y} appels<br>%{marker.size:.2f}"
