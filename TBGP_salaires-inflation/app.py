@@ -91,11 +91,17 @@ class SalaryInflation():
 
     def update_graph(self, year):
         data = self.df[(self.df.year == np.datetime64(int(year) - 1970, 'Y')) & (self.df.age == 'TOTAL') & (
-            self.df.sex == 'T')][['country', 'cumulative_sum']]
+            self.df.sex == 'T')][['country', 'cumulative_sum', 'wages_value']]
+        data = data.set_index('country')
+
+        base_values = self.df[(self.df.age == 'TOTAL') & (self.df.sex == 'T')].groupby('country').first()
+        base_values = base_values[base_values.year <= np.datetime64(int(year) - 1970, 'Y')]['wages_value']
+        data['test'] = data['wages_value'] / (data['cumulative_sum'] * base_values)
 
         fig = px.choropleth_mapbox(data, geojson=self.geodata,
-                                   locations='country', featureidkey='properties.ISO2',  # join keys
-                                   color='cumulative_sum', color_continuous_scale='Viridis',
+                                   locations=data.index, featureidkey='properties.ISO2',  # join keys
+                                   color='test', color_continuous_scale='rdylbu',
+                                   range_color=(0,2),
                                    mapbox_style='carto-positron',
                                    zoom=3, center={'lat': 52, 'lon': 10},
                                    opacity=0.5,
