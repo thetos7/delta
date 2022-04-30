@@ -9,6 +9,10 @@ from MDMR_NYPDCallsMeteoNY.figures.scatter_figure import display_correlation_sca
 from MDMR_NYPDCallsMeteoNY.figures.types_figure import types_of_calls
 from MDMR_NYPDCallsMeteoNY.figures.type_inout_temp_figure import in_out_of_calls
 
+
+from MDMR_NYPDCallsMeteoNY.assets.header import *
+from MDMR_NYPDCallsMeteoNY.assets.graph import *
+
 from MDMR_NYPDCallsMeteoNY.helpers.design import (
     background_color,
     font_color,
@@ -16,7 +20,6 @@ from MDMR_NYPDCallsMeteoNY.helpers.design import (
     color_green,
 )
 from MDMR_NYPDCallsMeteoNY.helpers.utils import load_weather_data
-
 class SliderDataManager:
     def __init__(self):
         yearsM = sorted(load_weather_data().resample("M").mean().index)
@@ -75,7 +78,21 @@ class MDMR_NYPDCallsMeteoNY:
         else:
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
-        
+
+        self.app.css.config.serve_locally = True
+        self.app.scripts.config.serve_locally = True
+
+        # Add css file (locally hosted)
+        self.app.css.append_css({"external_url": [
+            "MDMR_NYPDCallsMeteoNY/assets/graphs.css"
+        ]})
+
+        # Serving local static files
+        @self.app.server.route('/MDMR_NYPDCallsMeteoNY/assets/<path>')
+        def static_file(path):
+            static_folder = os.path.join(os.getcwd(), 'assets')
+            return send_from_directory(static_folder, path)
+
         @self.app.callback(
             Output("figure-corr", "figure"),
             Input("frequence", "value"),
@@ -197,17 +214,19 @@ class MDMR_NYPDCallsMeteoNY:
         """
 
         self.main_layout = html.Div(
-            className="app-base",
+            style=app_base,
             children=[
-                html.H1("Appels NYPD en fonction de la météo à New-York"),
+                html.H1(
+                    style=h1,
+                    children=["Appels NYPD en fonction de la météo à New-York"]),
                 html.Div(
-                    className="app-intro",
+                    style=app_intro,
                     children=[
-                        dcc.Markdown(paraf_intro, className="paraf_intro"),
+                        dcc.Markdown(paraf_intro),
                     ],
                 ),
                 html.Div(
-                    className="app-Dropdown-div",
+                    style=app_Dropdown_div,
                     children=[
                         dcc.Dropdown(
                             id="frequence",
@@ -216,27 +235,31 @@ class MDMR_NYPDCallsMeteoNY:
                             searchable=False,
                             clearable=False,
                             persistence=True,
-                            className="app-Dropdown",
+                            style=app_Dropdown,
                         ),
                     ],
                 ),
                 html.Div(
-                    className="graph-div",
-                    children=[
-                        html.H2(children="Nombre d'appels et température moyenne"),
-                        html.Div([dcc.Graph(className="graph", id="figure-corr")]),
-                        dcc.Markdown(paraf_corr, className="graph-text"),
-                    ],
-                ),
-                html.Div(
-                    className="graph-div",
+                    style=graph_div,
                     children=[
                         html.H2(
-                            "Nombre d'appels en fonction de la température moyenne"
+                            style=h2,
+                            children="Nombre d'appels et température moyenne"
                         ),
-                        html.Div([dcc.Graph(className="graph", id="figure-scatter")]),
+                        html.Div([dcc.Graph(style={**graph_div, **graph}, id="figure-corr")]),
+                        dcc.Markdown(paraf_corr, style=graph_text),
+                    ],
+                ),
+                html.Div(
+                    style=graph_div,
+                    children=[
+                        html.H2(
+                            style=h2,
+                            children=["Nombre d'appels en fonction de la température moyenne"]
+                        ),
+                        html.Div([dcc.Graph(style=graph | graph_div, id="figure-scatter")]),
                         html.Div(
-                            className="app-Dropdown-scatter",
+                            style=app_Dropdown_scatter,
                             children=[
                                 dcc.Dropdown(
                                     id="size_scatter",
@@ -245,30 +268,31 @@ class MDMR_NYPDCallsMeteoNY:
                                     searchable=False,
                                     clearable=False,
                                     persistence=True,
-                                    className="app-Dropdown",
+                                    style=app_Dropdown,
                                 ),
                             ],
                         ),
-                        dcc.Markdown(paraf_scatter, className="graph-text"),
+                        dcc.Markdown(paraf_scatter, style=graph_text),
                     ],
                 ),
                 html.Div(
                     [
-                        html.H2(
-                            "Type et lieu des appels par rapport à la température moyenne"
-                        ),
                         html.Div(
-                            className="graph-div-types",
+                            style=graph_div,
                             children=[
+                                html.H2(
+                                    style=h2,
+                                    children=["Type et lieu des appels par rapport à la température moyenne"]
+                                ),
                                 html.Div(
-                                    className="graph-types",
+                                    style=graph_types,
                                     children=[
                                         html.Div(
-                                            className="graph-types-general",
+                                            style=graph_types_general,
                                             children=[dcc.Graph(id="figure-types")],
                                         ),
                                         html.Div(
-                                            className="graph-types-in-out",
+                                            style=graph_types_in_out,
                                             children=[
                                                 dcc.Graph(id="figure-types-in-out")
                                             ],
@@ -304,7 +328,7 @@ class MDMR_NYPDCallsMeteoNY:
                                             },
                                         ),
                                         html.Div(
-                                            className="graph-types-slider",
+                                            style=graph_types_slider,
                                             children=dcc.Slider(
                                                 id="slider",
                                                 value=0,
@@ -313,18 +337,20 @@ class MDMR_NYPDCallsMeteoNY:
                                         ),
                                     ],
                                 ),
-                                html.P(className="graph-text", children=paraf_type),
+                                dcc.Markdown(children=paraf_type, style=graph_text),
                             ],
                         ),
                     ]
                 ),
                 html.Div(
-                    className="graph-div",
+                    style=graph_div,
                     children=[
-                        html.H2(children="A propos"),
+                        html.H2(
+                            style=h2,
+                            children=["A propos"]),
                         dcc.Markdown(
                             """
-                        * Sources :
+                        Sources :
                         * [Appels NYPD](https://data.cityofnewyork.us/Public-Safety/NYPD-Calls-for-Service-Historic-/d6zx-ckhd) sur data.cityofnewyork.us
                         * [Météo à New-York](https://meteostat.net/fr/place/us/new-york-city?t=2018-01-01/2020-12-31&s=72502) sur meteostat.net  
                         """,
@@ -333,8 +359,9 @@ class MDMR_NYPDCallsMeteoNY:
                     ],
                 ),
                 html.Footer(
+                    style=footer,
                     children=[
-                        dcc.Markdown("""(c) 2022 Moustapha Diop - Mathieu Rivier""")
+                        dcc.Markdown("""© 2022 Moustapha Diop - Mathieu Rivier""")
                     ]
                 ),
             ],
