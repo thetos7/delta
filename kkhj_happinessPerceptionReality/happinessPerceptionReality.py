@@ -193,7 +193,7 @@ class happinessPerceptionReality():
                          # title = f"{year}", cliponaxis=False,
                          size="population", size_max=60,
                          color="region", color_discrete_map=self.continent_colors,
-                         hover_name="Country Name", log_x=True)
+                         hover_name="Country", log_x=True)
         fig.update_layout(
             xaxis=dict(title='Revenus net par personnes (en $ US de 2020)',
                        type='linear' if xaxis_type == 'Linéaire' else 'log',
@@ -207,67 +207,47 @@ class happinessPerceptionReality():
         )
         return fig
 
-    def run(self, debug=False, port=8050):
-        self.app.run_server(host="0.0.0.0", debug=debug, port=port)
-
-
-if __name__ == "__main__":
-    res = happinessPerceptionReality()
-    df = res.df
-    res.df.to_excel("output.xlsx")
-    res.run(port=8055)
-
-"""
-class WorldPopulationStats():
-
-    def __init__(self, application = None):
-  
-        
-
-        
-
-
-    
-
     def create_time_series(self, country, what, axis_type, title):
         return {
             'data': [go.Scatter(
-                x = self.years,
-                y = self.df[self.df["Country Name"] == country][what],
-                mode = 'lines+markers',
+                x=self.years,
+                y=self.df[self.df["Country"] == country][what],
+                mode='lines+markers',
             )],
             'layout': {
                 'height': 225,
                 'margin': {'l': 50, 'b': 20, 'r': 10, 't': 20},
-                'yaxis': {'title':title,
+                'yaxis': {'title': title,
                           'type': 'linear' if axis_type == 'Linéaire' else 'log'},
                 'xaxis': {'showgrid': False}
             }
         }
 
-
     def get_country(self, hoverData):
         if hoverData == None:  # init value
-            return self.df['Country Name'].iloc[np.random.randint(len(self.df))]
+            return self.df['Country'].iloc[np.random.randint(len(self.df))]
         return hoverData['points'][0]['hovertext']
 
     def country_chosen(self, hoverData):
         return self.get_country(hoverData)
 
-    # graph incomes vs years
-    def update_income_timeseries(self, hoverData, xaxis_type):
-        country = self.get_country(hoverData)
-        return self.create_time_series(country, 'incomes', xaxis_type, 'PIB par personne (US $)')
+    """
+        # graph incomes vs years
+        def update_income_timeseries(self, hoverData, xaxis_type):
+            country = self.get_country(hoverData)
+            return self.create_time_series(country, 'incomes', xaxis_type, 'PIB par personne (US $)')
 
-    # graph children vs years
-    def update_fertility_timeseries(self, hoverData, xaxis_type):
-        country = self.get_country(hoverData)
-        return self.create_time_series(country, 'fertility', xaxis_type, "Nombre d'enfants par femme")
+        # graph children vs years
+        def update_fertility_timeseries(self, hoverData, xaxis_type):
+            country = self.get_country(hoverData)
+            return self.create_time_series(country, 'fertility', xaxis_type, "Nombre d'enfants par femme")
 
-    # graph population vs years
-    def update_pop_timeseries(self, hoverData, xaxis_type):
-        country = self.get_country(hoverData)
-        return self.create_time_series(country, 'population', xaxis_type, 'Population')
+        # graph population vs years
+        def update_pop_timeseries(self, hoverData, xaxis_type):
+            country = self.get_country(hoverData)
+            return self.create_time_series(country, 'population', xaxis_type, 'Population')
+    """
+
 
     # start and stop the movie
     def button_on_click(self, n_clicks, text):
@@ -280,7 +260,7 @@ class WorldPopulationStats():
     # in the same callback
     def run_movie(self, text):
         if text == self.START:    # then it means we are stopped
-            return 0 
+            return 0
         else:
             return -1
 
@@ -294,10 +274,13 @@ class WorldPopulationStats():
         else:
             return year  # nothing changes
 
-   
+    def run(self, debug=False, port=8050):
+        self.app.run_server(host="0.0.0.0", debug=debug, port=port)
 
 
+if __name__ == "__main__":
+    res = happinessPerceptionReality()
+    df = res.df
+    res.df.to_excel("output.xlsx")
+    res.run(port=8055)
 
-
-
-"""
