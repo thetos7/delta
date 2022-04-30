@@ -584,6 +584,8 @@ class Inegalites_de_revenus:
                     ]
                 )
             )
+            if xmax != -1:
+                fig.update_xaxes(range=[0, xmax])
             return fig
         res["value"] *= 100
         fig = px.scatter(
