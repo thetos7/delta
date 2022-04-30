@@ -12,11 +12,17 @@ import dateutil as du
 from scipy import stats
 from scipy import fft
 
+import get_data
+
 
 class Pollution():
     def __init__(self, application=None):
+        self.df = get_data.prices
+
         self.main_layout = html.Div(children=[
             html.H3(children='Pollution/Petrole'),
+            html.Div([ dcc.Graph(id='mpj-main-graph'), ], style={'width':'100%', }),
+            html.Br(),
             dcc.Markdown("""Space Movie 1992""")
         ], style={
             'backgroundColor': 'white',
