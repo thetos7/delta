@@ -32,6 +32,9 @@ h2 {
     font-size: 20px;
 }
 
+html {
+    background-color: #000000 !important;
+}
 .app-Dropdown-div {
     background-color: #FFFFFF;
     position: -webkit-sticky;
@@ -66,3 +69,5 @@ footer {
     text-align: center;
     font-size: 22px;
 }
+
+
