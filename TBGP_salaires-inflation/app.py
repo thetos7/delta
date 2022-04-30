@@ -19,6 +19,7 @@ class SalaryInflation():
                     style={'textAlign': 'center'}),
             html.Div([dcc.Graph(id='europe-map'),
                      html.Div(id='year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
+
             dcc.Slider(
                 id='year-filter-slider',
                 min=self.years[0],
@@ -31,13 +32,17 @@ class SalaryInflation():
             # dcc.Markdown(id='md'),
             html.Div([
                 html.Div([
-                    dcc.Graph(id='men-graph',
-                        style={'width': '33%', 'display': 'inline-block'}),
                     dcc.Graph(id='total-graph',
-                        style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
-                    dcc.Graph(id='women-graph',
-                        style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
-                    ], style={'display': 'flex', 'justifyContent': 'center', }),
+                        style={'width': '90%', 'display': 'inline-block'}),
+                    html.Div([
+                        html.Div('Sexe :'),
+                        dcc.RadioItems(id='sex', options=[
+                            {'label': 'Total', 'value': 'T'},
+                            {'label': 'Hommes', 'value': 'M'},
+                            {'label': 'Femmes', 'value': 'F'},
+                        ], value='T', labelStyle={'display': 'block'}),
+                    ], style={'width': '10%', 'display': 'block', 'padding-left': '1%' }),
+                ], style={'display': 'flex', 'justifyContent': 'center', }),
                 html.Div('* Salaire attendu si on prend uniquement l\'évolution de l\'inflation en compte')
             ]),
         ])
@@ -57,7 +62,7 @@ class SalaryInflation():
         self.app.callback(
             dash.dependencies.Output('total-graph', 'figure'),
             [dash.dependencies.Input('europe-map', 'clickData'),
-             dash.dependencies.Input('year-filter-slider', 'value')])(self.update_total_graph)
+             dash.dependencies.Input('sex', 'value')])(self.update_total_graph)
         self.app.callback(
             dash.dependencies.Output('men-graph', 'figure'),
             [dash.dependencies.Input('europe-map', 'clickData'),
@@ -93,17 +98,16 @@ class SalaryInflation():
         )
         return fig
 
-    def update_total_graph(self, hover, year):
+    def update_total_graph(self, hover, sex):
         country = self.print_hover(hover)
         country_df = self.df[(self.df.country == country) & (
-            self.df.sex == 'T') & (self.df.age == 'TOTAL')]
+            self.df.sex == sex) & (self.df.age == 'TOTAL')]
         w = country_df.wages_value.iloc[0]
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=country_df.year, y=country_df.wages_value, mode='lines', name='Salaire réel'))
         fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation*'))
         fig.update_layout(
-            title = 'Évolution du salaire médian en comparaison avec l\'inflation.<br>Lieu : ' + country_name[country] + '<br><sup>Au total</sup>',
-            title_font_size = 12,
+            title = 'Évolution du salaire médian en comparaison avec l\'inflation.<br>Lieu : ' + country_name[country],
             title_xanchor = 'auto',
             title_pad = { 't': 0, 'b': 0, 'l': 0, 'r': 0},
             height=450,
