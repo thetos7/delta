@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import mzgl_inegalites_de_revenus.data.get_data as gd
 
-list_percentile = [f"p{i}p{i+1}" for i in range(0, 100)]
+list_yaxis = [f"p{i}p{i+1}" for i in range(0, 100)]
 
 
 def gini(array):
@@ -21,6 +21,9 @@ def gini(array):
 
 
 class Inegalites_de_revenus:
+    START = "Start"
+    STOP = "Stop"
+
     def __init__(self, application=None):
         self.continent_colors = {
             "Afrique": "brown",
@@ -29,7 +32,7 @@ class Inegalites_de_revenus:
             "Europe": "green",
             "Océanie": "red",
         }
-        self.percentile_colors = {
+        self.yaxis_colors = {
             "p0p10": "red",
             "p0p50": "blue",
             "p90p100": "green",
@@ -40,14 +43,13 @@ class Inegalites_de_revenus:
         self.gdp_df = gd.get_gdp_df()
         self.cpi_df = gd.get_corruption_df()
         self.dem_df = gd.get_democratie_index_df()
-        self.ine_df = gd.get_inegalities_df()
-
+        self.ine_df = gd.get_inegalities_df(self.countries_df)
         self.gini_df = (
-            self.ine_df[self.ine_df.index.isin(list_percentile, level="Percentile")]
+            self.ine_df[self.ine_df.index.isin(list_yaxis, level="Percentile")]
             .groupby(level=[0, 2])["value"]
             .agg([gini])
         )
-
+        self.ine_df = self.ine_df.join(self.gini_df, on=["alpha3", "Year"])
         self.main_layout = html.Div(
             [
                 html.Div(
@@ -69,7 +71,13 @@ class Inegalites_de_revenus:
                                             [
                                                 dcc.Slider(
                                                     id="Year-Slider", step=1, value=1995
-                                                )
+                                                ),
+                                                dcc.Interval(  # fire a callback periodically
+                                                    id="ine-auto-stepper",
+                                                    interval=1000,  # in milliseconds
+                                                    max_intervals=-1,  # start running
+                                                    n_intervals=0,
+                                                ),
                                             ]
                                         ),
                                         html.Br(),
@@ -183,6 +191,11 @@ class Inegalites_de_revenus:
                                         ),
                                     ]
                                 ),
+                                html.Button(
+                                    self.START,
+                                    id="ine-button-start-stop",
+                                    style={"display": "inline-block"},
+                                ),
                             ],
                         ),
                     ],
@@ -207,8 +220,14 @@ class Inegalites_de_revenus:
             ],
             [
                 dash.dependencies.Input("select-X", "value"),
+                dash.dependencies.Input("ine-auto-stepper", "n_intervals"),
+            ],
+            [
+                dash.dependencies.State("Year-Slider", "value"),
+                dash.dependencies.State("ine-button-start-stop", "children"),
             ],
         )(self.update_year_slider)
+
         self.app.callback(
             dash.dependencies.Output("main-graph", "figure"),
             [
@@ -245,17 +264,34 @@ class Inegalites_de_revenus:
             ],
         )(self.create_right_graph)
 
-    def update_title(self, percentile, xaxis):
-        yaxis = "les 10% les plus pauvres"
-        if percentile == "p99p100":
-            yaxis = "les 1% les plus riches"
-        elif percentile == "p0p50":
-            yaxis = "les 50% les plus pauvres"
-        elif percentile == "p90p100":
-            yaxis = "les 10% les plus riches"
+        self.app.callback(
+            dash.dependencies.Output("ine-button-start-stop", "children"),
+            dash.dependencies.Input("ine-button-start-stop", "n_clicks"),
+            dash.dependencies.State("ine-button-start-stop", "children"),
+        )(self.button_on_click)
+        # this one is triggered by the previous one because we cannot have 2 outputs for the same callback
+        self.app.callback(
+            dash.dependencies.Output("ine-auto-stepper", "max_interval"),
+            [dash.dependencies.Input("ine-button-start-stop", "children")],
+        )(self.run_movie)
+
+    def update_title(self, yaxis, xaxis):
+        yaxis_title = "les 10% les plus pauvres"
+        if yaxis == "p99p100":
+            yaxis_title = "les 1% les plus riches"
+        elif yaxis == "p0p50":
+            yaxis_title = "les 50% les plus pauvres"
+        elif yaxis == "p90p100":
+            yaxis_title = "les 10% les plus riches"
         title = " ".join(
-            ["Évolution par pays de la part des revenus détenus par", yaxis, "vs "]
+            [
+                "Évolution par pays de la part des revenus détenus par",
+                yaxis_title,
+                "vs ",
+            ]
         )
+        if yaxis == "G":
+            title = "Coefficient de Gini vs "
         if xaxis == "C":
             title += "Indice de corruption"
         elif xaxis == "P":
@@ -270,7 +306,7 @@ class Inegalites_de_revenus:
             return country["Country_Name"]
         return hoverData["points"][0]["hovertext"]
 
-    def percentile_graph(self, code, yaxis):
+    def yaxis_graph(self, code, yaxis):
         title, y_axis_title = (
             "Évolution de la part des revenus des 1% les plus riches",
             "Pourcentage des revenus des 1% les plus riches",
@@ -295,7 +331,7 @@ class Inegalites_de_revenus:
             go.Scatter(
                 name="Indice de corruption",
                 x=df.index.get_level_values(level=2).array,
-                y=df["value"].array,
+                y=df["value"].array * 100,
                 mode="lines",
                 hovertemplate="Année: %{x}<br>Part des revenus: %{y}%<extra></extra>",
             )
@@ -313,18 +349,17 @@ class Inegalites_de_revenus:
         return fig
 
     def create_left_graph(self, hoverData, year, yaxis):
-        country_name = (self.get_country(hoverData),)
         code = (
             self.countries_df.reset_index()
             .set_index(["Country_Name"])
-            .loc[country_name]["alpha2"]
+            .loc[self.get_country(hoverData)]["alpha3"]
         )
         if yaxis != "G":
-            return self.percentile_graph(code, yaxis)
+            return self.yaxis_graph(code, yaxis)
         tmp = self.ine_df.reset_index(level=1).sort_index().loc[(code, year), :]
-        tmp = tmp[tmp["Percentile"].isin(list_percentile)]
+        tmp = tmp[tmp["Percentile"].isin(list_yaxis)]
         cumsum = list(np.cumsum(np.sort(tmp["value"].array)) * 100)
-        cumsum[-1] = 100.0
+        cumsum[-1] = 100
         data, layout = [
             go.Scatter(
                 x=np.arange(1, 101, 1),
@@ -447,35 +482,65 @@ class Inegalites_de_revenus:
         )
         return fig
 
-    def update_year_slider(self, xaxis):
+    # see if it should move the slider for simulating a movie
+    def on_interval(self, n_intervals, year, text):
+        if text == self.STOP:  # then we are running
+            if year == self.years[-1]:
+                return self.years[0]
+            else:
+                return year + 1
+        else:
+            return year  # nothing changes
+
+    def update_year_slider(self, xaxis, n_intervals, year, text):
+        is_running = 0
+        if text == self.STOP:
+            is_running = 1
         x_axis_df = self.dem_df
         if xaxis == "C":
             x_axis_df = self.cpi_df
         elif xaxis == "P":
+            if year + is_running > 2020 or year < 1995:
+                return (
+                    1995,
+                    2020,
+                    1995,
+                    {str(y): str(y) for y in range(1995, 2021, 5)},
+                )
             return (
                 1995,
                 2020,
-                1995,
-                {str(year): str(year) for year in range(1995, 2021, 5)},
+                year + is_running,
+                {str(y): str(y) for y in range(1995, 2021, 5)},
             )
         years = x_axis_df.reset_index()["Year"]
         min_year, max_year = years.min(), years.max()
+        if year + is_running > max_year or year < min_year:
+            return (
+                min_year,
+                max_year,
+                min_year,
+                {str(y): str(y) for y in range(min_year, max_year + 1, 5)},
+            )
         return (
             min_year,
             max_year,
-            min_year,
-            {str(year): str(year) for year in range(min_year, max_year + 1, 5)},
+            year + is_running,
+            {str(y): str(y) for y in range(min_year, max_year + 1, 5)},
         )
 
-    def update_main_graph(self, percentile, xaxis, year, regions):
-        x_axis_df, yaxis, xmax = self.dem_df, "10% les plus pauvres", 100
-        tmp = self.ine_df.loc[(slice(None), percentile, year), :]
-        tmp = (
-            tmp.join(self.countries_df, sort=False)
-            .reset_index()
-            .set_index(["alpha3", "Year"])
-            .sort_index()
+    def update_main_graph(self, yaxis, xaxis, year, regions):
+        x_axis_df, yaxis_title, xmax = (
+            self.dem_df,
+            "Part des revenus des 10% les plus pauvres",
+            100,
         )
+        tmp = None
+        if yaxis != "G":
+            tmp = self.ine_df.loc[(slice(None), yaxis, year), :]
+        else:
+            tmp = self.ine_df.loc[(slice(None), "p99p100", year), :]
+        tmp = tmp.reset_index().set_index(["alpha3", "Year"]).sort_index()
         if len(regions) != 5:
             tmp = tmp[tmp["region"].isin(regions)]
         if xaxis == "C":
@@ -500,6 +565,36 @@ class Inegalites_de_revenus:
             )
             .dropna()
         )
+        if yaxis == "G":
+            fig = px.scatter(
+                res,
+                x="score",
+                y="gini",
+                size="population",
+                size_max=60,
+                hover_name="Country_Name",
+                color="region",
+                color_discrete_map=self.continent_colors,
+                custom_data=["Country_Name", "population"],
+            )
+            fig.update_yaxes(range=[0.3, 0.8])
+            fig.update_layout(
+                xaxis=dict(title=xaxis, type="linear"),
+                yaxis=dict(title="Coefficient de Gini", type="linear"),
+                margin={"l": 0, "b": 1, "t": 1, "r": 0},
+                hovermode="closest",
+                showlegend=False,
+            )
+            fig.update_traces(
+                hovertemplate="".join(
+                    [
+                        "<b>%{customdata[0]}</b><br><br>Coefficient de Gini: %{y}<br>Population: %{customdata[1]:,}<br>",
+                        xaxis,
+                        ": %{x}<extra></extra>",
+                    ]
+                )
+            )
+            return fig
         res["value"] *= 100
         fig = px.scatter(
             res,
@@ -515,18 +610,18 @@ class Inegalites_de_revenus:
         if xmax != -1:
             fig.update_xaxes(range=[0, xmax])
         fig.update_yaxes(range=[0, 0.7])
-        if percentile == "p99p100":
+        if yaxis == "p99p100":
             fig.update_yaxes(range=[0, 35.0])
-            yaxis = "1% les plus riches"
-        elif percentile == "p0p50":
+            yaxis_title = "Part des revenus des 1% les plus riches"
+        elif yaxis == "p0p50":
             fig.update_yaxes(range=[0, 30.0])
-            yaxis = "50% les plus pauvres"
-        elif percentile == "p90p100":
+            yaxis_title = "Part des revenus des 50% les plus pauvres"
+        elif yaxis == "p90p100":
             fig.update_yaxes(range=[25.0, 70.0])
-            yaxis = "10% les plus riches"
+            yaxis_title = "Part des revenus des 10% les plus riches"
         fig.update_layout(
             xaxis=dict(title=xaxis, type="linear"),
-            yaxis=dict(title=yaxis, type="linear"),
+            yaxis=dict(title=yaxis_title, type="linear"),
             margin={"l": 0, "b": 1, "t": 1, "r": 0},
             hovermode="closest",
             showlegend=False,
@@ -541,6 +636,21 @@ class Inegalites_de_revenus:
             )
         )
         return fig
+
+    # start and stop the movie
+    def button_on_click(self, n_clicks, text):
+        if text == self.START:
+            return self.STOP
+        else:
+            return self.START
+
+    # this one is triggered by the previous one because we cannot have 2 outputs
+    # in the same callback
+    def run_movie(self, text):
+        if text == self.START:  # then it means we are stopped
+            return 0
+        else:
+            return -1
 
     def run(self, debug=False, port=8050):
         self.app.run_server(host="0.0.0.0", debug=debug, port=port)

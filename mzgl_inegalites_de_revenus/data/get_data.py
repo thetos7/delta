@@ -6,7 +6,7 @@ import numpy as np
 path = os.path.join(os.getcwd(), "mzgl_inegalites_de_revenus/data/")
 
 
-def get_inegalities_df():
+def get_inegalities_df(countries_df):
     """
     Read every csv files of the World Inegalities Database, load it into one dataframe
     """
@@ -17,10 +17,16 @@ def get_inegalities_df():
         ]
     )
     df = df.loc[df["year"] >= 1995]
-    return (
+    df = (
         df.drop(["pop", "age", "variable"], axis=1)
         .set_index(["country", "percentile", "year"])
         .rename_axis(["alpha2", "Percentile", "Year"], axis=0)
+        .sort_index()
+    )
+    return (
+        df.join(countries_df, sort=False)
+        .reset_index()
+        .set_index(["alpha3", "Percentile", "Year"])
         .sort_index()
     )
 
@@ -114,4 +120,35 @@ def get_gdp_df():
         .replace("..", np.nan)
         .sort_index()
     )
-    return gdp_df.loc[(slice(None), "GDP per capita (current US$)", slice(None))]
+    gdp_df = gdp_df.loc[(slice(None), "GDP per capita (current US$)", slice(None))]
+    return gdp_df.loc[
+        :,
+        [
+            "1995",
+            "1996",
+            "1997",
+            "1998",
+            "1999",
+            "2000",
+            "2001",
+            "2002",
+            "2003",
+            "2004",
+            "2005",
+            "2006",
+            "2007",
+            "2008",
+            "2009",
+            "2010",
+            "2011",
+            "2012",
+            "2013",
+            "2014",
+            "2015",
+            "2016",
+            "2017",
+            "2018",
+            "2019",
+            "2020",
+        ],
+    ]
