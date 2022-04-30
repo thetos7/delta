@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from MDMR_NYPDCallsMeteoNY import NYPD_dash_visualisation as NYWeather
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -23,6 +25,8 @@ main_layout = html.Div([
                               dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
                               html.Br(),
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
+                              html.Br(),
+                              dcc.Link(html.Button('MDMR_NYPDCallsMeteoNY', style={'width':"100%"}), href='/MDMR_NYPDCallsMeteoNY'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
@@ -66,6 +70,8 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/MDMR_NYPDCallsMeteoNY':
+        return nypd_weather.main_layout
     else:
         return home_page
 
