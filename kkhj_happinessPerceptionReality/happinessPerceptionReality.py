@@ -55,7 +55,7 @@ class happinessPerceptionReality():
                                  'North America': 'navy', 'South America': 'pink'}
         self.french = {'Asia': 'Asie', 'Europe': 'Europe', 'Africa': 'Afrique', 'Oceania': 'Océanie',
                        'North America': 'Amérique du Nord', 'South America': 'Amérique du Sud'}
-        self.years = sorted(set(self.df.index.values)) #2012 - 2021
+        self.years = sorted(set(self.df['Year']))
 
         self.main_layout = html.Div(children=[
             html.H3(children='Vrai Bonheur VS. Fake Bonheur'),
@@ -105,7 +105,7 @@ class happinessPerceptionReality():
                         max=self.years[-1],
                         step=1,
                         value=self.years[0],
-                        marks={str(year): str(year) for year in self.years[::5]},
+                        marks={str(year): str(year) for year in self.years[::1]},
                     ),
                     style={'display': 'inline-block', 'width': "90%"}
                 ),
@@ -124,12 +124,13 @@ class happinessPerceptionReality():
             html.Div(id='wps-div-country'),
 
             html.Div([
-                dcc.Graph(id='wps-income-time-series',
+                dcc.Graph(id='wps-gdb-time-series',
                           style={'width': '33%', 'display': 'inline-block'}),
-                dcc.Graph(id='wps-fertility-time-series',
+                dcc.Graph(id='wps-safety-time-series',
                           style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
-                dcc.Graph(id='wps-pop-time-series',
+                dcc.Graph(id='wps-unemployment-time-series',
                           style={'width': '33%', 'display': 'inline-block', 'padding-left': '0.5%'}),
+                # TODO add contribution and educationLevel
             ], style={'display': 'flex',
                       'borderTop': 'thin lightgrey solid',
                       'borderBottom': 'thin lightgrey solid',
@@ -185,9 +186,9 @@ class happinessPerceptionReality():
             [dash.dependencies.Input('wps-main-graph', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_pop_timeseries)
 
-    def update_graph(self, regions, xaxis_type, year):
-        dfg = self.df.loc[year]
-        dfg = dfg[dfg['region'].isin(regions)]
+    def update_graph(self, continent, xaxis_type, year):
+        dfg = self.df['Year']
+        dfg = dfg[dfg['Continent'].isin(continent)]
         fig = px.scatter(dfg, x="incomes", y="fertility",
                          # title = f"{year}", cliponaxis=False,
                          size="population", size_max=60,
