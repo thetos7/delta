@@ -15,7 +15,7 @@ import datetime
 
 class Deces():
     def __init__(self, application = None):
-        df = pd.concat([pd.read_pickle(f) for f in glob.glob('deces/data/morts_par_jour-*')])
+        df = pd.concat([pd.read_pickle(f) for f in glob.glob('data/morts_par_jour-*')])
         df = df.groupby('deces').sum()
         df.sort_index(inplace=True)
         last_month = "02/2022"
