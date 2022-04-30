@@ -4,6 +4,7 @@ from dash import dcc
 from dash import html
 import plotly.graph_objects as go
 import plotly.express as px
+import numpy as np
 import get_data
 import json
 
@@ -11,7 +12,7 @@ import json
 class SalaryInflation():
     def __init__(self):
         self.df = get_data.get_data()
-        self.years = self.df.year.unique()
+        self.years = self.df.year.unique().astype('datetime64[Y]').astype(int) + 1970
         self.geodata = json.load(open('data/europe.geojson'))
         self.app = dash.Dash()
         self.app.layout = html.Div(children=[
@@ -89,8 +90,9 @@ class SalaryInflation():
         return hover['points'][0]['location'] if hover['points'][0]['location'] != 'UK' else 'GB'
 
     def update_graph(self, year):
-        data = self.df[(self.df.year == int(year)) & (self.df.age == 'TOTAL') & (
+        data = self.df[(self.df.year == np.datetime64(int(year) - 1970, 'Y')) & (self.df.age == 'TOTAL') & (
             self.df.sex == 'T')][['country', 'cumulative_sum']]
+
         fig = px.choropleth_mapbox(data, geojson=self.geodata,
                                    locations='country', featureidkey='properties.ISO2',  # join keys
                                    color='cumulative_sum', color_continuous_scale='Viridis',

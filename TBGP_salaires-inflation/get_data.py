@@ -51,9 +51,26 @@ infl_conv = {
     'EU27_2020': 'EU27_2020'
 }
 
+def fill_missing_years(wages, countries):
+    tmp_wages = wages.set_index('year')
+    to_add = pd.DataFrame()
+
+    for country in countries:
+        c = tmp_wages[(tmp_wages.country == country) & (tmp_wages.age == 'TOTAL') & (tmp_wages.sex == 'T')]
+        if (not c.empty):
+            r = pd.date_range(start=c.index.min(), end=c.index.max(), freq='YS')
+
+            filled = c.reindex(r, fill_value=np.nan).rename_axis('year')
+            rows_to_add = filled[filled['age'].isna()].index
+            filled = filled.interpolate(method='time').fillna(method='ffill')
+
+            if (not rows_to_add.empty):
+                to_add = pd.concat([to_add, filled.loc[rows_to_add].reset_index()],ignore_index = True, axis=0)
+
+    return pd.concat([wages, to_add], ignore_index=True, axis=0)
+
 def clean_inflation(inflation):
     inflation.LOCATION = inflation.LOCATION.apply(lambda s: infl_conv[s])
-    #inflation.LOCATION[inflation.LOCATION == 'GB'] = 'UK'
     inflation.rename({'LOCATION': 'country', 'TIME': 'year'}, axis='columns', inplace=True)
     return inflation
 
@@ -86,7 +103,10 @@ def merge_dataframes(inflation, wages):
     return ret
 
 def get_data():
-    wages = pd.read_csv('data/salaires.csv', usecols=['age', 'sex', 'indic_il', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE'])
-    inflation = pd.read_csv('data/inflation.csv', usecols=['LOCATION', 'TIME', 'Value'])
+    wages = pd.read_csv('data/salaires.csv', usecols=['age', 'sex', 'indic_il', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE'], parse_dates=['TIME_PERIOD'])
+    inflation = pd.read_csv('data/inflation.csv', usecols=['LOCATION', 'TIME', 'Value'], parse_dates=['TIME'])
+
     inflation, wages = clean_inflation(inflation), clean_wages(wages)
+    wages = fill_missing_years(wages, inflation.country.unique())
+
     return merge_dataframes(compute_cumulative(inflation, wages), wages)
