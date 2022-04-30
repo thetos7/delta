@@ -103,15 +103,15 @@ class Naissance():
         # Subgraph of the map
         self.app.callback(
             dash.dependencies.Output('number_of_child', 'figure'),
-            [dash.dependencies.Input('map_france', 'hoverData'),
+            [dash.dependencies.Input('map_france', 'clickData'),
              ])(self.update_number_of_child)
         self.app.callback(
             dash.dependencies.Output('mean_parent_age', 'figure'),
-            [dash.dependencies.Input('map_france', 'hoverData'),
+            [dash.dependencies.Input('map_france', 'clickData'),
              ])(self.update_mean_parent_age)
         self.app.callback(
             dash.dependencies.Output('child_sex', 'figure'),
-            [dash.dependencies.Input('map_france', 'hoverData'),
+            [dash.dependencies.Input('map_france', 'clickData'),
              ])(self.update_child_sex)
 
     def get_department(self, hoverData):
@@ -119,22 +119,22 @@ class Naissance():
             return '75'
         return hoverData['points'][0]['location']
 
-    def update_number_of_child(self, hoverData):
-        department = self.get_department(hoverData)
+    def update_number_of_child(self, clickData):
+        department = self.get_department(clickData)
         return self.create_time_series(self.date, self.date_axis, department,
                                        [('size',
                                          '')],
                                        "Nombre d'enfants par mois")
 
-    def update_mean_parent_age(self, hoverData):
-        department = self.get_department(hoverData)
+    def update_mean_parent_age(self, clickData):
+        department = self.get_department(clickData)
         return self.create_time_series(self.date, self.date_axis, department,
                                        [('AGEMERE', 'Age de la mère'),
                                         ('AGEPERE', 'Age du père')],
                                        "Age des parents à la naissance")
 
-    def update_child_sex(self, hoverData):
-        department = self.get_department(hoverData)
+    def update_child_sex(self, clickData):
+        department = self.get_department(clickData)
         return self.create_time_series(self.age_pere_mere, list(range(20, 46)),
                                        department,
                                        [('SIZEMERE', 'Mère'),
