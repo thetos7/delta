@@ -14,7 +14,7 @@ def save_data_as_pkl(data, filename):
         for name in f.namelist():
             with f.open(name) as zd:
                 files.append(pd.read_csv(zd, delimiter=';', dtype={
-                    'DEPDOM': str}))
+                    'DEPNAIS': str}))
     db, _ = files
     df = db[
         ['ANAIS', 'MNAIS', 'AGEMERE', 'AGEPERE', 'DEPNAIS', 'NBENF', 'ORIGINOM',
