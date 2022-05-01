@@ -2,11 +2,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def get_data():
-    usecols = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE']
+    usecols = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE', 'nrg_bal']
     usecols_import_export = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE', 'partner']
     prod_cons = pd.read_csv('resources/conso_production_petrole.csv', usecols=usecols)
     prod_cons = prod_cons[prod_cons.unit != "NR"]
-    prod_cons = prod_cons[prod_cons.OBS_VALUE != 0]
+    prod_cons = prod_cons[prod_cons.geo != "EU27_2020"]
+    prod_cons = prod_cons[prod_cons.geo != "EA19"]
+    prod_cons = prod_cons[prod_cons.geo != "EU28"]
+    prod = prod_cons[prod_cons.nrg_bal == "IPRD"]
+    cons = prod_cons[prod_cons.nrg_bal == "FC"]
     export = pd.read_csv('resources/export_petrole.csv', usecols=usecols_import_export)
     export = export[export.unit != "NR"]
     export = export[export.geo != "EU27_2020"]
@@ -17,7 +21,7 @@ def get_data():
     impor = impor[impor.geo != "EU27_2020"]
     impor = impor[impor.geo != "EA19"]
     impor = impor[impor.geo != "EU28"]
-    return prod_cons, export, impor
+    return prod, cons, export, impor
 
 
 def get_by_country(data, country):
