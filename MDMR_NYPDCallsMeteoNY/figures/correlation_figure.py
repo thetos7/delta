@@ -14,7 +14,6 @@ from MDMR_NYPDCallsMeteoNY.helpers.design import (
     color_green,
 )
 
-# import numpy as np
 
 calls = load_calls_correlation_data()
 weather = load_weather_data()
@@ -23,7 +22,6 @@ weather = load_weather_data()
 def display_correlation_plot(freq="M"):
     nb_calls = remove_outliers(calls.resample(freq).size())
     avg = remove_outliers(weather.tavg.resample(freq).mean())
-    # corr = np.corrcoef(nb_calls, avg)[0][1]
 
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
