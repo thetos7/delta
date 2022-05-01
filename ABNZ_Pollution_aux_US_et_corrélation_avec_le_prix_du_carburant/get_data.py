@@ -2,11 +2,12 @@ import pandas as pd
 import numpy as np
 import glob
 import plotly.express as px
+import os
 
 # Pollution data
 # --------------------------------------------------------------------------------------
 
-pollution = pd.read_csv('data/pollution_2000_2021.csv',
+pollution = pd.read_csv('ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant/data/pollution_2000_2021.csv',
                 engine = 'python',
                 parse_dates = True)
 del pollution["Year"]
@@ -50,7 +51,7 @@ SO2fig.show()
 # Prices data
 # --------------------------------------------------------------------------------------
 
-prices = pd.read_csv('data/gas_price_US.csv',
+prices = pd.read_csv('ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant/data/gas_price_US.csv',
                 engine = 'python',
                 parse_dates = True)
 
@@ -67,7 +68,7 @@ pricesFig.show()
 # Temperature and precipitation data
 # --------------------------------------------------------------------------------------
 
-path = 'data/US_weather_data/'
+path = 'ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant/data/US_weather_data/'
 filenames = glob.glob(path + "/*.csv")
 cities = []
 

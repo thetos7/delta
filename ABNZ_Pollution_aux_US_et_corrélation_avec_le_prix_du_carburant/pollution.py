@@ -12,12 +12,12 @@ import dateutil as du
 from scipy import stats
 from scipy import fft
 
-import get_data
+import ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant.get_data as dfdata
 
 
 class Pollution():
     def __init__(self, application=None):
-        self.df = get_data.prices
+        self.df = dfdata.prices
 
         self.main_layout = html.Div(children=[
             html.H3(children='Pollution/Petrole'),
