@@ -30,7 +30,7 @@ class MDMR_NYPDCallsMeteoNY:
     permet de mettre en relations différents aspects météorologiques avec le nombre d'appels.  
 
     __Remarque:__  
-    Grace au bouton ci dessous ___qui est toujours visible sur la page___, vous pourrez changer la
+    Grâce au bouton ci dessous ___qui est toujours visible sur la page___, vous pourrez changer la
     fréquence de tout les graphs de la page.  
 
     Trois options s'offrent à vous:
@@ -56,11 +56,12 @@ class MDMR_NYPDCallsMeteoNY:
     - Précipitations    
 
     Ce graphique représente le nombre d’appels NYPD en fonction de la température à New-York
-    sur une période de 3 ans entre le 1er janvier 2018 et le 31 décembre 2020. La taille des bulles correspond
-    au soit: à la vitesse du vent (par défaut) ou au nombre de millimètre de précipitation. Plus une bulle est grosse, plus il y'a eu du vent/plu.
-    On remarque que le nombre d’appels est corrélé à la température mais pas corrélé à la précipitation. 
-    De plus, il est possible de constaté que, au même titre que la précipitation la vitesse du vent, ne semble
-    pas corrélé avec le nombre d'appels.
+    sur une période de 3 ans entre le 1er janvier 2018 et le 31 décembre 2020. La taille des bulles correspond 
+    à la vitesse du vent (par défaut) ou au nombre de millimètre de précipitation. Plus une bulle est grosse, 
+    plus il y'a eu du vent/de la pluie.
+    On remarque que le nombre d’appels est corrélé à la température mais pas à la précipitation. 
+    De plus, il est possible de constaté, au même titre que la précipitation, que la vitesse du vent ne semble
+    pas être corrélée avec le nombre d'appels.
     En effet les différentes tailles des bulles sont assez uniformément réparties sur l’ensemble du graphique.
     """
 
