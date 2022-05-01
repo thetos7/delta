@@ -12,7 +12,7 @@ import dateutil as du
 from scipy import stats
 from scipy import fft
 import geojson
-import plotly.graph_objects as go
+import plotly.express as px
 
 from get_data import get_data
 from get_data import get_by_year
@@ -27,6 +27,14 @@ class Independance_Petrole():
    
         years = list_years(self.impor)
 
+        with open("resources/custom.europe.geojson", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
+            self.europe = geojson.load(f)
+
+        for i in self.europe["features"]:
+            fips = i["properties"]["iso_a2"]
+            print(fips)
+            i["id"] = fips
+
         self.main_layout = html.Div(children=[
             html.H3(children='Petrole'),
             dcc.Markdown("""Independance Européene face au Petrole comme energie fossile"""),
@@ -38,7 +46,7 @@ class Independance_Petrole():
                                disabled=False,
                            ),
                          ], style={'width': '6em', 'padding':'2em 0px 0px 0px'}), # bas D haut G
-        html.Div([ dcc.Graph(id='nrg-main-graph'), ], style={'width':'100%', }),
+        html.Div([ dcc.Graph(id='nrg-main-graph'), ], style={ }),
         ], style={
             'backgroundColor': 'white',
             'padding': '10px 50px 10px 50px',
@@ -57,24 +65,15 @@ class Independance_Petrole():
                     [dash.dependencies.Input('nrg-which-year', 'value')])(self.update_graph)
     
     def update_graph(self, year):
-        with open("resources/custom.geo.json", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
-            geometry = geojson.load(f)
+        fig = px.choropleth_mapbox(self.impor, geojson=self.europe, locations='geo', color='OBS_VALUE',
+                                color_continuous_scale="Viridis",
+                                range_color=(-1, 1),
+                                mapbox_style="carto-positron",
+                                zoom=2, center = {"lat": 55, "lon": 0},
+                                opacity=0.5,
+                                )
+        fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
-        locs = list_countries(self.impor)
-        fig = go.Figure([
-            go.Choropleth(
-                geojson = geometry,
-                locations = locs,
-                text = locs
-        )])
-
-        fig.update_geos(
-            fitbounds="locations",
-            resolution=50,
-            visible=True,
-            showframe=False,
-            projection={"type": "mercator"},
-        )
         return fig
 
 
