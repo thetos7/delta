@@ -1,6 +1,6 @@
-from kkhj_happinessPerceptionReality.getDatasets import get_datasets
-from kkhj_happinessPerceptionReality.missingValues import *
-from kkhj_happinessPerceptionReality.perceivedIndex import *
+from getDatasets import get_datasets
+from missingValues import *
+from perceivedIndex import *
 import dash
 from dash import dcc
 from dash import html
@@ -250,7 +250,7 @@ class HappinessPerceptionReality:
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_contribution_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-sum-message', 'children'),
-            dash.dependencies.Output('wps-main-graph', 'hoverData'),
+            #dash.dependencies.Output('wps-main-graph', 'hoverData'),
             [dash.dependencies.Input('wps-submit-button', 'n_clicks')],
             [dash.dependencies.State('wps-attribute-ratio-gdp', 'value')],
             [dash.dependencies.State('wps-attribute-ratio-safety', 'value')],
@@ -259,7 +259,6 @@ class HappinessPerceptionReality:
 
     def update_attributes_ratio(self, n_clicks, v_gdp, v_safety, v_unemployment, v_contribution):
         if n_clicks:
-
             sum = v_gdp + v_safety + v_unemployment + v_contribution
             if (sum != 100):
                 return "Sum needs to be equal to 100"

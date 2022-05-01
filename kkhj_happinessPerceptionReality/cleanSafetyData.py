@@ -1,7 +1,7 @@
 import pandas as pd
 
 def extract_safety(year):
-    file = "kkhj_happinessPerceptionReality/data/criminality" + str(year) + ".xlsx"
+    file = "data/criminality" + str(year) + ".xlsx"
     tab = pd.read_excel(file)
     df = pd.DataFrame({'Country': tab["Country"], f"{year}": tab["Safety Index"]})
     return df

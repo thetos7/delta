@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 def get_dataframe():
-    df = pd.read_csv("kkhj_happinessPerceptionReality/data/GDP_per_capita.csv")
+    df = pd.read_csv("data/GDP_per_capita.csv")
     df.rename(columns={'Country Name': 'Country'}, inplace=True)
     df.drop("Indicator Name", inplace=True, axis=1)
     df.drop("Indicator Code", inplace=True, axis=1)

@@ -1,7 +1,7 @@
 import pandas as pd
 
 def get_security_contribution():
-    df = pd.read_excel("kkhj_happinessPerceptionReality/data/socialSecurityContributions.xlsx")
+    df = pd.read_excel("data/socialSecurityContributions.xlsx")
     df = df.melt(['Country'], var_name='Year', value_name='Social Security Employer Contribution Index')
     # TODO if don't want to keep empty cells => decomment line below
     return df[(df != '-').all(1)]

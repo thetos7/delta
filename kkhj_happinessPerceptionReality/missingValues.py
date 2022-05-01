@@ -1,12 +1,12 @@
 import pandas as pd
-import kkhj_happinessPerceptionReality.cleanGdpData as gdp
-import kkhj_happinessPerceptionReality.cleanSafetyData as safety
-import kkhj_happinessPerceptionReality.cleanSocialSecurityContributionData as social
-import kkhj_happinessPerceptionReality.cleanUnemploymentData as unemployment
+import cleanGdpData as gdp
+import cleanSafetyData as safety
+import cleanSocialSecurityContributionData as social
+import cleanUnemploymentData as unemployment
 
 
 def get_real_happiness_dataset():
-    df = pd.read_csv('kkhj_happinessPerceptionReality/data/realHappiness.csv')
+    df = pd.read_csv('data/realHappiness.csv')
     df.rename(
         columns={'Entity': 'Country', 'Life satisfaction in Cantril Ladder (World Happiness Report 2021)': 'Value'},
         inplace=True)
