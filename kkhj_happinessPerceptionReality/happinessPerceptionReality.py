@@ -9,15 +9,13 @@ import plotly.graph_objs as go
 import plotly.express as px
 
 
-class HappinessPerceptionReality:
+class HappinessPerceptionReality():
     START = 'Start'
     STOP = 'Stop'
 
     def __init__(self, application=None):
         # Extract datasets
         datasets = get_datasets()
-
-        # TODO Read importance rate entered by users
 
         # Store importance rates
         importanceRate = {'safety': 0.25,
@@ -50,7 +48,6 @@ class HappinessPerceptionReality:
 
                 html.Div([
                     html.Div('Attributs'),
-                    html.Br(),
                     html.Label('PIB', htmlFor='gdp', style={'text-align': 'left',
                                                             'margin-right': '4px',
                                                             'display': 'inline-block',
@@ -77,7 +74,7 @@ class HappinessPerceptionReality:
                         style={'display': 'inline-block', 'width': '30%'}
                     ),
                     html.Br(),
-                    html.Label('Contribution Social', htmlFor='social-contribution', style={'text-align': 'left',
+                    html.Label('Contribution Sociale', htmlFor='social-contribution', style={'text-align': 'left',
                                                                                             'margin-right': '4px',
                                                                                             'display': 'inline-block',
                                                                                             'width': '55%'}),
@@ -91,9 +88,9 @@ class HappinessPerceptionReality:
                     ),
                     html.Br(),
                     html.Label('Sécurité', htmlFor='safety', style={'text-align': 'left',
-                                                                        'margin-right': '4px',
-                                                                        'display': 'inline-block',
-                                                                        'width': '55%'}),
+                                                                    'margin-right': '4px',
+                                                                    'display': 'inline-block',
+                                                                    'width': '55%'}),
                     dcc.Input(
                         name='safety',
                         id='wps-attribute-ratio-safety',
@@ -118,8 +115,8 @@ class HappinessPerceptionReality:
                     #     style={'display': 'inline-block', 'width': '30%'}
                     # ),
                     html.Br(),
-                    html.P('', style={'color':'#FF0000'}, id='wps-sum-message'),
-                    html.Button('Entrer', id='wps-submit-button'),
+                    html.P('', style={'color': '#FF0000'}, id='wps-sum-message'),
+                    html.Button('Calculer', id='wps-submit-button'),
                     html.Br(),
                     html.Br(),
 
@@ -130,17 +127,6 @@ class HappinessPerceptionReality:
                         value=sorted(self.continent_colors.keys()),
                         labelStyle={'display': 'block'},
                     ),
-                    html.Br(),
-                    html.Div('Échelle en X'),
-                    dcc.RadioItems(
-                        id='wps-crossfilter-xaxis-type',
-                        options=[{'label': i, 'value': i} for i in ['Linéaire', 'Log']],
-                        value='Log',
-                        labelStyle={'display': 'block'},
-                    ),
-                    html.Br(),
-                    html.Br(),
-                    html.Br(),
                     html.Br(),
                     html.Button(
                         self.START,
@@ -189,7 +175,9 @@ class HappinessPerceptionReality:
                           style={'width': '25%', 'display': 'inline-block', 'padding-left': '0.5%'}),
                 dcc.Graph(id='wps-contribution-time-series',
                           style={'width': '25%', 'display': 'inline-block', 'padding-left': '0.5%'}),
-                # TODO add contribution and educationLevel
+                # TODO if educationLevel, decomment line below and change 25% to 20% in prev lines
+                # dcc.Graph(id='wps-education-time-series',
+                #           style={'width': '20%', 'display': 'inline-block', 'padding-left': '0.5%'}),
             ], style={'display': 'flex',
                       'borderTop': 'thin lightgrey solid',
                       'borderBottom': 'thin lightgrey solid',
@@ -213,7 +201,6 @@ class HappinessPerceptionReality:
         self.app.callback(
             dash.dependencies.Output('wps-main-graphic', 'figure'),
             [dash.dependencies.Input('wps-crossfilter-which-continent', 'value'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value'),
              dash.dependencies.Input('wps-year-slider', 'value')])(self.update_graph)
         self.app.callback(
             dash.dependencies.Output('wps-country-div', 'children'),
@@ -234,33 +221,28 @@ class HappinessPerceptionReality:
              dash.dependencies.State('wps-start-stop-button', 'children')])(self.on_interval)
         self.app.callback(
             dash.dependencies.Output('wps-gdp-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graphic', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_gdp_timeseries)
+            [dash.dependencies.Input('wps-main-graphic', 'hoverData')])(self.update_gdp_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-safety-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graphic', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_safety_timeseries)
+            [dash.dependencies.Input('wps-main-graphic', 'hoverData')])(self.update_safety_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-unemployment-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graphic', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_unemployment_timeseries)
+            [dash.dependencies.Input('wps-main-graphic', 'hoverData')])(self.update_unemployment_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-contribution-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graphic', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_contribution_timeseries)
+            [dash.dependencies.Input('wps-main-graphic', 'hoverData')])(self.update_contribution_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-sum-message', 'children'),
-            #dash.dependencies.Output('wps-main-graphic', 'hoverData'),
             [dash.dependencies.Input('wps-submit-button', 'n_clicks')],
             [dash.dependencies.State('wps-attribute-ratio-gdp', 'value')],
             [dash.dependencies.State('wps-attribute-ratio-safety', 'value')],
             [dash.dependencies.State('wps-attribute-ratio-unemployment', 'value')],
-            [dash.dependencies.State('wps-attribute-ratio-social-contribution', 'value')],)(self.update_attributes_ratio)
+            [dash.dependencies.State('wps-attribute-ratio-social-contribution', 'value')], )(
+            self.update_attributes_ratio)
 
     def update_attributes_ratio(self, n_clicks, v_gdp, v_safety, v_unemployment, v_contribution):
         if n_clicks:
-            sum = v_gdp + v_safety + v_unemployment + v_contribution
-            if (sum != 100):
+            if v_gdp + v_safety + v_unemployment + v_contribution != 100:
                 return "Sum needs to be equal to 100"
             else:
                 self.importanceRate['gdpPerCapita'] = v_gdp / 100
@@ -275,9 +257,7 @@ class HappinessPerceptionReality:
 
                 return ""
 
-
-
-    def update_graph(self, continents, xaxis_type, year):
+    def update_graph(self, continents, year):
         dfg = self.df.loc[year]
         dfg = dfg[dfg['Continent'].isin(continents)]
         fig = px.scatter(dfg, x="Value", y="Perceived Happiness",
@@ -287,10 +267,8 @@ class HappinessPerceptionReality:
                          hover_name="Country", log_x=True)
         fig.update_layout(
             xaxis=dict(title='Bonheur recueilli dans un sondage',
-                       type='linear' if xaxis_type == 'Linéaire' else 'log',
-                       range=(0, 10) if xaxis_type == 'Linéaire'
-                       else (np.log10(1), np.log10(10))
-                       ),
+                       type='linear',
+                       range=(0, 10)),
             yaxis=dict(title="Bonheur calculé", range=(0, 10)),
             margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
             hovermode='closest',
@@ -299,14 +277,14 @@ class HappinessPerceptionReality:
         return fig
 
     def get_country(self, hoverData):
-        if hoverData == None:  # init value
+        if hoverData is None:  # init value
             return self.df['Country'].iloc[np.random.randint(len(self.df))]
         return hoverData['points'][0]['hovertext']
 
     def country_chosen(self, hoverData):
         return self.get_country(hoverData)
 
-    def create_time_series(self, country, what, axis_type, title):
+    def create_time_series(self, country, what, title):
         return {
             'data': [go.Scatter(
                 x=self.years,
@@ -314,39 +292,40 @@ class HappinessPerceptionReality:
                 mode='lines+markers',
             )],
             'layout': {
-                'height': 225,
+                'height': 300,
                 'margin': {'l': 50, 'b': 20, 'r': 10, 't': 20},
                 'yaxis': {'title': title,
-                          'type': 'linear' if axis_type == 'Linéaire' else 'log'},
+                          'type': 'linear'},
                 'xaxis': {'showgrid': False}
             }
         }
 
     # graph gdp vs years
-    def update_gdp_timeseries(self, hoverData, xaxis_type):
+    def update_gdp_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'GDP Index', xaxis_type, 'PIB par habitant (noté sur 10)')
+        return self.create_time_series(country, 'GDP Index', 'PIB par habitant (noté sur 10)')
 
     # graph safety vs years
-    def update_safety_timeseries(self, hoverData, xaxis_type):
+    def update_safety_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'Safety Index', xaxis_type, "Sécurité (notée sur 10)")
+        return self.create_time_series(country, 'Safety Index', "Sécurité (notée sur 10)")
 
     # graph unemployment vs years
-    def update_unemployment_timeseries(self, hoverData, xaxis_type):
+    def update_unemployment_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'Unemployment Index', xaxis_type, 'Chômage (noté sur 10)')
+        return self.create_time_series(country, 'Unemployment Index', 'Chômage (noté sur 10)')
 
     # graph social contribution vs years
-    def update_contribution_timeseries(self, hoverData, xaxis_type):
+    def update_contribution_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'Social Security Employer Contribution Index', xaxis_type, 'Contribution sociale (notée sur 10)')
+        return self.create_time_series(country, 'Social Security Employer Contribution Index',
+                                       'Contribution sociale (notée sur 10)')
 
     # TODO if education, decomment the line below
     # # graph education vs years
-    # def update_education_timeseries(self, hoverData, xaxis_type):
+    # def update_education_timeseries(self, hoverData):
     #     country = self.get_country(hoverData)
-    #     return self.create_time_series(country, 'Education Level Index', xaxis_type, 'Niveau d'éducation (noté sur 10)')
+    #     return self.create_time_series(country, 'Education Level Index', 'Niveau d'éducation (noté sur 10)')
 
     # start and stop the movie
     def button_on_click(self, n_clicks, text):
@@ -379,6 +358,4 @@ class HappinessPerceptionReality:
 
 if __name__ == "__main__":
     res = HappinessPerceptionReality()
-    # df = res.df
-    # res.df.to_excel("output.xlsx")
     res.run(port=8055)
