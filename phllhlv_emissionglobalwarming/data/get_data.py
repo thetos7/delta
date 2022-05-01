@@ -4,6 +4,12 @@ from pathlib import Path
 from pandas import DataFrame
 
 
+def export_to_csv(df: DataFrame, path: str):
+    filepath = Path(path)
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(filepath)
+
+
 def clean_temperature_data():
     temp_country = pd.read_csv('bad_global_land_temperatures_by_country.csv')
     # Removing the duplicated countries and countries for which no information about the temperature
@@ -21,25 +27,23 @@ def clean_temperature_data():
         'AverageTemperature'].mean().reset_index(name='Year')
     temp_country_yearly.rename(columns={'dt': 'Year', 'Year': 'AverageTemperature'}, inplace=True)
     temp_country_yearly['Year'] = pd.DatetimeIndex(temp_country_yearly['Year']).year
-    filepath = Path('./clean/clean_global_land_temperature_by_country.csv')
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    temp_country_yearly.to_csv(filepath)
+    export_to_csv(temp_country_yearly, './clean/clean_global_land_temperature_by_country.csv')
 
 
 def clean_emission_data():
     emission = pd.read_csv('bad_historical_emission_by_country.csv')
-    # Calculate and add Mean values of emission of each industrial sectors of each countries
+    # Calculate and add Mean values of emission of each industrial sectors of each country
     emission['Mean'] = emission.iloc[:, 5:34].mean(axis=1).round(decimals=3)
     # Get the total emission of all industrial sectors of each country
     total_emission = emission[emission['Sector'] == 'Total including LUCF']
     # Display by each year
     emission_countries_yearly = total_emission.melt(id_vars=["Country"], value_vars=total_emission.iloc[:, 5:34],
                                                     var_name="Year", value_name="TotalEmission")
-    filepath = Path('./clean/clean_total_emission_by_country.csv')
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    emission_countries_yearly.to_csv(filepath)
+    export_to_csv(emission_countries_yearly, './clean/clean_total_emission_by_country.csv')
 
 
 if __name__ == '__main__':
+    # clean emission data to desired dataframe structure
     clean_emission_data()
+    # clean temperature data to desired dataframe structure
     clean_temperature_data()
