@@ -1,18 +1,15 @@
-from getDatasets import get_datasets
-from missingValues import *
-from perceivedIndex import *
-import sys
+from kkhj_happinessPerceptionReality.getDatasets import get_datasets
+from kkhj_happinessPerceptionReality.missingValues import *
+from kkhj_happinessPerceptionReality.perceivedIndex import *
 import dash
-import flask
 from dash import dcc
 from dash import html
-import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
 
 
-class happinessPerceptionReality:
+class HappinessPerceptionReality:
     START = 'Start'
     STOP = 'Stop'
 
@@ -382,7 +379,7 @@ class happinessPerceptionReality:
 
 
 if __name__ == "__main__":
-    res = happinessPerceptionReality()
+    res = HappinessPerceptionReality()
     # df = res.df
     # res.df.to_excel("output.xlsx")
     res.run(port=8055)

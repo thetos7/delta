@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from kkhj_happinessPerceptionReality import happinessPerceptionReality
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,11 +13,12 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+hap = happinessPerceptionReality.HappinessPerceptionReality(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
              children=[ 
-                 dcc.Location(id='url', refresh=False),
+                 #dcc.Location(id='url', refresh=False),
                  html.Div(className="two columns",
                           children = [
                               html.Center(html.H2("Δelta δata")),
@@ -25,6 +27,8 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
+                              html.Br(),
+                              dcc.Link(html.Button('Conception du bonheur', style={'width':"100%"}), href='/bonheur'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -66,6 +70,8 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/bonheur':
+        return hap.main_layout
     else:
         return home_page
 
