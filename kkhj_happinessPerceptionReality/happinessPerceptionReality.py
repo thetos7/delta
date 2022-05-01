@@ -1,7 +1,6 @@
 from getDatasets import get_datasets
 from missingValues import *
 from perceivedIndex import *
-import pycountry_convert as pc
 import sys
 import dash
 import flask
@@ -27,28 +26,14 @@ class happinessPerceptionReality:
         importanceRate = {'safety': 0.25,
                           'unemployment': 0.25,
                           'socialContribution': 0.25,
-                          'gdpPerCapital': 0.25,
+                          'gdpPerCapita': 0.25,
                           'educationLevel': 0}
 
         # Add perceived happiness
         datasets = add_perceived_index(datasets, importanceRate)
 
-        continents = {
-            'NA': 'North America',
-            'SA': 'South America',
-            'AS': 'Asia',
-            'OC': 'Australia',
-            'AF': 'Africa',
-            'EU': 'Europe'
-        }
-
-        datasets['Country_code'] = datasets['Country'].apply(
-            lambda x: pc.country_name_to_country_alpha2(x, cn_name_format="default"))
-        datasets['Continent'] = datasets['Country_code'].apply(
-            lambda x: continents[pc.country_alpha2_to_continent_code(x)])
-        datasets.drop("Country_code", inplace=True, axis=1)
-
         # Initialise variables
+        self.importanceRate = importanceRate
         self.df = datasets
         self.countries = get_countries_list(self.df)
 
@@ -68,20 +53,47 @@ class happinessPerceptionReality:
 
                 html.Div([
                     html.Div('Attributs'),
-                    html.H6('PIB', style={'display': 'inline-block'}),
+                    html.H6('PIB', id='gdp', style={'display': 'inline-block', 'margin-right': 10}),
                     dcc.Input(
                         id='wps-attribute-ratio-gdp',
-                        placeholder='Entrer une valeur pour le PIB',
+                        placeholder='',
                         type='number',
-                        value='0',
-                        style={'display': 'inline-block'}
+                        value=25,
+                        size='1',
+                        style={'width': '30%', 'display': 'inline-block', 'border': '1px solid black'}
                     ),
-                    html.Br(),
+                    html.H4('Sécurité', id='safety', style={'display': 'inline-block', 'margin-right': 10}),
+                    dcc.Input(
+                        id='wps-attribute-ratio-safety',
+                        placeholder='',
+                        type='number',
+                        value=25,
+                        size='1',
+                        style={'width': '30%', 'display': 'inline-block', 'border': '1px solid black'}
+                    ),
+                    html.H4('Chômage', id='unemployment', style={'display': 'inline-block', 'margin-right': 10}),
+                    dcc.Input(
+                        id='wps-attribute-ratio-unemployment',
+                        placeholder='',
+                        type='number',
+                        value=25,
+                        size='1',
+                        style={'width': '40%', 'display': 'inline-block', 'border': '1px solid black'}
+                    ),
+                    html.H4('Contribution sociale', id='contribution', style={'display': 'inline-block', 'margin-right': 10}),
+                    dcc.Input(
+                        id='wps-attribute-ratio-contribution',
+                        placeholder='',
+                        type='number',
+                        value=25,
+                        size='1',
+                        style={'width': '40%', 'display': 'inline-block', 'border': '1px solid black'}
+                    ),
                     html.Br(),
                     html.Button('Entrer', id='wps-submit-button'),
                     html.Br(),
                     html.Br(),
-                    html.Br(),
+
                     html.Div('Continents'),
                     dcc.Checklist(
                         id='wps-crossfilter-which-continent',
@@ -210,13 +222,23 @@ class happinessPerceptionReality:
         self.app.callback(
             dash.dependencies.Output('wps-main-graph', 'hoverData'),
             [dash.dependencies.Input('wps-submit-button', 'n_clicks')],
-            [dash.dependencies.State('wps-attribute-ratio-gdp', 'value')])(self.update_attributes_ratio)
+            [dash.dependencies.State('wps-attribute-ratio-gdp', 'value')],
+            [dash.dependencies.State('wps-attribute-ratio-safety', 'value')],
+            [dash.dependencies.State('wps-attribute-ratio-unemployment', 'value')],
+            [dash.dependencies.State('wps-attribute-ratio-contribution', 'value')],)(self.update_attributes_ratio)
 
-    def update_attributes_ratio(self, n_clicks, value):
-        if (n_clicks > 0) :
-            print('The input value was "{}" and the button has been clicked {} times'.format(
-                value,
-                n_clicks))
+    def update_attributes_ratio(self, n_clicks, v_gdp, v_safety, v_unemployment, v_contribution):
+        if n_clicks:
+            self.importanceRate['gdpPerCapita'] = v_gdp / 100
+            self.importanceRate['safety'] = v_safety / 100
+            self.importanceRate['unemployment'] = v_unemployment / 100
+            self.importanceRate['socialContribution'] = v_contribution / 100
+
+            # TODO decomment line below if education leve
+            # self.importanceRate['educationLevel'] = v_education
+
+            print(self.importanceRate)
+            self.df = add_perceived_index(self.df, self.importanceRate)
 
 
     def update_graph(self, continents, xaxis_type, year):

@@ -7,7 +7,7 @@ def add_perceived_index(datasets, rates):
     safetyImportance = rates['safety']
     unemploymentImportance = rates['unemployment']
     socialContributionImportance = rates['socialContribution']
-    gdpPerCapitalImportance = rates['gdpPerCapital']
+    gdpPerCapitalImportance = rates['gdpPerCapita']
     # educationLevelImportance = rates['educationLevel']
 
     modifiedIndex = [apply_importance_rate(datasets['Safety Index'], safetyImportance),
@@ -25,11 +25,3 @@ def add_perceived_index(datasets, rates):
     # TODO if educationLevel then append line below to the prev
     # + modifiedIndex[4]
     return datasets
-
-
-# importanceRate = {'safety': 0.25,
-#                   'unemployment': 0.25,
-#                   'socialContribution': 0.25,
-#                   'gdpPerCapital': 0.25,
-#                   'educationLevel': 0}
-# get_perceived_index(happinessPerceptionReality().df, importanceRate).to_excel('perceived.xlsx')
