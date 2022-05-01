@@ -16,10 +16,19 @@ class SalaryInflation():
         self.geodata = json.load(open('data/europe.geojson'))
         self.app = dash.Dash()
         self.app.layout = html.Div(children=[
-            html.H3(children='Comparaison salaire / inflation',
+            html.H3(children='Comparaison salaire / inflation en Europe',
                     style={'textAlign': 'center'}),
             html.Div([dcc.Graph(id='tbgp-si-map'),
-                     html.Div(id='tbgp-si-year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
+
+            dcc.Markdown("""
+            La couleur représente le ratio entre le salaire médian de l'année choisie
+            et le salaire éstimé selon le taux d'inflation et le salaire médian de référénce.
+
+            Les couleurs vers le rouge indiquent donc une perte de pouvoir d'achat, tandis que les couleurs vers le bleu
+            indiquent une hausse et le jaune indique un maintien.
+            """),
+
+            html.Div(id='tbgp-si-year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
 
             dcc.RangeSlider(
                 id='tbgp-si-year-filter-slider',
@@ -63,7 +72,7 @@ class SalaryInflation():
             celui estimé par l'inflation nous donne une estimation du gain ou de
             la perte de pouvoir d'achat des habitants du pays en question.
 
-            La carte est intéractive : cliquer sur un pays permet de mettre à
+            La carte est interactive : cliquer sur un pays permet de mettre à
             jour le graphique selon les statistiques de ce pays.
 
             Le graphique affiche les statistiques de l'Union Européenne par
@@ -73,12 +82,12 @@ class SalaryInflation():
             Vous pouvez également isoler les statistiques selon l'âge et le
             sexe.
 
-            Enfin, un slider est à votre disposition afin de changer les années
-            sur lesquelles vous voulez comparer.
+            Enfin, un slider est à votre disposition afin de changer l'année de référence
+            pour l'inflation et l'année à comparer.
 
             Observations :
             * Les courbes sont toujours similaires selon les sexes, nous
-            remarquons juste que les valeurs sont plus faibles pour les femmes.
+            remarquons juste que les valeurs sont généralement plus faibles pour les femmes.
             * Il faut faire attention au fait que les plus de 65 ans en 2020 ne
             sont pas les mêmes qu'en 1995. Ce biais doit être pris en compte
             avant de tirer des conclusions de ces courbes.
