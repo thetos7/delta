@@ -32,8 +32,8 @@ class HappinessPerceptionReality():
         self.df = datasets
         self.countries = get_countries_list(self.df)
 
-        self.continent_colors = {'Asia': 'gold', 'Europe': 'green', 'Africa': 'red', 'Oceania': 'purple',
-                                 'North America': 'blue', 'South America': 'pink'}
+        self.continent_colors = {'Asia': '#1882E9', 'Europe': 'red', 'Africa': '#60D979', 'Oceania': '#F29219',
+                                 'North America': '#F27EBF', 'South America': '#FEF612'}
         self.french = {'Asia': 'Asie', 'Europe': 'Europe', 'Africa': 'Afrique', 'Oceania': 'Océanie',
                        'North America': 'Amérique du Nord', 'South America': 'Amérique du Sud'}
         self.years = sorted(set(self.df.index.values))
@@ -284,11 +284,12 @@ class HappinessPerceptionReality():
     def country_chosen(self, hoverData):
         return self.get_country(hoverData)
 
-    def create_time_series(self, country, what, title):
+    def create_time_series(self, country, what, title, color):
         return {
             'data': [go.Scatter(
                 x=self.years,
                 y=self.df[self.df["Country"] == country][what],
+                marker={'color': color},
                 mode='lines+markers',
             )],
             'layout': {
@@ -303,23 +304,23 @@ class HappinessPerceptionReality():
     # graph gdp vs years
     def update_gdp_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'GDP per capita', 'PIB par habitant en US $')
+        return self.create_time_series(country, 'GDP per capita', 'PIB par habitant en US $', '#69DAF4')
 
     # graph safety vs years
     def update_safety_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'Safety Index', "Sécurité (notée sur 10)")
+        return self.create_time_series(country, 'Safety Index', "Sécurité (notée sur 10)", '#16A8CA')
 
     # graph unemployment vs years
     def update_unemployment_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'Unemployment Index', 'Chômage (noté sur 10)')
+        return self.create_time_series(country, 'Unemployment Index', 'Chômage (noté sur 10)', '#0F809A')
 
     # graph social contribution vs years
     def update_contribution_timeseries(self, hoverData):
         country = self.get_country(hoverData)
         return self.create_time_series(country, 'Social Security Employer Contribution Index',
-                                       'Contribution sociale (notée sur 10)')
+                                       'Contribution sociale (notée sur 10)', '#05576B')
 
     # TODO if education, decomment the line below
     # # graph education vs years
