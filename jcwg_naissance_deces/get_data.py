@@ -100,22 +100,3 @@ if __name__ == '__main__':
     save_data_as_pkl(
         'https://www.insee.fr/fr/statistiques/fichier/4768335/etatcivil2019_nais2019_csv.zip',
         'https://www.insee.fr/fr/statistiques/fichier/4801913/etatcivil2019_dec2019_csv.zip')
-    #
-    # with open('data/jcwg_departements.geojson') as f:
-    #     dep = json.load(f)
-    #
-    # dep_map = {d['properties']['code']: d['properties']['nom']
-    #            for d in dep['features']}
-    #
-    # dfn = pd.read_pickle('data/naissance-2019.pkl')
-    #
-    # depn = dfn.groupby('DEPNAIS').size().rename('SIZE').to_frame()
-    #
-    # depn['NAME'] = [dep_map[d]
-    #                 if d in dep_map else 'NON'
-    #                 for d in depn.index]
-    #
-    # depn = depn.drop(depn[depn['NAME'] == 'NON'].index)
-    # print(depn)
-    # depn.to_pickle('data/test.csv')
-    # print(pd.read_pickle('data/test.csv'))
