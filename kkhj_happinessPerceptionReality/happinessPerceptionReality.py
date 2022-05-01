@@ -53,42 +53,73 @@ class happinessPerceptionReality:
 
                 html.Div([
                     html.Div('Attributs'),
-                    html.H6('PIB', id='gdp', style={'display': 'inline-block', 'margin-right': 10}),
+                    html.Br(),
+                    html.Label('PIB', htmlFor='gdp', style={'text-align': 'left',
+                                                            'margin-right': '4px',
+                                                            'display': 'inline-block',
+                                                            'width': '55%'}),
                     dcc.Input(
+                        name='gdp',
                         id='wps-attribute-ratio-gdp',
                         placeholder='',
                         type='number',
                         value=25,
-                        size='1',
-                        style={'width': '30%', 'display': 'inline-block', 'border': '1px solid black'}
+                        style={'display': 'inline-block', 'width': '30%'}
                     ),
-                    html.H4('Sécurité', id='safety', style={'display': 'inline-block', 'margin-right': 10}),
+                    html.Br(),
+                    html.Label('Chômage', htmlFor='unemployment', style={'text-align': 'left',
+                                                                         'margin-right': '4px',
+                                                                         'display': 'inline-block',
+                                                                         'width': '55%'}),
                     dcc.Input(
-                        id='wps-attribute-ratio-safety',
-                        placeholder='',
-                        type='number',
-                        value=25,
-                        size='1',
-                        style={'width': '30%', 'display': 'inline-block', 'border': '1px solid black'}
-                    ),
-                    html.H4('Chômage', id='unemployment', style={'display': 'inline-block', 'margin-right': 10}),
-                    dcc.Input(
+                        name='unemployment',
                         id='wps-attribute-ratio-unemployment',
-                        placeholder='',
+                        placeholder='Entrer une valeur pour le Chômage',
                         type='number',
                         value=25,
-                        size='1',
-                        style={'width': '40%', 'display': 'inline-block', 'border': '1px solid black'}
+                        style={'display': 'inline-block', 'width': '30%'}
                     ),
-                    html.H4('Contribution sociale', id='contribution', style={'display': 'inline-block', 'margin-right': 10}),
+                    html.Br(),
+                    html.Label('Contribution Social', htmlFor='social-contribution', style={'text-align': 'left',
+                                                                                            'margin-right': '4px',
+                                                                                            'display': 'inline-block',
+                                                                                            'width': '55%'}),
                     dcc.Input(
-                        id='wps-attribute-ratio-contribution',
-                        placeholder='',
+                        name='social-contribution',
+                        id='wps-attribute-ratio-social-contribution',
+                        placeholder='Entrer une valeur pour la contribution social',
                         type='number',
                         value=25,
-                        size='1',
-                        style={'width': '40%', 'display': 'inline-block', 'border': '1px solid black'}
+                        style={'display': 'inline-block', 'width': '30%'}
                     ),
+                    html.Br(),
+                    html.Label('Sécurité', htmlFor='safety', style={'text-align': 'left',
+                                                                        'margin-right': '4px',
+                                                                        'display': 'inline-block',
+                                                                        'width': '55%'}),
+                    dcc.Input(
+                        name='safety',
+                        id='wps-attribute-ratio-safety',
+                        placeholder='Entrer une valeur pour la sécurité',
+                        type='number',
+                        value=25,
+                        style={'display': 'inline-block', 'width': '30%'}
+                    ),
+
+                    # TODO if education level, decomment line below
+                    # html.Br(),
+                    # html.Label('Éducation', htmlFor='education', style={'text-align': 'left',
+                    #                                                     'margin-right': '4px',
+                    #                                                     'display': 'inline-block',
+                    #                                                     'width': '55%'}),
+                    # dcc.Input(
+                    #     name='education',
+                    #     id='wps-attribute-ratio-education',
+                    #     placeholder='Entrer une valeur pour l\'éducation',
+                    #     type='number',
+                    #     value=25,
+                    #     style={'display': 'inline-block', 'width': '30%'}
+                    # ),
                     html.Br(),
                     html.Button('Entrer', id='wps-submit-button'),
                     html.Br(),
@@ -225,7 +256,7 @@ class happinessPerceptionReality:
             [dash.dependencies.State('wps-attribute-ratio-gdp', 'value')],
             [dash.dependencies.State('wps-attribute-ratio-safety', 'value')],
             [dash.dependencies.State('wps-attribute-ratio-unemployment', 'value')],
-            [dash.dependencies.State('wps-attribute-ratio-contribution', 'value')],)(self.update_attributes_ratio)
+            [dash.dependencies.State('wps-attribute-ratio-social-contribution', 'value')],)(self.update_attributes_ratio)
 
     def update_attributes_ratio(self, n_clicks, v_gdp, v_safety, v_unemployment, v_contribution):
         if n_clicks:
@@ -237,9 +268,7 @@ class happinessPerceptionReality:
             # TODO decomment line below if education leve
             # self.importanceRate['educationLevel'] = v_education
 
-            print(self.importanceRate)
             self.df = add_perceived_index(self.df, self.importanceRate)
-
 
     def update_graph(self, continents, xaxis_type, year):
         dfg = self.df.loc[year]
