@@ -17,7 +17,7 @@ import ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant.get_data 
 
 class Pollution():
     def __init__(self, application=None):
-        self.df = dfdata.prices
+        self.df = pd.read_pickle(glob.glob('data/prices.pkl'))
 
         self.main_layout = html.Div(children=[
             html.H3(children='Pollution/Petrole'),
