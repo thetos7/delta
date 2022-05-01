@@ -93,7 +93,7 @@ def get_all_datasets():
     # gdp
     gdp_dataset = gdp.gdp_out_of_10()
     gdp_dataset.drop("Country Code", inplace=True, axis=1)
-    gdp_dataset.drop("Value", inplace=True, axis=1)
+    gdp_dataset.rename(columns={'Value': 'GDP per capita'}, inplace=True)
     gdp_dataset.rename(columns={'GDP': 'Value'}, inplace=True)
     gdp_dataset['Year'] = gdp_dataset['Year'].astype(int)
 

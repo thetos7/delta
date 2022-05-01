@@ -303,7 +303,7 @@ class HappinessPerceptionReality():
     # graph gdp vs years
     def update_gdp_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'GDP Index', 'PIB par habitant (noté sur 10)')
+        return self.create_time_series(country, 'GDP per capita', 'PIB par habitant en US $')
 
     # graph safety vs years
     def update_safety_timeseries(self, hoverData):

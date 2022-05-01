@@ -53,14 +53,3 @@ def gdp_out_of_10():
             gdp_value = get_gdp_value_for_single_value(counts, bins, value, total_area)
             dataframe.loc[(dataframe['Year'] == str(year)) & (dataframe['Country'] == location), ["GDP"]] = gdp_value
     return dataframe
-
-
-def extract_gdp_index():
-    df = gdp_out_of_10().rename(columns={'GDP': 'GDP Index'})
-    del df['Country Code']
-    del df['Value']
-    df['Year'] = df['Year'].astype(int)
-    return df
-
-# print(extract_gdp_index())
-# print(gdp_out_of_10())
