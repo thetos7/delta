@@ -19,7 +19,13 @@ class CovidBasics():
 
         self.main_layout = html.Div(children=[
             html.H3(children='Covid Basics'),
-            html.Div([ dcc.Graph(figure=self.update_graph()), ], style={'width':'100%', }),
+            html.Div([ dcc.Graph(id='cvd-main-graph'), ], style={'width':'100%', }),
+            html.Div([ dcc.RadioItems(id='cvd-dep', 
+                                     options=[{'label':'Paris', 'value': '05'},
+                                              {'label':'Haute-Saône', 'value': '07'}], 
+                                     value='70',
+                                     labelStyle={'display':'block'}) ,
+                                     ]),
             html.Br(),
             dcc.Markdown("""
             Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
@@ -45,13 +51,20 @@ class CovidBasics():
             self.app.layout = self.main_layout
 
         # self.app.callback(dash.dependencies.Output('cvd-main-graph', 'figure'))(self.update_graph)
+        self.app.callback(
+                    dash.dependencies.Output('cvd-main-graph', 'figure'),
+                    dash.dependencies.Input('cvd-dep', 'value'))(self.update_graph)
 
-    def update_graph(self):
+    def update_graph(self, dep):
+
+        # deps = ['70', '05', '31', '50']
+        deps_df = self.df.loc[dep].reset_index()
         fig = px.line(
-          self.df,
+          deps_df,
           template='plotly_white',
-          x=self.df.index.get_level_values(0),
-          y="pos"
+          x='date',
+          y='pos_7j',
+          # color='dep'
         )
 
         # fig.update_traces(hovertemplate='%{y} décès le %{x:%d/%m/%y}', name='')

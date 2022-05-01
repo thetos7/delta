@@ -4,7 +4,7 @@ import numpy as np
 url = 'https://www.data.gouv.fr/fr/datasets/r/5c4e1452-3850-4b59-b11c-3dd51d7fb8b5'
 df = pd.read_csv(url, dtype={'dep': 'str'})
 
-df = df.set_index(['date', 'dep']).sort_index()
+df = df.set_index(['dep', 'date']).sort_index()
 
 df = df.drop(['R', 'cv_dose1', 'rad', 'incid_rad'], axis=1)
 
