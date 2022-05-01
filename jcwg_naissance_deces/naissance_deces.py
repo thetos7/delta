@@ -12,88 +12,35 @@ from dash import html
 
 class Naissance():
     def __init__(self, application=None):
-
         with open('data/jcwg_departements.geojson') as f:
             self.dep = json.load(f)
 
-        dfn = pd.concat(
-            [pd.read_pickle(f) for f in glob.glob(
-                'data/naissance-2019.pkl')])
-        dfn.sort_index(inplace=True)
+        # Load pkl
+        self.daten = pd.read_pickle('data/date_naissance.pkl')
+        self.dated = pd.read_pickle('data/date_deces.pkl')
 
-        dfd = pd.concat(
-            [pd.read_pickle(f) for f in glob.glob(
-                'data/deces-2019.pkl')])
-        dfd.sort_index(inplace=True)
+        self.depn = pd.read_pickle('data/department_naissance.pkl')
+        self.depd = pd.read_pickle('data/department_deces.pkl')
 
+        self.agen = pd.read_pickle('data/age_naissance.pkl')
+        self.aged = pd.read_pickle('data/age_deces.pkl')
+
+        self.zmax = max(self.depn['SIZE'].max(), self.depd['SIZE'].max())
+        self.zmin = min(self.depn['SIZE'].min(), self.depd['SIZE'].min())
+
+        # Set info for graph
+        self.tickval = [self.zmin, 1000, 2000, 5000, 10000, 20000, 30000,
+                        self.zmax]
         self.date_axis = [pd.to_datetime(d) for d in sorted(set(
-            dfn.index.values))]
-
+            self.daten.reset_index()['date']))]
         self.age_naissances_axis = list(range(17, 46))
-        self.age_deces_axis = list(sorted(set(dfd['AGE'])))
-
+        self.age_deces_axis = list(sorted(set(self.aged.reset_index()['AGE'])))
         self.dep_map = {d['properties']['code']: d['properties']['nom']
                         for d in self.dep['features']}
 
-        self.daten = dfn.groupby(
-            ['DEPNAIS', 'date']).aggregate({
-            'AGEMERE': np.mean,
-            'AGEPERE': np.mean,
-            'NBENF': np.mean,
-            'SEXE': lambda x: sum(x == 1) / len(x),
-        })
-        self.daten['SEXEG'] = 1 - self.daten['SEXE']
-        self.daten['SIZE'] = dfn.groupby(['DEPNAIS', 'date']).size()
-
-        self.dated = dfd.groupby(['DEPDEC', 'date']).aggregate({
-            'AGE': np.mean,
-            'SEXE': lambda x: sum(x == 1) / len(x)
-        })
-
-        self.dated['SEXEG'] = 1 - self.dated['SEXE']
-        self.dated['SIZE'] = dfd.groupby(['DEPDEC', 'date']).size()
-
-        self.depn = dfn.groupby('DEPNAIS').size().reset_index()
-        self.depd = dfd.groupby('DEPDEC').size().reset_index()
-
-        self.depn['NAME'] = [self.dep_map[d]
-                             if d in self.dep_map else 'NON'
-                             for d in self.depn['DEPNAIS']]
-        self.depd['NAME'] = [self.dep_map[d]
-                             if d in self.dep_map else 'NON'
-                             for d in self.depd['DEPDEC']]
-
-        self.depn = self.depn.drop(self.depn[self.depn['NAME'] == 'NON'].index)
-        self.depd = self.depd.drop(self.depd[self.depd['NAME'] == 'NON'].index)
-
-        agemn = dfn.groupby(['DEPNAIS', 'AGEMERE']).size().rename('SIZEMEREN')
-        agepn = dfn.groupby(['DEPNAIS', 'AGEPERE']).size().rename('SIZEPEREN')
-
-        agemd = dfd.loc[dfd.SEXE == 2, ['DEPDEC', 'AGE']].groupby(
-            ['DEPDEC', 'AGE']).size().rename('SIZEMERED')
-        agepd = dfd.loc[dfd.SEXE == 1, ['DEPDEC', 'AGE']].groupby(
-            ['DEPDEC', 'AGE']).size().rename('SIZEPERED')
-
-        self.agen = pd.concat([agemn, agepn, ], axis=1)
-        self.agen['SIZEMEREPEREN'] = self.agen['SIZEMEREN'] + self.agen[
-            'SIZEPEREN']
-        self.agen['MGMEREPEREN'] = (self.agen['SIZEMEREN'] + self.agen[
-            'SIZEPEREN']) // 2
-
-        self.aged = pd.concat([agemd, agepd, ], axis=1)
-        self.aged['SIZEMEREPERED'] = self.aged['SIZEMERED'] + self.aged[
-            'SIZEPERED']
-        self.aged['MGMEREPERED'] = (self.aged['SIZEMERED'] + self.aged[
-            'SIZEPERED']) // 2
-
-        self.zmax = max(self.depn[0].max(), self.depd[0].max())
-        self.zmin = min(self.depn[0].min(), self.depd[0].min())
-
-        self.tickval = [self.zmin, 1000, 2000, 5000, 10000, 20000, 30000,
-                        self.zmax]
-
+        # main layout
         self.main_layout = html.Div(children=[
-            html.H3(children='Naissance et décès en France'),
+            html.H3(children='Naissance et décès en France en 2019'),
             html.Div([
                 html.Div([
                     dcc.Graph(id='map_france_naissance',
@@ -310,15 +257,15 @@ class Naissance():
                 tickvals=[np.log10(i) for i in self.tickval],
                 ticktext=self.tickval
             ),
-            locations=self.depn['DEPNAIS'],
-            customdata=np.stack((self.depn['NAME'], self.depn['DEPNAIS'],
-                                 self.depn[0]),
+            locations=self.depn.index,
+            customdata=np.stack((self.depn['NAME'], self.depn.index,
+                                 self.depn['SIZE']),
                                 axis=1),
             hovertemplate=
             "<b>Departement : %{customdata[1]}</b><br><br>" +
             "Nom : %{customdata[0]}<br>" +
             "Naissance : %{customdata[2]}<br>",
-            z=np.log10(self.depn[0]),
+            z=np.log10(self.depn['SIZE']),
             zmin=np.log10(self.zmin),
             zmax=np.log10(self.zmax),
         ))
@@ -342,15 +289,15 @@ class Naissance():
                 tickvals=[np.log10(i) for i in self.tickval],
                 ticktext=self.tickval
             ),
-            locations=self.depd['DEPDEC'],
-            customdata=np.stack((self.depd['NAME'], self.depd['DEPDEC'],
-                                 self.depd[0]),
+            locations=self.depd.index,
+            customdata=np.stack((self.depd['NAME'], self.depd.index,
+                                 self.depd['SIZE']),
                                 axis=1),
             hovertemplate=
             "<b>Departement : %{customdata[1]}</b><br><br>" +
             "Nom : %{customdata[0]}<br>" +
             "Décès : %{customdata[2]}<br>",
-            z=np.log10(self.depd[0]),
+            z=np.log10(self.depd['SIZE']),
             zmin=np.log10(self.zmin),
             zmax=np.log10(self.zmax),
         ))
@@ -376,11 +323,13 @@ class Naissance():
         what = []
         if unmg_val == 'Unitaire':
             if 'Naissance' in nd_val:
-                what += [(d, self.daten, 'SIZE', 'Naissance ' + self.dep_map[d])
+                what += [(d, self.daten, 'SIZE', 'Naissance ' +
+                          self.dep_map[d])
                          for d in depnid]
 
             if 'Décès' in nd_val:
-                what += [(d, self.dated, 'SIZE', 'Décès ' + self.dep_map[d])
+                what += [(d, self.dated, 'SIZE',
+                          'Décès ' + self.dep_map[d])
                          for d in depdid]
         else:
             if 'Naissance' in nd_val:
