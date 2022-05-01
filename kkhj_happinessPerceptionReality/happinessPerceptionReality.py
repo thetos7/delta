@@ -67,6 +67,21 @@ class happinessPerceptionReality:
                 html.Div([dcc.Graph(id='wps-main-graph'), ], style={'width': '90%', }),
 
                 html.Div([
+                    html.Div('Attributs'),
+                    html.H6('PIB', style={'display': 'inline-block'}),
+                    dcc.Input(
+                        id='wps-attribute-ratio-gdp',
+                        placeholder='Entrer une valeur pour le PIB',
+                        type='number',
+                        value='0',
+                        style={'display': 'inline-block'}
+                    ),
+                    html.Br(),
+                    html.Br(),
+                    html.Button('Entrer', id='wps-submit-button'),
+                    html.Br(),
+                    html.Br(),
+                    html.Br(),
                     html.Div('Continents'),
                     dcc.Checklist(
                         id='wps-crossfilter-which-continent',
@@ -192,6 +207,17 @@ class happinessPerceptionReality:
             dash.dependencies.Output('wps-contribution-time-series', 'figure'),
             [dash.dependencies.Input('wps-main-graph', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_contribution_timeseries)
+        self.app.callback(
+            dash.dependencies.Output('wps-main-graph', 'hoverData'),
+            [dash.dependencies.Input('wps-submit-button', 'n_clicks')],
+            [dash.dependencies.State('wps-attribute-ratio-gdp', 'value')])(self.update_attributes_ratio)
+
+    def update_attributes_ratio(self, n_clicks, value):
+        if (n_clicks > 0) :
+            print('The input value was "{}" and the button has been clicked {} times'.format(
+                value,
+                n_clicks))
+
 
     def update_graph(self, continents, xaxis_type, year):
         dfg = self.df.loc[year]
