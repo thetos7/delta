@@ -25,30 +25,42 @@ class Independance_Petrole():
 
         self.prod_cons, self.export, self.impor = get_data()
    
-        years = list_years(self.impor)
+        self.years = list_years(self.impor)
 
-        print(self.impor[self.impor.TIME_PERIOD == 1990].groupby("geo")["OBS_VALUE"].sum())
+        #print(self.impor[self.impor.TIME_PERIOD == 1990].groupby("geo")["OBS_VALUE"].sum())
 
         with open("resources/custom.europe.geojson", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
             self.europe = geojson.load(f)
 
         for i in self.europe["features"]:
             fips = i["properties"]["iso_a2"]
-            print(fips)
+            #print(fips)
             i["id"] = fips
-
+        
         self.main_layout = html.Div(children=[
             html.H3(children='Petrole'),
             dcc.Markdown("""Independance Européene face au Petrole comme energie fossile"""),
             html.Div([ html.Div('Année ref.'),
-                          dcc.Dropdown(
-                               id='nrg-which-year',
-                               options=[{'label': i, 'value': i} for i in years],
-                               value=years[0],
-                               disabled=False,
+                          dcc.Slider(0, len(self.years) -1, 1,
+                               id='year',
+                               marks={i: str(self.years[i]) for i in range(len(self.years))},
+                               value=1
                            ),
-                         ], style={'width': '6em', 'padding':'2em 0px 0px 0px'}), # bas D haut G
-        html.Div([ dcc.Graph(id='nrg-main-graph'), ], style={ }),
+                           #dcc.Dropdown(
+                           #    id='year',
+                           #    options=[{'label': i, 'value': i} for i in years],
+                           #    value=years[0],
+                           #    clearable=False
+                           #),
+                         ], style={'width': '100%', 'padding':'4em 0px 0px 0px'}), # bas D haut G
+            html.Div([
+                html.Div([
+                    html.Div('Importations de petrole par pays:'),
+                    html.Div([ dcc.Graph(id='import-graph'), ], style={'width': '55em' })]),
+                html.Div([
+                    html.Div('Exportations de petrole par pays:'),
+                    html.Div([ dcc.Graph(id='export-graph'), ], style={'width': '55em'})])
+            ], style={'display': 'flex', 'justify-content': 'space-between'})
         ], style={
             'backgroundColor': 'white',
             'padding': '10px 50px 10px 50px',
@@ -63,18 +75,39 @@ class Independance_Petrole():
             self.app.layout = self.main_layout
         
         self.app.callback(
-                    dash.dependencies.Output('nrg-main-graph', 'figure'),
-                    [dash.dependencies.Input('nrg-which-year', 'value')])(self.update_graph)
+                    dash.dependencies.Output('import-graph', 'figure'),
+                    [dash.dependencies.Input('year', 'value')])(self.update_graph_import)
+        self.app.callback(
+                    dash.dependencies.Output('export-graph', 'figure'),
+                    [dash.dependencies.Input('year', 'value')])(self.update_graph_export)
     
-    def update_graph(self, year):
+    def update_graph_import(self, year):
+        year = self.years[year]
         df = self.impor[self.impor.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
         max_val = max(df)
         df = df.reset_index()
         print(f"year: {year}")
-        print(f"max: {df}")
 
         fig = px.choropleth_mapbox(df, geojson=self.europe, locations='geo', color='OBS_VALUE',
                                 color_continuous_scale="Viridis",
+                                range_color=(0, max_val),
+                                mapbox_style="carto-positron",
+                                zoom=2, center = {"lat": 55, "lon": 0},
+                                opacity=0.5,
+                                )
+        fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+
+        return fig
+
+    def update_graph_export(self, year):
+        year = self.years[year]
+        df = self.export[self.export.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
+        max_val = max(df)
+        df = df.reset_index()
+
+
+        fig = px.choropleth_mapbox(df, geojson=self.europe, locations='geo', color='OBS_VALUE',
+                                color_continuous_scale="RdYlGn",
                                 range_color=(0, max_val),
                                 mapbox_style="carto-positron",
                                 zoom=2, center = {"lat": 55, "lon": 0},

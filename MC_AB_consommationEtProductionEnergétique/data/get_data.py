@@ -3,14 +3,16 @@ import matplotlib.pyplot as plt
 
 def get_data():
     usecols = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE']
-    usecols_import = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE', 'partner']
+    usecols_import_export = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE', 'partner']
     prod_cons = pd.read_csv('resources/conso_production_petrole.csv', usecols=usecols)
     prod_cons = prod_cons[prod_cons.unit != "NR"]
     prod_cons = prod_cons[prod_cons.OBS_VALUE != 0]
-    export = pd.read_csv('resources/export_petrole.csv', usecols=usecols)
+    export = pd.read_csv('resources/export_petrole.csv', usecols=usecols_import_export)
     export = export[export.unit != "NR"]
-    export = export[export.OBS_VALUE != 0]
-    impor = pd.read_csv('resources/import_petrole.csv', usecols=usecols_import)
+    export = export[export.geo != "EU27_2020"]
+    export = export[export.geo != "EA19"]
+    export = export[export.geo != "EU28"]
+    impor = pd.read_csv('resources/import_petrole.csv', usecols=usecols_import_export)
     impor = impor[impor.unit != "NR"]
     impor = impor[impor.geo != "EU27_2020"]
     impor = impor[impor.geo != "EA19"]
