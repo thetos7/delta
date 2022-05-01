@@ -49,7 +49,7 @@ pollution = pollution.resample('d', on='Date').mean()
 #SO2fig.show()
 
 # saving dataframes
-pollution.to_pickle("pollution.pkl")
+pollution.to_pickle("ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant/data/pollution.pkl")
 
 # Prices data
 # --------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ prices = prices.loc[(prices['Date'] >= '2000-01-03')]
 #pricesFig.show()
 
 # saving dataframes
-prices.to_pickle("prices.pkl")
+prices.to_pickle("ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant/data/prices.pkl")
 
 # Temperature and precipitation data
 # --------------------------------------------------------------------------------------
@@ -100,4 +100,4 @@ average_cities = pd.concat(cities).groupby('Date', as_index=False).mean()
 #prcpFig.show()
 
 # saving dataframes
-average_cities.to_pickle("average_cities.pkl")
+average_cities.to_pickle("ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant/data/average_cities.pkl")
