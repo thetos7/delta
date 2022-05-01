@@ -56,6 +56,32 @@ class SalaryInflation():
                 html.Div('* Salaire attendu si on prend uniquement l\'évolution de l\'inflation en compte')
             ]),
             dcc.Markdown("""
+            Ce projet montre l'évolution du salaire médian en Europe par rapport
+            à l'inflation. Notre méthode est simple : nous prenons une année de
+            référence, puis nous multiplions le salaire médian de cette année
+            par le taux d'inflation. La comparaison du salaire médian réel avec
+            celui estimé par l'inflation nous donne une estimation du gain ou de
+            la perte de pouvoir d'achat des habitants du pays en question.
+
+            La carte est intéractive : cliquer sur un pays permet de mettre à
+            jour le graphique selon les statistiques de ce pays.
+
+            Le graphique affiche les statistiques de l'Union Européenne par
+            défaut. Un bouton est à votre disposition si vous voulez afficher
+            les stats de cette dernière sans recharger la page.
+
+            Vous pouvez également isoler les statistiques selon l'âge et le
+            sexe.
+
+            Enfin, un slider est à votre disposition afin de changer les années
+            sur lesquelles vous voulez comparer.
+
+            Observations :
+            * Les courbes sont toujours similaires selon les sexes, nous
+            remarquons juste que les valeurs sont plus faibles pour les femmes.
+            * Il faut faire attention au fait que les plus de 65 ans en 2020 ne
+            sont pas les mêmes qu'en 1995. Ce biais doit être pris en compte
+            avant de tirer des conclusions de ces courbes.
 
             ### A propos
 
