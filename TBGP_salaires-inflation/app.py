@@ -18,11 +18,11 @@ class SalaryInflation():
         self.app.layout = html.Div(children=[
             html.H3(children='Comparaison salaire / inflation',
                     style={'textAlign': 'center'}),
-            html.Div([dcc.Graph(id='map'),
-                     html.Div(id='year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
+            html.Div([dcc.Graph(id='tbgp-si-map'),
+                     html.Div(id='tbgp-si-year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
 
             dcc.RangeSlider(
-                id='year-filter-slider',
+                id='tbgp-si-year-filter-slider',
                 min=self.years[0],
                 max=self.years[-1],
                 step=1,
@@ -33,18 +33,18 @@ class SalaryInflation():
             ),
             html.Div([
                 html.Div([
-                    dcc.Graph(id='graph',
+                    dcc.Graph(id='tbgp-si-graph',
                         style={'width': '85%', 'display': 'inline-block'}),
                     html.Div([
-                        html.Button('Union Européenne', id='europe_button', style={'width': '100%'}),
+                        html.Button('Union Européenne', id='tbgp-si-europe_button', style={'width': '100%'}),
                         html.Div(html.U('Sexe :'), style={'padding-top': '10%'}),
-                        dcc.RadioItems(id='sex', options=[
+                        dcc.RadioItems(id='tbgp-si-sex', options=[
                             {'label': 'Total', 'value': 'T'},
                             {'label': 'Hommes', 'value': 'M'},
                             {'label': 'Femmes', 'value': 'F'},
                         ], value='T', labelStyle={'display': 'block'}),
                         html.Div(html.U('Age :'), style={'padding-top': '5%'}),
-                        dcc.RadioItems(id='age', options=[
+                        dcc.RadioItems(id='tbgp-si-age', options=[
                             {'label': 'Total', 'value': 'TOTAL'},
                             {'label': 'Plus de 65 ans', 'value': 'Y_GE65'},
                             {'label': '50-64 ans', 'value': 'Y50-64'},
@@ -93,26 +93,22 @@ class SalaryInflation():
         ])
 
         self.app.callback(
-            dash.dependencies.Output('map', 'clickData'),
-            dash.dependencies.Input('europe_button', 'n_clicks'))(self.set_ue)
+            dash.dependencies.Output('tbgp-si-map', 'clickData'),
+            dash.dependencies.Input('tbgp-si-europe_button', 'n_clicks'))(self.set_ue)
         self.app.callback(
-            dash.dependencies.Output('year', 'children'),
-            dash.dependencies.Input('year-filter-slider', 'value'))(self.update_year)
+            dash.dependencies.Output('tbgp-si-year', 'children'),
+            dash.dependencies.Input('tbgp-si-year-filter-slider', 'value'))(self.update_year)
 
         self.app.callback(
-            dash.dependencies.Output('map', 'figure'),
-            dash.dependencies.Input('year-filter-slider', 'value'))(self.update_map)
+            dash.dependencies.Output('tbgp-si-map', 'figure'),
+            dash.dependencies.Input('tbgp-si-year-filter-slider', 'value'))(self.update_map)
 
         self.app.callback(
-            dash.dependencies.Output('md', 'children'),
-            dash.dependencies.Input('map', 'clickData'))(self.print_hover)
-
-        self.app.callback(
-            dash.dependencies.Output('graph', 'figure'),
-            [dash.dependencies.Input('map', 'clickData'),
-             dash.dependencies.Input('sex', 'value'),
-             dash.dependencies.Input('age', 'value'),
-             dash.dependencies.Input('year-filter-slider', 'value')])(self.update_graph)
+            dash.dependencies.Output('tbgp-si-graph', 'figure'),
+            [dash.dependencies.Input('tbgp-si-map', 'clickData'),
+             dash.dependencies.Input('tbgp-si-sex', 'value'),
+             dash.dependencies.Input('tbgp-si-age', 'value'),
+             dash.dependencies.Input('tbgp-si-year-filter-slider', 'value')])(self.update_graph)
 
 
     def set_ue(self, n):
