@@ -73,7 +73,8 @@ class SalaryInflation():
             dash.dependencies.Output('graph', 'figure'),
             [dash.dependencies.Input('map', 'clickData'),
              dash.dependencies.Input('sex', 'value'),
-             dash.dependencies.Input('age', 'value')])(self.update_graph)
+             dash.dependencies.Input('age', 'value'),
+             dash.dependencies.Input('year-filter-slider', 'value')])(self.update_graph)
 
     def update_year(self, years):
         return f'Années: {years[0]} - {years[1]}'
@@ -114,23 +115,33 @@ class SalaryInflation():
         )
         return fig
 
-    def update_graph(self, hover, sex, age):
+    def update_graph(self, hover, sex, age, years):
         country = self.print_hover(hover)
-        country_df = self.df[(self.df.country == country) & (
-            self.df.sex == sex) & (self.df.age == age)]
+        country_df = self.df[(self.df.country == country) &
+                             (self.df.sex == sex) &
+                             (self.df.age == age) &
+                             (self.df.year >= np.datetime64(int(years[0]) - 1970, 'Y'))]
+        
+        min_year = np.datetime64(country_df.year.iloc[0]).astype('datetime64[Y]').astype(int) + 1970
+        max_year = max(min_year + 1, years[1])
+        
+        country_df = country_df[country_df.year <= np.datetime64(int(max_year) - 1970, 'Y')]
+
         w = country_df.wages_value.iloc[0]
+        base = country_df.cumulative_sum.iloc[0]
+
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=country_df.year, y=np.round(country_df.wages_value, 0), mode='lines', name='Salaire réel'))
-        fig.add_trace(go.Scatter(x=country_df.year, y=np.round(country_df.cumulative_sum * w, 0), mode='lines', name='Inflation*'))
+        fig.add_trace(go.Scatter(x=country_df.year, y=np.round(country_df.cumulative_sum / base * w, 0), mode='lines', name='Inflation*'))
         fig.update_layout(
-            title = 'Évolution du salaire médian en comparaison avec l\'inflation.<br>Lieu : ' + country_name[country],
+            title = 'Évolution du salaire médian comparé à l\'inflation depuis ' + f'{min_year}' + '.<br>Lieu : ' + country_name[country],
             title_xanchor = 'auto',
             title_pad = { 't': 0, 'b': 0, 'l': 0, 'r': 0},
             height=450,
             hovermode='x unified',
             legend = {'title': 'Courbes'},
             xaxis_title='Année',
-            yaxis_title='Valeur médiane',
+            yaxis_title='Salaire médian (€)',
         )
         return fig
 
