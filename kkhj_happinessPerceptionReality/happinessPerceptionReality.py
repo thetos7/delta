@@ -209,9 +209,12 @@ class HappinessPerceptionReality():
 
             html.Br(),
             html.H6(children='A propos'),
-            html.Div('Auteurs: Jiayi Hao & Karen Kaspar'),
-            html.Div('Sources: '),
+
+            html.Div('Sources des données:'),
             html.Ul([html.Li(html.A(href=x, children=x)) for x in self.source_list]),
+            html.Br(),
+            html.Div('(c) 2023 Auteurs:'),
+            html.Ul([html.Li('Jiayi Hao'), html.Li('Karen Kaspar')]),
 
             ], style={
             # 'backgroundColor': 'rgb(240, 240, 240)',
@@ -274,8 +277,10 @@ class HappinessPerceptionReality():
 
     def update_attributes_ratio(self, n_clicks, v_gdp, v_safety, v_unemployment, v_contribution):
         if n_clicks:
-            if v_gdp + v_safety + v_unemployment + v_contribution != 100:
-                return "Sum needs to be equal to 100"
+            if v_gdp < 0 or v_safety < 0 or v_unemployment < 0 or v_contribution < 0:
+                return "Les pourcentages doivent être positifs"
+            elif v_gdp + v_safety + v_unemployment + v_contribution != 100:
+                return "La somme doit être égale à 100"
             else:
                 self.importanceRate['gdpPerCapita'] = v_gdp / 100
                 self.importanceRate['safety'] = v_safety / 100
