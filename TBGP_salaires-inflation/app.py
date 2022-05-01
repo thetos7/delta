@@ -18,7 +18,7 @@ class SalaryInflation():
         self.app.layout = html.Div(children=[
             html.H3(children='Comparaison salaire / inflation',
                     style={'textAlign': 'center'}),
-            html.Div([dcc.Graph(id='europe-map'),
+            html.Div([dcc.Graph(id='map'),
                      html.Div(id='year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
 
             dcc.Slider(
@@ -33,7 +33,7 @@ class SalaryInflation():
             # dcc.Markdown(id='md'),
             html.Div([
                 html.Div([
-                    dcc.Graph(id='total-graph',
+                    dcc.Graph(id='graph',
                         style={'width': '85%', 'display': 'inline-block'}),
                     html.Div([
                         html.U('Sexe :'),
@@ -61,25 +61,17 @@ class SalaryInflation():
             dash.dependencies.Input('year-filter-slider', 'value'))(self.update_year)
 
         self.app.callback(
-            dash.dependencies.Output('europe-map', 'figure'),
-            dash.dependencies.Input('year-filter-slider', 'value'))(self.update_graph)
+            dash.dependencies.Output('map', 'figure'),
+            dash.dependencies.Input('year-filter-slider', 'value'))(self.update_map)
 
         self.app.callback(
             dash.dependencies.Output('md', 'children'),
-            dash.dependencies.Input('europe-map', 'clickData'))(self.print_hover)
+            dash.dependencies.Input('map', 'clickData'))(self.print_hover)
 
         self.app.callback(
-            dash.dependencies.Output('total-graph', 'figure'),
-            [dash.dependencies.Input('europe-map', 'clickData'),
-             dash.dependencies.Input('sex', 'value'), dash.dependencies.Input('age', 'value')])(self.update_total_graph)
-        self.app.callback(
-            dash.dependencies.Output('men-graph', 'figure'),
-            [dash.dependencies.Input('europe-map', 'clickData'),
-             dash.dependencies.Input('year-filter-slider', 'value')])(self.update_men_graph)
-        self.app.callback(
-            dash.dependencies.Output('women-graph', 'figure'),
-            [dash.dependencies.Input('europe-map', 'clickData'),
-             dash.dependencies.Input('year-filter-slider', 'value')])(self.update_women_graph)
+            dash.dependencies.Output('graph', 'figure'),
+            [dash.dependencies.Input('map', 'clickData'),
+             dash.dependencies.Input('sex', 'value'), dash.dependencies.Input('age', 'value')])(self.update_graph)
 
     def update_year(self, year):
         return f'Année: {year}'
@@ -89,18 +81,18 @@ class SalaryInflation():
             return 'EU27_2020'
         return hover['points'][0]['location'] if hover['points'][0]['location'] != 'UK' else 'GB'
 
-    def update_graph(self, year):
+    def update_map(self, year):
         data = self.df[(self.df.year == np.datetime64(int(year) - 1970, 'Y')) & (self.df.age == 'TOTAL') & (
             self.df.sex == 'T')][['country', 'cumulative_sum', 'wages_value']]
         data = data.set_index('country')
 
         base_values = self.df[(self.df.age == 'TOTAL') & (self.df.sex == 'T')].groupby('country').first()
         base_values = base_values[base_values.year <= np.datetime64(int(year) - 1970, 'Y')]['wages_value']
-        data['test'] = data['wages_value'] / (data['cumulative_sum'] * base_values)
+        data['Ratio'] = np.round(data['wages_value'] / (data['cumulative_sum'] * base_values), 2)
 
         fig = px.choropleth_mapbox(data, geojson=self.geodata,
                                    locations=data.index, featureidkey='properties.ISO2',  # join keys
-                                   color='test', color_continuous_scale='rdylbu',
+                                   color='Ratio', color_continuous_scale='rdylbu',
                                    range_color=(0,2),
                                    mapbox_style='carto-positron',
                                    zoom=3, center={'lat': 52, 'lon': 10},
@@ -114,58 +106,16 @@ class SalaryInflation():
         )
         return fig
 
-    def update_total_graph(self, hover, sex, age):
+    def update_graph(self, hover, sex, age):
         country = self.print_hover(hover)
         country_df = self.df[(self.df.country == country) & (
             self.df.sex == sex) & (self.df.age == age)]
         w = country_df.wages_value.iloc[0]
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.wages_value, mode='lines', name='Salaire réel'))
-        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation*'))
+        fig.add_trace(go.Scatter(x=country_df.year, y=np.round(country_df.wages_value, 0), mode='lines', name='Salaire réel'))
+        fig.add_trace(go.Scatter(x=country_df.year, y=np.round(country_df.cumulative_sum * w, 0), mode='lines', name='Inflation*'))
         fig.update_layout(
             title = 'Évolution du salaire médian en comparaison avec l\'inflation.<br>Lieu : ' + country_name[country],
-            title_xanchor = 'auto',
-            title_pad = { 't': 0, 'b': 0, 'l': 0, 'r': 0},
-            height=450,
-            hovermode='x unified',
-            legend = {'title': 'Courbes'},
-            xaxis_title='Année',
-            yaxis_title='Valeur médiane',
-        )
-        return fig
-
-    def update_men_graph(self, hover, year):
-        country = self.print_hover(hover)
-        country_df = self.df[(self.df.country == country) & (
-            self.df.sex == 'M') & (self.df.age == 'TOTAL')]
-        w = country_df.wages_value.iloc[0]
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.wages_value, mode='lines', name='Salaire réel'))
-        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation*'))
-        fig.update_layout(
-            title = 'Évolution du salaire médian en comparaison avec l\'inflation.<br>Lieu : ' + country_name[country] + '<br><sup>Chez les hommes</sup>',
-            title_font_size = 11,
-            title_xanchor = 'auto',
-            title_pad = { 't': 0, 'b': 0, 'l': 0, 'r': 0},
-            height=450,
-            hovermode='x unified',
-            legend = {'title': 'Courbes'},
-            xaxis_title='Année',
-            yaxis_title='Valeur médiane',
-        )
-        return fig
-
-    def update_women_graph(self, hover, year):
-        country = self.print_hover(hover)
-        country_df = self.df[(self.df.country == country) & (
-            self.df.sex == 'F') & (self.df.age == 'TOTAL')]
-        w = country_df.wages_value.iloc[0]
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.wages_value, mode='lines', name='Salaire réel'))
-        fig.add_trace(go.Scatter(x=country_df.year, y=country_df.cumulative_sum * w, mode='lines', name='Inflation*'))
-        fig.update_layout(
-            title = 'Évolution du salaire médian en comparaison avec l\'inflation.<br>Lieu : ' + country_name[country] + '<br><sup>Chez les femmes</sup>',
-            title_font_size = 11,
             title_xanchor = 'auto',
             title_pad = { 't': 0, 'b': 0, 'l': 0, 'r': 0},
             height=450,
