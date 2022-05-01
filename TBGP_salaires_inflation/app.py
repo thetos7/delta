@@ -5,17 +5,20 @@ from dash import html
 import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
-import get_data
+if __name__ == '__main__':
+    import get_data
+else:
+    from TBGP_salaires_inflation import get_data
 import json
 
+path = '.' if __name__ == '__main__' else 'TBGP_salaires_inflation'
 
 class SalaryInflation():
-    def __init__(self):
-        self.df = get_data.get_data()
+    def __init__(self, application = None):
+        self.df = get_data.get_data(path)
         self.years = self.df.year.unique().astype('datetime64[Y]').astype(int) + 1970
-        self.geodata = json.load(open('data/europe.geojson'))
-        self.app = dash.Dash()
-        self.app.layout = html.Div(children=[
+        self.geodata = json.load(open(f'{path}/data/europe.geojson'))
+        self.main_layout = html.Div(children=[
             html.H3(children='Comparaison salaire / inflation en Europe',
                     style={'textAlign': 'center'}),
             html.Div([dcc.Graph(id='tbgp-si-map'),
@@ -100,6 +103,12 @@ class SalaryInflation():
             * (c) 2022 Guillaume POISSON et Théo BACHIR
             """),
         ])
+
+        if application:
+            self.app = application
+        else:
+            self.app = dash.Dash(__name__)
+            self.app.layout = self.main_layout
 
         self.app.callback(
             dash.dependencies.Output('tbgp-si-map', 'clickData'),

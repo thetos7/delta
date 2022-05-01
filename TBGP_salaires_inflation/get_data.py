@@ -102,9 +102,9 @@ def merge_dataframes(inflation, wages):
     ret.dropna(inplace=True)
     return ret
 
-def get_data():
-    wages = pd.read_csv('data/salaires.csv', usecols=['age', 'sex', 'indic_il', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE'], parse_dates=['TIME_PERIOD'])
-    inflation = pd.read_csv('data/inflation.csv', usecols=['LOCATION', 'TIME', 'Value'], parse_dates=['TIME'])
+def get_data(path):
+    wages = pd.read_csv(f'{path}/data/salaires.csv', usecols=['age', 'sex', 'indic_il', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE'], parse_dates=['TIME_PERIOD'])
+    inflation = pd.read_csv(f'{path}/data/inflation.csv', usecols=['LOCATION', 'TIME', 'Value'], parse_dates=['TIME'])
 
     inflation, wages = clean_inflation(inflation), clean_wages(wages)
     wages = fill_missing_years(wages, inflation.country.unique())
