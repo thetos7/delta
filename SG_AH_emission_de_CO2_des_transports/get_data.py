@@ -30,17 +30,29 @@ def transform_countries_names(df, col):
                        'NO' : 'Norvège', 'PL' : 'Pologne', 'PT' : 'Portugal',
                        'RO' : 'Roumanie', 'SE' : 'Suède', 'SI' : 'Slovénie',
                        'SK' : 'Slovaquie', 'TR' : 'Turquie', 'UK' : 'Royaume-Uni'}
+
+    countries_name_en = { 'AT': 'Austria', 'BE' : 'Belgium', 'BG' : 'Bulgaria',
+                       'CH' : 'Switzerland', 'CY': 'Cyprus', 'CZ': 'Czech Republic',
+                       'DE' : 'Germany', 'DK' : 'Denmark', 'EE' : 'Estonia',
+                       'EL' : 'Greece', 'ES' : 'Spain', 'FI' : 'Finland',
+                       'FR' : 'France', 'HR' : 'Croatia', 'HU' : 'Hungary',
+                       'IE' : 'Ireland', 'IS' : 'Iceland', 'IT' : 'Italy',
+                       'LI' : 'Liechtenstein', 'LT' : 'Lithuania', 'LU' : 'Luxembourg',
+                       'LV' : 'Latvia', 'MT' : 'Malta', 'NL' : 'Netherlands',
+                       'NO' : 'Norway', 'PL' : 'Poland', 'PT' : 'Portugal',
+                       'RO' : 'Romania', 'SE' : 'Sweden', 'SI' : 'Slovenia',
+                       'SK' : 'Slovakia', 'TR' : 'Turkey', 'UK' : 'United Kingdom'}
     df[col].replace(countries_name, inplace = True)
     return df
-
+import os
 def get_transport_pollution_eu():
-    df = pd.read_csv("data/emission_de_polluant_des_transports_1990-2020.csv")
+    df = pd.read_csv("SG_AH_emission_de_CO2_des_transports/data/emission_de_polluant_des_transports_1990-2020.csv")
     
     # Remove the useless columns, keeping only:
     # The data (TIME_PERIOD), The country (geo), Pollution type (airpol), the value of the pollution (OBS_VALUE) 
     columns_to_keep = ['airpol', 'geo', 'TIME_PERIOD', 'OBS_VALUE']
     df = df[columns_to_keep]
-    df = df.rename(columns= {'airpol': 'Type de Pollution', 'geo': 'Pays', 'TIME_PERIOD': 'Année', 'OBS_VALUE' :'Taux de pollution'})
+    df = df.rename(columns= {'airpol': 'Type de pollution', 'geo': 'Pays', 'TIME_PERIOD': 'Année', 'OBS_VALUE' :'Taux de pollution'})
 
     # Seperate data for all EUROPE
     df_all_eu = df.loc[df['Pays'] == 'EU27_2020']
@@ -48,10 +60,10 @@ def get_transport_pollution_eu():
     
     # Rename geo columns with right names
     df = transform_countries_names(df, 'Pays')
-    return (df_all_eu, df[df['Type de Pollution'] == 'NMVOC'], df[df['Type de Pollution'] == 'NOX'], df[df['Type de Pollution'] == 'PM10'])
+    return (df_all_eu, df)
 
 def get_mean_co2_new_vehicules():
-    df = pd.read_csv("data/moyenne_emissions_CO2_vehicules_neuf_2000-2020.csv")
+    df = pd.read_csv("SG_AH_emission_de_CO2_des_transports/data/moyenne_emissions_CO2_vehicules_neuf_2000-2020.csv")
 
     # Remove the useless columns
     # Keep : geo, TIME_PERIOD, OBS_VALUE
@@ -68,7 +80,7 @@ def get_mean_co2_new_vehicules():
     return (df, df_all_eu)
 
 def get_air_pollution_schools():
-    df = pd.read_csv("data/ecoles-creches-idf-prepared_2012-2017.csv")
+    df = pd.read_csv("SG_AH_emission_de_CO2_des_transports/data/ecoles-creches-idf-prepared_2012-2017.csv")
 
     # remove useless columns
     df = df.drop(['ID', 'ville', 'CP', 'type', 'geometry'], axis=1)
@@ -81,7 +93,7 @@ def get_air_pollution_schools():
     return (df_no2, df_pm10, df_pm25)
 
 def get_pollution_per_vehicules_in_france():
-    df = pd.read_csv("data/vehicules_polluant_france_2015.csv",sep=";",encoding="latin1")
+    df = pd.read_csv("SG_AH_emission_de_CO2_des_transports/data/vehicules_polluant_france_2015.csv",sep=";",encoding="latin1")
 
     # Remove the useless columns
     # Keep : geo, TIME_PERIOD, OBS_VALUE
