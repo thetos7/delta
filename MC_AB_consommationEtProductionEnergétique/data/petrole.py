@@ -27,6 +27,8 @@ class Independance_Petrole():
    
         years = list_years(self.impor)
 
+        print(self.impor[self.impor.TIME_PERIOD == 1990].groupby("geo")["OBS_VALUE"].sum())
+
         with open("resources/custom.europe.geojson", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
             self.europe = geojson.load(f)
 
@@ -42,7 +44,7 @@ class Independance_Petrole():
                           dcc.Dropdown(
                                id='nrg-which-year',
                                options=[{'label': i, 'value': i} for i in years],
-                               value=1,
+                               value=years[0],
                                disabled=False,
                            ),
                          ], style={'width': '6em', 'padding':'2em 0px 0px 0px'}), # bas D haut G
@@ -65,9 +67,15 @@ class Independance_Petrole():
                     [dash.dependencies.Input('nrg-which-year', 'value')])(self.update_graph)
     
     def update_graph(self, year):
-        fig = px.choropleth_mapbox(self.impor, geojson=self.europe, locations='geo', color='OBS_VALUE',
+        df = self.impor[self.impor.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
+        max_val = max(df)
+        df = df.reset_index()
+        print(f"year: {year}")
+        print(f"max: {df}")
+
+        fig = px.choropleth_mapbox(df, geojson=self.europe, locations='geo', color='OBS_VALUE',
                                 color_continuous_scale="Viridis",
-                                range_color=(-1, 1),
+                                range_color=(0, max_val),
                                 mapbox_style="carto-positron",
                                 zoom=2, center = {"lat": 55, "lon": 0},
                                 opacity=0.5,
