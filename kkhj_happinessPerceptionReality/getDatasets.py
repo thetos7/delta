@@ -19,6 +19,8 @@ def get_datasets():
         if count == 0:
             continue
         df = pd.merge(datasets[key], df, on=["Country", "Year"])
+
+    df.rename(columns={'Value': 'General Happiness Index'}, inplace=True)
     return add_continents(df.set_index('Year'))
 
 

@@ -38,8 +38,25 @@ class HappinessPerceptionReality():
                        'North America': 'Amérique du Nord', 'South America': 'Amérique du Sud'}
         self.years = sorted(set(self.df.index.values))
 
+        self.source_list = ['https://stats.oecd.org/index.aspx?DataSetCode=PDB_LV#',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2012-Q1',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2013-Q1',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2014',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2015',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2016',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2017',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2018',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2019',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2020',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2021',
+                            'https://www.numbeo.com/crime/rankings_by_country.jsp?title=2022',
+                            'https://ourworldindata.org/happiness-and-life-satisfaction',
+                            'https://data.oecd.org/eduatt/adult-education-level.htm#indicator-chart',
+                            'https://home.kpmg/xx/en/home/services/tax/tax-tools-and-resources/tax-rates-online/social-security-employer-tax-rates-table.html']
+
         self.main_layout = html.Div(children=[
-            html.H3(children='Vrai Bonheur VS. Fake Bonheur'),
+            html.H3(children='Conception du bonheur'),
+            html.H5(children='Evolution de l\'indice mondial du bonheur en fonction du bonheur calculé suivant la pyramide des besoins personnels'),
 
             html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'),
 
@@ -47,7 +64,7 @@ class HappinessPerceptionReality():
                 html.Div([dcc.Graph(id='wps-main-graphic'), ], style={'width': '80%'}),
 
                 html.Div([
-                    html.Div('Attributs'),
+                    html.Div('Pourcentage pour chaque propriétés permettant de calculer votre propre bonheur'),
                     html.Label('PIB', htmlFor='gdp', style={'text-align': 'left',
                                                             'margin-right': '4px',
                                                             'display': 'inline-block',
@@ -163,8 +180,15 @@ class HappinessPerceptionReality():
                 'width': '100%'
             }),
 
+            html.Div([
+                html.P(
+                    'Grâce aux données, il est possible de constater que l\'évolution de la richesse et de l\'indice de la sécurité sont les plus grands facteurs du bonheur dans le monde. D\'autre part, plus le PIB, la contribution sociale et le taux d\'emploi augmentent et plus le taux de criminalité baisse, entraînant ainsi une amélioration du bonheur. Cependant, dans certains pays moins avancés, un paradox peut être relevé. En effet, le bonheur calculé est assez faible, alors que le bonheur moyen (receuilli par sondage) est relativement élevé. Néanmoins, dans les pays plus développés, cette tendance diffère, le bonheur calculé étant plus proche de l\'indice moyen du bonheur. Il est possible d\'expliquer ce phénomène en s\'interressant à la pyramide des besoins, notamment en constatant que dans les pays les moins avancés, la population cherche avant tout à répondre aux besoins les plus élémentaires, qui sont faciles à satisfaire contrairement aux besoins intellectuels et moraux.')
+            ]),
+
+            html.Br(),
             html.Br(),
             html.Div(id='wps-country-div'),
+
 
             html.Div([
                 dcc.Graph(id='wps-gdp-time-series',
@@ -183,11 +207,19 @@ class HappinessPerceptionReality():
                       'borderBottom': 'thin lightgrey solid',
                       'justifyContent': 'center', }),
 
-        ], style={
+            html.Br(),
+            html.H6(children='A propos'),
+            html.Div('Auteurs: Jiayi Hao & Karen Kaspar'),
+            html.Div('Sources: '),
+            html.Ul([html.Li(html.A(href=x, children=x)) for x in self.source_list]),
+
+            ], style={
             # 'backgroundColor': 'rgb(240, 240, 240)',
             'padding': '10px 10px 10px 10px',
-        }
+            },
+
         )
+
 
         if application:
             self.app = application
@@ -260,13 +292,13 @@ class HappinessPerceptionReality():
     def update_graph(self, continents, year):
         dfg = self.df.loc[year]
         dfg = dfg[dfg['Continent'].isin(continents)]
-        fig = px.scatter(dfg, x="Value", y="Perceived Happiness",
+        fig = px.scatter(dfg, x="General Happiness Index", y="Calculated Happiness",
                          # title = f"{year}", cliponaxis=False,
                          size=None,
                          color="Continent", color_discrete_map=self.continent_colors,
                          hover_name="Country", log_x=True)
         fig.update_layout(
-            xaxis=dict(title='Bonheur recueilli dans un sondage',
+            xaxis=dict(title='Indice annuel du bonheur recueilli dans un sondage',
                        type='linear',
                        range=(0, 10)),
             yaxis=dict(title="Bonheur calculé", range=(0, 10)),
@@ -309,12 +341,12 @@ class HappinessPerceptionReality():
     # graph safety vs years
     def update_safety_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'Safety Index', "Sécurité (notée sur 10)", '#16A8CA')
+        return self.create_time_series(country, 'Safety Index', "Indice de sécurité (noté sur 10)", '#16A8CA')
 
     # graph unemployment vs years
     def update_unemployment_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'Unemployment Index', 'Chômage (noté sur 10)', '#0F809A')
+        return self.create_time_series(country, 'Unemployment Index', 'Taux d\'emploi (noté sur 10)', '#0F809A')
 
     # graph social contribution vs years
     def update_contribution_timeseries(self, hoverData):
