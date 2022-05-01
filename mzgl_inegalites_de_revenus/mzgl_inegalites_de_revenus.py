@@ -118,10 +118,10 @@ class Inegalites_de_revenus:
                                 Pour l'indicateur "Produit intérieur brut par habitant", un autoscaling sur l'axe des abscisses est appliqué afin de suivre l'augmentation du PIB.
                                 #### Observations sur les résultats
                                 * En moyenne, les inégalités de répartition de revenus ont augmenté à travers le monde depuis 1995.
-                                * On remarque, qu'une mauvaise répartition des richesses n'est pas liée à un problème de corruption ou de démocratie. Des pays démocratiques et peu corrompus, comme les USA ou le japon, sont tout aussi inégalitaires que des pays peu démocratiques et corrompus, comme Haïti ou la Russie.
-                                * De même, le PIB n'est pas indicateur de l'inégalité : en Afrique on a une grande variance dans les inégalités avec des pays ayant un PIB similaire.
-                                * L'Europe et l'Océanie ont des inégalités de revenus bien plus faible que les autres et possèdent tous deux l'indice de démocratie / de corruption moyen le plus faible.
-                                * On en conclut que l'importance de l'inégalité dans un pays ne semble pas être lié au niveau de démocratie, de corruption ou de développement de celui-ci. Il semble plutôt que dans le cas de l'Europe et de l'Océanie, les pays sont en moyennes plus égalitaire et que c'est donc la "manière" européenne de gérer un pays qui fait la différence.
+                                * On remarque, qu'une mauvaise répartition des richesses n'est pas liée à un problème de corruption ou de démocratie. Des pays démocratiques et peu corrompus, comme les USA ou le Japon, sont tout aussi inégalitaires que des pays peu démocratiques et corrompus, comme Haïti ou la Russie.
+                                * De même, le PIB par habitant n'est pas indicateur de l'inégalité: en Afrique, on a une grande variance dans les inégalités avec des pays ayant un PIB par habitant similaire.
+                                * L'Europe et l'Océanie ont des inégalités de revenus bien plus faibles que les autres et possèdent tous deux l'indice de démocratie ou de corruption moyen le plus faible.
+                                * On en conclut que l'importance de l'inégalité de revenus dans un pays ne semble pas être liée au niveau de démocratie, de corruption ou de développement de celui-ci. On remarque que les pays de l'Europe et de l'Océanie sont en moyenne plus égalitaires que sur les autres continents.
                                 ### À propos
                                 Données :
                                 - [Population, Banque mondiale](https://data.worldbank.org/indicator/SP.POP.TOTL?name_desc=false)
@@ -298,6 +298,9 @@ class Inegalites_de_revenus:
         )(self.run_movie)
 
     def get_definition_xaxis(self, xaxis, yaxis):
+        """
+        Display some explanations about axes of the scatter plot
+        """
         text = "Le coefficient de Gini est entre 0 et 1. Il permet de rendre compte des inégalités de répartition des revenus dans un pays. Plus ce coefficient est proche de 0, plus on se rapproche de l'égalité parfaite."
         if yaxis != "G":
             text = ""
@@ -315,6 +318,9 @@ class Inegalites_de_revenus:
             )
 
     def update_title(self, yaxis, xaxis):
+        """
+        Manage slider of the scatter plot
+        """
         yaxis_title = "les 10% les plus pauvres"
         if yaxis == "p99p100":
             yaxis_title = "les 1% les plus riches"
@@ -340,6 +346,9 @@ class Inegalites_de_revenus:
         return title
 
     def get_country(self, hoverData):
+        """
+        Retrieve country name from hoverData
+        """
         if hoverData is None:
             country = self.countries_df.iloc[np.random.randint(len(self.countries_df))]
             return country["Country_Name"]
@@ -668,16 +677,20 @@ class Inegalites_de_revenus:
         )
         return fig
 
-    # start and stop the movie
     def button_on_click(self, n_clicks, text):
+        """
+        start and stop the movie
+        """
         if text == self.START:
             return self.STOP
         else:
             return self.START
 
-    # this one is triggered by the previous one because we cannot have 2 outputs
-    # in the same callback
     def run_movie(self, text):
+        """
+        this one is triggered by the previous one because we cannot have 2 outputs
+        in the same callback
+        """
         if text == self.START:  # then it means we are stopped
             return 0
         else:
