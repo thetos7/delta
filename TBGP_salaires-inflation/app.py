@@ -31,13 +31,13 @@ class SalaryInflation():
                 marks={str(year): str(year)
                        for year in range(self.years[0], self.years[-1]+1, 5)}
             ),
-            # dcc.Markdown(id='md'),
             html.Div([
                 html.Div([
                     dcc.Graph(id='graph',
                         style={'width': '85%', 'display': 'inline-block'}),
                     html.Div([
-                        html.U('Sexe :'),
+                        html.Button('Union Européenne', id='europe_button', style={'width': '100%'}),
+                        html.Div(html.U('Sexe :'), style={'padding-top': '10%'}),
                         dcc.RadioItems(id='sex', options=[
                             {'label': 'Total', 'value': 'T'},
                             {'label': 'Hommes', 'value': 'M'},
@@ -55,8 +55,20 @@ class SalaryInflation():
                 ], style={'display': 'flex', 'justifyContent': 'center', }),
                 html.Div('* Salaire attendu si on prend uniquement l\'évolution de l\'inflation en compte')
             ]),
+            dcc.Markdown("""
+
+            ### A propos
+
+            * Sources :
+                * [Le salaire médian en Europe selon l'âge et le sexe](https://ec.europa.eu/eurostat/fr/web/products-datasets/-/ILC_DI03) par Eurostat
+                * [L'évolution annuelle de l'inflation depuis 1995](https://data.oecd.org/fr/price/inflation-ipc.htm) par l'OCDE
+            * (c) 2022 Guillaume POISSON et Théo BACHIR
+            """),
         ])
 
+        self.app.callback(
+            dash.dependencies.Output('map', 'clickData'),
+            dash.dependencies.Input('europe_button', 'n_clicks'))(self.set_ue)
         self.app.callback(
             dash.dependencies.Output('year', 'children'),
             dash.dependencies.Input('year-filter-slider', 'value'))(self.update_year)
@@ -75,6 +87,10 @@ class SalaryInflation():
              dash.dependencies.Input('sex', 'value'),
              dash.dependencies.Input('age', 'value'),
              dash.dependencies.Input('year-filter-slider', 'value')])(self.update_graph)
+
+
+    def set_ue(self, n):
+        return None
 
     def update_year(self, years):
         return f'Années: {years[0]} - {years[1]}'
