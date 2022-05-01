@@ -3,7 +3,7 @@ from dash import dcc
 from dash import html
 from energies import energies
 from population import population
-from SG_AH_emission_de_CO2_des_transports import polution
+from SG_AH_emission_de_CO2_des_transports import pollution
 from deces import deces
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -13,7 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
-pol = polution.Polution(app)
+pol = pollution.Pollution(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -28,7 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
-                              dcc.Link(html.Button('Emission de CO2', style={'width':"100%"}), href='/polution'),
+                              dcc.Link(html.Button('Emission de CO2', style={'width':"100%"}), href='/pollution'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -70,7 +70,7 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
-    elif pathname == '/polution':
+    elif pathname == '/pollution':
         return pol.main_layout
     else:
         return home_page
