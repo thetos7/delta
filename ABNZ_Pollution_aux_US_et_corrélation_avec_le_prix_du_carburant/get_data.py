@@ -43,10 +43,10 @@ COfig = px.line(pollution, y="CO Mean", title='CO per day')
 NO2fig = px.line(pollution, y="NO2 Mean", title='NO2 per day')
 O3fig = px.line(pollution, y="O3 Mean", title='O3 per day') # not produced by cars, but byproduct of NO2 under UV light
 SO2fig = px.line(pollution, y="SO2 Mean", title='SO2 per day') # not rejected by cars
-COfig.show()
-NO2fig.show()
-O3fig.show()
-SO2fig.show()
+#COfig.show()
+#NO2fig.show()
+#O3fig.show()
+#SO2fig.show()
 
 # Prices data
 # --------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ prices = prices.loc[(prices['Date'] >= '2000-01-03')]
 
 # drawing graph
 pricesFig = px.line(prices, x="Date", y="Regular All Formulations Retail Gasoline Prices Dollars per Gallon", title='Gas price per week')
-pricesFig.show()
+#pricesFig.show()
 
 # Temperature and precipitation data
 # --------------------------------------------------------------------------------------
@@ -90,5 +90,5 @@ average_cities = pd.concat(cities).groupby('Date', as_index=False).mean()
 # drawing graphs
 celsiusFig = px.line(average_cities, x="Date", y="average_celsius", title='average_celsius')
 prcpFig = px.line(average_cities, x="Date", y="prcp_cm", title='prcp_cm')
-celsiusFig.show()
-prcpFig.show()
+#celsiusFig.show()
+#prcpFig.show()
