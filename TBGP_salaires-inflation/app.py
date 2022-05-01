@@ -21,12 +21,13 @@ class SalaryInflation():
             html.Div([dcc.Graph(id='map'),
                      html.Div(id='year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
 
-            dcc.Slider(
+            dcc.RangeSlider(
                 id='year-filter-slider',
                 min=self.years[0],
                 max=self.years[-1],
                 step=1,
-                value=self.years[-1],
+                pushable=1,
+                value=[2006, 2018],
                 marks={str(year): str(year)
                        for year in range(self.years[0], self.years[-1]+1, 5)}
             ),
@@ -71,24 +72,31 @@ class SalaryInflation():
         self.app.callback(
             dash.dependencies.Output('graph', 'figure'),
             [dash.dependencies.Input('map', 'clickData'),
-             dash.dependencies.Input('sex', 'value'), dash.dependencies.Input('age', 'value')])(self.update_graph)
+             dash.dependencies.Input('sex', 'value'),
+             dash.dependencies.Input('age', 'value')])(self.update_graph)
 
-    def update_year(self, year):
-        return f'Année: {year}'
+    def update_year(self, years):
+        return f'Années: {years[0]} - {years[1]}'
 
     def print_hover(self, hover):
         if hover is None:
             return 'EU27_2020'
         return hover['points'][0]['location'] if hover['points'][0]['location'] != 'UK' else 'GB'
 
-    def update_map(self, year):
-        data = self.df[(self.df.year == np.datetime64(int(year) - 1970, 'Y')) & (self.df.age == 'TOTAL') & (
+    def update_map(self, years):
+        data = self.df[(self.df.year == np.datetime64(int(years[1]) - 1970, 'Y')) & (self.df.age == 'TOTAL') & (
             self.df.sex == 'T')][['country', 'cumulative_sum', 'wages_value']]
         data = data.set_index('country')
 
-        base_values = self.df[(self.df.age == 'TOTAL') & (self.df.sex == 'T')].groupby('country').first()
-        base_values = base_values[base_values.year <= np.datetime64(int(year) - 1970, 'Y')]['wages_value']
-        data['Ratio'] = np.round(data['wages_value'] / (data['cumulative_sum'] * base_values), 2)
+        base_values = self.df[(self.df.age == 'TOTAL') & (self.df.sex == 'T') & (self.df.year >= np.datetime64(int(years[0]) - 1970, 'Y'))].groupby('country').first()
+        base_values = base_values[base_values.year <= np.datetime64(int(years[1]) - 1970, 'Y')]['wages_value']
+        
+        base_inflation = self.df[(self.df.year == np.datetime64(int(years[0]) - 1970, 'Y')) & (self.df.age == 'TOTAL') & (
+            self.df.sex == 'T')][['country', 'cumulative_sum']].set_index('country').rename(columns={'cumulative_sum' : 'base_inflation'})
+        
+        data = base_inflation.join(data, how='inner')
+
+        data['Ratio'] = np.round(data['wages_value'] / (data['cumulative_sum'] / data['base_inflation'] * base_values), 2)
 
         fig = px.choropleth_mapbox(data, geojson=self.geodata,
                                    locations=data.index, featureidkey='properties.ISO2',  # join keys
@@ -99,7 +107,7 @@ class SalaryInflation():
                                    opacity=0.5,
                                    )
         fig.update_layout(
-            title=f'{year}',
+            title=f'{years}',
             margin={'l': 0, 'b': 0, 't': 0, 'r': 0},
             hovermode='closest',
             showlegend=False,
