@@ -68,20 +68,64 @@ class happinessPerceptionReality:
 
                 html.Div([
                     html.Div('Attributs'),
-                    html.H6('PIB', style={'display': 'inline-block'}),
+                    html.Br(),
+                    html.Label('PIB', htmlFor='gdp', style={'text-align': 'left',
+                                                            'margin-right': '4px',
+                                                            'display': 'inline-block',
+                                                            'width': '55%'}),
                     dcc.Input(
+                        name='gdp',
                         id='wps-attribute-ratio-gdp',
                         placeholder='Entrer une valeur pour le PIB',
                         type='number',
                         value='0',
-                        style={'display': 'inline-block'}
+                        style={'display': 'inline-block', 'width': '30%'}
                     ),
                     html.Br(),
+                    html.Label('Chômage', htmlFor='unemployment', style={'text-align': 'left',
+                                                                         'margin-right': '4px',
+                                                                         'display': 'inline-block',
+                                                                         'width': '55%'}),
+                    dcc.Input(
+                        name='unemployment',
+                        id='wps-attribute-ratio-unemployment',
+                        placeholder='Entrer une valeur pour le Chômage',
+                        type='number',
+                        value='0',
+                        style={'display': 'inline-block', 'width': '30%'}
+                    ),
+                    html.Br(),
+                    html.Label('Contribution Social', htmlFor='social-contribution', style={'text-align': 'left',
+                                                                                            'margin-right': '4px',
+                                                                                            'display': 'inline-block',
+                                                                                            'width': '55%'}),
+                    dcc.Input(
+                        name='social-contribution',
+                        id='wps-attribute-ratio-social-contribution',
+                        placeholder='Entrer une valeur pour la contribution social',
+                        type='number',
+                        value='0',
+                        style={'display': 'inline-block', 'width': '30%'}
+                    ),
+                    html.Br(),
+                    html.Label('Éducation', htmlFor='education', style={'text-align': 'left',
+                                                                        'margin-right': '4px',
+                                                                        'display': 'inline-block',
+                                                                        'width': '55%'}),
+                    dcc.Input(
+                        name='education',
+                        id='wps-attribute-ratio-education',
+                        placeholder='Entrer une valeur pour l\'éducation',
+                        type='number',
+                        value='0',
+                        style={'display': 'inline-block', 'width': '30%'}
+                    ),
                     html.Br(),
                     html.Button('Entrer', id='wps-submit-button'),
                     html.Br(),
                     html.Br(),
                     html.Br(),
+
                     html.Div('Continents'),
                     dcc.Checklist(
                         id='wps-crossfilter-which-continent',
@@ -213,7 +257,7 @@ class happinessPerceptionReality:
             [dash.dependencies.State('wps-attribute-ratio-gdp', 'value')])(self.update_attributes_ratio)
 
     def update_attributes_ratio(self, n_clicks, value):
-        if (n_clicks > 0) :
+        if (n_clicks != None and n_clicks > 0) :
             print('The input value was "{}" and the button has been clicked {} times'.format(
                 value,
                 n_clicks))
