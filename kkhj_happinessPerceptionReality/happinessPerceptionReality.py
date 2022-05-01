@@ -121,6 +121,7 @@ class happinessPerceptionReality:
                     #     style={'display': 'inline-block', 'width': '30%'}
                     # ),
                     html.Br(),
+                    html.P('', style={'color':'#FF0000'}, id='wps-sum-message'),
                     html.Button('Entrer', id='wps-submit-button'),
                     html.Br(),
                     html.Br(),
@@ -251,6 +252,7 @@ class happinessPerceptionReality:
             [dash.dependencies.Input('wps-main-graph', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_contribution_timeseries)
         self.app.callback(
+            dash.dependencies.Output('wps-sum-message', 'children'),
             dash.dependencies.Output('wps-main-graph', 'hoverData'),
             [dash.dependencies.Input('wps-submit-button', 'n_clicks')],
             [dash.dependencies.State('wps-attribute-ratio-gdp', 'value')],
@@ -260,15 +262,24 @@ class happinessPerceptionReality:
 
     def update_attributes_ratio(self, n_clicks, v_gdp, v_safety, v_unemployment, v_contribution):
         if n_clicks:
-            self.importanceRate['gdpPerCapita'] = v_gdp / 100
-            self.importanceRate['safety'] = v_safety / 100
-            self.importanceRate['unemployment'] = v_unemployment / 100
-            self.importanceRate['socialContribution'] = v_contribution / 100
 
-            # TODO decomment line below if education leve
-            # self.importanceRate['educationLevel'] = v_education
+            sum = v_gdp + v_safety + v_unemployment + v_contribution
+            if (sum != 100):
+                return "Sum needs to be equal to 100"
+            else:
+                self.importanceRate['gdpPerCapita'] = v_gdp / 100
+                self.importanceRate['safety'] = v_safety / 100
+                self.importanceRate['unemployment'] = v_unemployment / 100
+                self.importanceRate['socialContribution'] = v_contribution / 100
 
-            self.df = add_perceived_index(self.df, self.importanceRate)
+                # TODO decomment line below if education defined
+                # self.importanceRate['educationLevel'] = v_education
+
+                self.df = add_perceived_index(self.df, self.importanceRate)
+
+                return ""
+
+
 
     def update_graph(self, continents, xaxis_type, year):
         dfg = self.df.loc[year]
