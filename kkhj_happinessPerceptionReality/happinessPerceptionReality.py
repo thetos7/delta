@@ -1,6 +1,6 @@
-from getDatasets import get_datasets
-from missingValues import *
-from perceivedIndex import *
+from kkhj_happinessPerceptionReality.getDatasets import get_datasets
+from kkhj_happinessPerceptionReality.missingValues import *
+from kkhj_happinessPerceptionReality.perceivedIndex import *
 import dash
 from dash import dcc
 from dash import html
@@ -46,7 +46,7 @@ class HappinessPerceptionReality:
             html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'),
 
             html.Div([
-                html.Div([dcc.Graph(id='wps-main-graph'), ], style={'width': '90%', }),
+                html.Div([dcc.Graph(id='wps-main-graphic'), ], style={'width': '80%'}),
 
                 html.Div([
                     html.Div('Attributs'),
@@ -144,20 +144,20 @@ class HappinessPerceptionReality:
                     html.Br(),
                     html.Button(
                         self.START,
-                        id='wps-button-start-stop',
+                        id='wps-start-stop-button',
                         style={'display': 'inline-block'}
                     ),
-                ], style={'margin-left': '15px', 'width': '7em', 'float': 'right'}),
+                ], style={'margin-left': '15px', 'width': '15em', 'float': 'right'}),
             ], style={
-                'padding': '10px 50px',
+                'padding': '10px 10px',
                 'display': 'flex',
-                'justifyContent': 'center'
+                'justifyContent': 'left'
             }),
 
             html.Div([
                 html.Div(
                     dcc.Slider(
-                        id='wps-crossfilter-year-slider',
+                        id='wps-year-slider',
                         min=self.years[0],
                         max=self.years[-1],
                         step=1,
@@ -167,18 +167,18 @@ class HappinessPerceptionReality:
                     style={'display': 'inline-block', 'width': "90%"}
                 ),
                 dcc.Interval(  # fire a callback periodically
-                    id='wps-auto-stepper',
+                    id='wps-stepper',
                     interval=500,  # in milliseconds
                     max_intervals=-1,  # start running
                     n_intervals=0
                 ),
             ], style={
-                'padding': '0px 50px',
+                'padding': '0px 10px',
                 'width': '100%'
             }),
 
             html.Br(),
-            html.Div(id='wps-div-country'),
+            html.Div(id='wps-country-div'),
 
             html.Div([
                 dcc.Graph(id='wps-gdp-time-series',
@@ -197,7 +197,7 @@ class HappinessPerceptionReality:
 
         ], style={
             # 'backgroundColor': 'rgb(240, 240, 240)',
-            'padding': '10px 50px 10px 50px',
+            'padding': '10px 10px 10px 10px',
         }
         )
 
@@ -211,46 +211,46 @@ class HappinessPerceptionReality:
         # I link callbacks here since @app decorator does not work inside a class
         # (somhow it is more clear to have here all interaction between functions and components)
         self.app.callback(
-            dash.dependencies.Output('wps-main-graph', 'figure'),
+            dash.dependencies.Output('wps-main-graphic', 'figure'),
             [dash.dependencies.Input('wps-crossfilter-which-continent', 'value'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value'),
-             dash.dependencies.Input('wps-crossfilter-year-slider', 'value')])(self.update_graph)
+             dash.dependencies.Input('wps-year-slider', 'value')])(self.update_graph)
         self.app.callback(
-            dash.dependencies.Output('wps-div-country', 'children'),
-            dash.dependencies.Input('wps-main-graph', 'hoverData'))(self.country_chosen)
+            dash.dependencies.Output('wps-country-div', 'children'),
+            dash.dependencies.Input('wps-main-graphic', 'hoverData'))(self.country_chosen)
         self.app.callback(
-            dash.dependencies.Output('wps-button-start-stop', 'children'),
-            dash.dependencies.Input('wps-button-start-stop', 'n_clicks'),
-            dash.dependencies.State('wps-button-start-stop', 'children'))(self.button_on_click)
+            dash.dependencies.Output('wps-start-stop-button', 'children'),
+            dash.dependencies.Input('wps-start-stop-button', 'n_clicks'),
+            dash.dependencies.State('wps-start-stop-button', 'children'))(self.button_on_click)
         # this one is triggered by the previous one because we cannot have 2 outputs for the same callback
         self.app.callback(
-            dash.dependencies.Output('wps-auto-stepper', 'max_interval'),
-            [dash.dependencies.Input('wps-button-start-stop', 'children')])(self.run_movie)
+            dash.dependencies.Output('wps-stepper', 'max_interval'),
+            [dash.dependencies.Input('wps-start-stop-button', 'children')])(self.run_movie)
         # triggered by previous
         self.app.callback(
-            dash.dependencies.Output('wps-crossfilter-year-slider', 'value'),
-            dash.dependencies.Input('wps-auto-stepper', 'n_intervals'),
-            [dash.dependencies.State('wps-crossfilter-year-slider', 'value'),
-             dash.dependencies.State('wps-button-start-stop', 'children')])(self.on_interval)
+            dash.dependencies.Output('wps-year-slider', 'value'),
+            dash.dependencies.Input('wps-stepper', 'n_intervals'),
+            [dash.dependencies.State('wps-year-slider', 'value'),
+             dash.dependencies.State('wps-start-stop-button', 'children')])(self.on_interval)
         self.app.callback(
             dash.dependencies.Output('wps-gdp-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graph', 'hoverData'),
+            [dash.dependencies.Input('wps-main-graphic', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_gdp_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-safety-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graph', 'hoverData'),
+            [dash.dependencies.Input('wps-main-graphic', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_safety_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-unemployment-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graph', 'hoverData'),
+            [dash.dependencies.Input('wps-main-graphic', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_unemployment_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-contribution-time-series', 'figure'),
-            [dash.dependencies.Input('wps-main-graph', 'hoverData'),
+            [dash.dependencies.Input('wps-main-graphic', 'hoverData'),
              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_contribution_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-sum-message', 'children'),
-            #dash.dependencies.Output('wps-main-graph', 'hoverData'),
+            #dash.dependencies.Output('wps-main-graphic', 'hoverData'),
             [dash.dependencies.Input('wps-submit-button', 'n_clicks')],
             [dash.dependencies.State('wps-attribute-ratio-gdp', 'value')],
             [dash.dependencies.State('wps-attribute-ratio-safety', 'value')],

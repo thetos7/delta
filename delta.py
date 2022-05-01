@@ -18,7 +18,7 @@ hap = happinessPerceptionReality.HappinessPerceptionReality(app)
 main_layout = html.Div([
     html.Div(className = "row",
              children=[ 
-                 #dcc.Location(id='url', refresh=False),
+                 dcc.Location(id='url', refresh=False),
                  html.Div(className="two columns",
                           children = [
                               html.Center(html.H2("Δelta δata")),

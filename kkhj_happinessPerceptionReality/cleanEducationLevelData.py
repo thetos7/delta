@@ -3,7 +3,7 @@ import pycountry as pyc
 
 #main function
 def education_out_of_10():
-    df = pd.read_csv("data/educationLevel.csv")
+    df = pd.read_csv("kkhj_happinessPerceptionReality/data/educationLevel.csv")
     df.rename(columns={'TIME': 'Year'}, inplace=True)
     mask = (df['Year'] >= 2012) & (df['Year'] <= 2021)
     df = df[mask]

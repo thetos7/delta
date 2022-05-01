@@ -1,5 +1,5 @@
-from missingValues import get_all_datasets
-from cleanEducationLevelData import *
+from kkhj_happinessPerceptionReality.missingValues import get_all_datasets
+from kkhj_happinessPerceptionReality.cleanEducationLevelData import *
 import pycountry_convert as pc
 
 
