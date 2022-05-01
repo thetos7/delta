@@ -58,7 +58,8 @@ def pgn_bz2_to_csv(bz2_path, csv_path):
     while line:
         key_value = parse_pgn_line(line.decode("utf-8"))
         if key_value:
-            db_dict[key_value[0]] = key_value[1]
+            if key_value[1] != "?":
+                db_dict[key_value[0]] = key_value[1]
             if key_value[0] == "Moves":
                 csv_writer.writerow(list(db_dict.values()))
                 db_dict = OrderedDict([(key, None) for key in header])
