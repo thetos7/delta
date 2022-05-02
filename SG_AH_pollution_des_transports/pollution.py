@@ -49,6 +49,8 @@ class Pollution():
             html.H1(children="Pollution des Transports à différentes échelles"),
             html.Br(),
             html.H2(children='Étude de la pollution de l\'air en Europe'),
+            dcc.Markdown("""Tout d'abord nous allons étudier quelques chiffres sur la pollution des transports en Europe.
+            """),
             html.H3(children='Pollution des Transports en Europe de 1990 à 2020'),
             html.Div([dcc.Graph(id='pol-main-europe-graph'), ],
                      style={'width': '100%'}),
@@ -95,6 +97,20 @@ class Pollution():
                 'padding': '0px 50px',
                 'width': '100%'
             }),
+            dcc.Markdown("""Cette carte est intéractive. Pour visualiser la pollution d'une certaine temporalité
+            appuyez sur le button stop et glissez le curseur le long de l'axe pour changer l'année observée.
+"""),
+            dcc.Markdown("""Cette carte nous permet d'observer les différents niveaux de pollution par pays entre 1990 et 2020. 
+            Ces pourcentages étant calculés par rapport aux données de l'année 2000, cela nous permet de savoir si les émissions
+             des différents gaz polluants (tels que l'Oxyde d'azote, les composés organiques volatils autres que le méthane et 
+             les particules ayant une taille inférieure à 10 nanomètres) sont considérablement différentes par rapport à l'année observée.
+            On peut observer la Lettonie rejette énormément d'Oxyde d'azote et de composés organiques volatils autre que le méthane.
+            Dans l'ensemble l'Europe, on voit qu'à partir de 2006 la pollution en particules augmente beaucoup.
+            """),
+            dcc.Markdown("""
+            Maintenant qu'on a observé la pollution des transports en général et autre que le C02, nous allons nous concentrer sur les véhicules
+            neufs afin d'estimer quel pays contribue le plus à la pollution en CO2 en Europe.
+            """),
             html.Br(),
             html.H3(
                 children="Émission de CO2 des véhicules neufs entre 2000 et 2020 en Europe"),
@@ -125,6 +141,20 @@ class Pollution():
                 'flexDirection': 'row',
                 'justifyContent': 'flex-start',
             }),
+            dcc.Markdown("""Avec cette représentation il est possible de comparer un seul pays 
+            avec la moyenne de la consommation de toute l'Europe en choisissant le pays souhaité avec le menu
+            déroulant.
+            """),
+            dcc.Markdown("""La Suède émettait énormément de CO2 dans les années 2000 et s'est 
+            ensuite réduit pour faire parti des pays les moins polluant d'Europes. Les Pays-Bas reste majoritèrement
+            ceux qui sont les moins pollueurs parmis tout les pays d'Europe. La France quant à elle reste toujours 
+            très en dessous de la moyenne européene et plutôt stable dans le temps. Mais comparer aux Pays-Bas sur les dernières années
+            la France reste plus pollueuse.
+            """),
+            dcc.Markdown("""Dans la suite nous allons nous concentrer sur la France pour voir comment elle
+             contribue à la pollution européenne, et après voir quel impact cela a sur la vie des français et plus particulièrement
+             sur les écoles et crèches de l'Île-de-France.
+            """),
             html.Br(),
             html.H2(children="Étude de la pollution des transports en France"),
             html.H3(
@@ -175,9 +205,13 @@ class Pollution():
                     "justifyContent": "flex-start",
                 },
             ),
+            dcc.Markdown("""Insérer description
+            """),
             html.Br(),
             html.H3(
                 children='Pollution aérienne des écoles et crêches en Île de France entre 2012 et 2017'),
+            dcc.Markdown(""" Insérer description
+            """),
             html.Br(),
             html.H2(children="À propos"),
             dcc.Markdown("""
@@ -261,7 +295,9 @@ class Pollution():
             fig = px.line(mean_eu, x='Année', y='Taux de pollution', color="Pays", title=f"Comparaison entre la moyenne des émissions de CO2 pour toute l\'Europe et en {country}")
             return fig
 
-        return px.line(df, x='Année', y='Taux de pollution', color="Pays", title='Moyenne des émissions de CO2 pour chacun des pays d\'Europe')
+        return px.line(df, x='Année', y='Taux de pollution', color="Pays", title='Moyenne des émissions de CO2 pour chacun des pays d\'Europe', labels={
+                                       'Taux de pollution': f'Taux de Pollution en g/km'},
+)
 
     def update_graph_cars(self, name, axis):
         col = f"Emission {name}"
