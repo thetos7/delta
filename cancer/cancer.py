@@ -83,27 +83,21 @@ class Cancer():
                             marks={0:'0-4',1:'5-9',2:'10-14',3:'15-19',4:'20-24',5:'25-29',6:'30-34',7:'35-39',8:'40-44',9:'45-49',10:'50-54',11:'55-59',12:'60-64',13:'65-69',14:'70 -74',15:'75-79',16:'80-84',17:'85+',18:'Unknown'},
                             value=[4,7])],
                 style={'display':'block', 'width':"50%"}),
-            html.Div(children=[
-                html.Div([
-                dcc.Graph(id='cancer-by-age',
-                            style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
-                dcc.RadioItems(id='sex-radioitem', 
+            html.Div([
+                dcc.Graph(id='cancer-by-age', 
+                          style={'width':'50%', 'display':'inline-block'}),
+                dcc.Graph(id='cancer-by-country',
+                          style={'width':'50%', 'display':'inline-block', 'padding-left': '0.5%'}),
+            ], style={ 'display':'flex', 
+                       'borderTop': 'thin lightgrey solid',
+                       'borderBottom': 'thin lightgrey solid',
+                       'justifyContent':'center', }),
+            html.Div(dcc.RadioItems(id='sex-radioitem', 
                                      options=[{'label':'Male', 'value':'Male'},
                                               {'label':'Female', 'value':'Female'}, 
                                               ],
                                     value='Female',
-                                    style={'display':'block'})]),
-                
-                
-                
-                html.Div([
-                dcc.Graph(id='cancer-by-country-selected-continent',
-                            style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
-                ]),
-                ], style={ 'display':'flex', 
-                           'borderTop': 'thin lightgrey solid',
-                           'borderBottom': 'thin lightgrey solid',
-                           'justifyContent':'center', }),
+                                    style={'display':'block'})),
             html.Br()])
         
 
@@ -153,7 +147,7 @@ class Cancer():
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
         sub_df = sub_df[sub_df['Sex'] == selected_sex]
-        fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Sex'],text_auto=True)
+        fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},text_auto=True)
         return fig
     
     def update_graph_country(self,continent_id,column_x):
