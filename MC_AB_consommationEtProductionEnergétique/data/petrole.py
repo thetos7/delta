@@ -9,10 +9,8 @@ import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
 import dateutil as du
-from scipy import stats
-from scipy import fft
-import geojson
 import plotly.express as px
+import json
 
 from get_data import get_data
 from get_data import get_by_year
@@ -27,10 +25,12 @@ class Independance_Petrole():
    
         self.years = list_years(self.impor)
 
+        self.partners = self.impor["partner"].unique()
+
         #print(self.impor[self.impor.TIME_PERIOD == 1990].groupby("geo")["OBS_VALUE"].sum())
 
         with open("resources/europe.geo.json", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
-            self.europe = geojson.load(f)
+            self.europe = json.load(f)
 
         for i in self.europe["features"]:
             fips = i["properties"]["iso_a2"]
@@ -44,14 +44,15 @@ class Independance_Petrole():
                           dcc.Slider(0, len(self.years) -1, 1,
                                id='year',
                                marks={i: str(self.years[i]) for i in range(len(self.years))},
-                               value=1
+                               value=0
                            ),
-                           #dcc.Dropdown(
-                           #    id='year',
-                           #    options=[{'label': i, 'value': i} for i in years],
-                           #    value=years[0],
-                           #    clearable=False
-                           #),
+                           html.Div('Selectionner les pays dont on souhaite stopper les exportations'),
+                           dcc.Dropdown(
+                               id='excluded-countries',
+                               options=[i for i in self.partners],
+                               value=[],
+                               multi=True
+                           ),
                          ], style={'width': '100%', 'padding':'4em 0px 0px 0px'}), # bas D haut G
             html.Div([
                 html.Div([
@@ -154,7 +155,6 @@ class Independance_Petrole():
         df = self.prod[self.prod.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
         max_val = max(df)
         df = df.reset_index()
-        print(df)
 
 
         fig = px.choropleth_mapbox(df, geojson=self.europe, locations='geo', color='OBS_VALUE',
