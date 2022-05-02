@@ -28,6 +28,11 @@ class EuropeanEnvironmentStudies():
 
             html.Br(),
 
+            dcc.Markdown("""
+            Pour le graphique ci-dessous :
+            - Les axes X et Y représentent la politique environnementale, avec respectivement le pourcentage du PIB utilisé et le pourcentage des taxes environnementales.
+            - La taille des bulles et leur couleur représentent la quantité d'émission de gaz à effet de serre, l'unité est modifiable dans la légende. 
+            """),
             html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'), 
 
             html.Div([
@@ -89,6 +94,14 @@ class EuropeanEnvironmentStudies():
                     'padding': '0px 50px', 
                     'width':'100%'
                 }),
+
+            html.Br(),
+
+            html.Div("Obtenez plus d'information sur un pays en passant votre curseur dessus sur le graphique ci-dessus."),
+
+            html.Br(),
+            html.Div("Les différents graphiques ci-dessous nous permettent de mieux comprendre l'évolution des données en prenant un pays en particulier."),
+            html.Div("On voit donc l'évolution des émissions de gaz à effet de serre, le poucentage du PIB investi et le pourcentage des taxes environnementales."),
 
             html.Br(),
             html.Div(id='wps-div-country-our'),
