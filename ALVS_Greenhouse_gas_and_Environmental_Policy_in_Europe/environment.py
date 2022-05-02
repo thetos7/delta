@@ -48,11 +48,11 @@ class EuropeanEnvironmentStudies():
                             labelStyle={'display':'block'},
                         )], style={'maxHeight':'300px', 'overflow':'scroll','width':'10em'}),
                         html.Br(),
-                        html.Div('Échelle en X'),
+                        html.Div('Unité de mesure'),
                         dcc.RadioItems(
-                            id='wps-crossfilter-xaxis-type',
-                            options=[{'label': i, 'value': i} for i in ['Linéaire', 'Log']],
-                            value='Linéaire',
+                            id='wps-crossfilter-unit-type',
+                            options=[{'label': i, 'value': i} for i in ['T_HAB', 'I90']],
+                            value='T_HAB',
                             labelStyle={'display':'block'},
                         ),
                         
@@ -148,7 +148,7 @@ class EuropeanEnvironmentStudies():
         self.app.callback(
             dash.dependencies.Output('wps-main-graph-our', 'figure'),
             [ dash.dependencies.Input('wps-crossfilter-which-pays', 'value'),
-              dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value'),
+              dash.dependencies.Input('wps-crossfilter-unit-type', 'value'),
               dash.dependencies.Input('wps-crossfilter-year-slider-our', 'value')])(self.update_graph)
         self.app.callback(
             dash.dependencies.Output('wps-div-country-our', 'children'),
@@ -170,29 +170,26 @@ class EuropeanEnvironmentStudies():
         self.app.callback(
             dash.dependencies.Output('wps-income-time-series-our', 'figure'),
             [dash.dependencies.Input('wps-main-graph-our', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_income_timeseries)
+             dash.dependencies.Input('wps-crossfilter-unit-type', 'value')])(self.update_income_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-fertility-time-series-our', 'figure'),
-            [dash.dependencies.Input('wps-main-graph-our', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_fertility_timeseries)
+            [dash.dependencies.Input('wps-main-graph-our', 'hoverData')])(self.update_fertility_timeseries)
         self.app.callback(
             dash.dependencies.Output('wps-pop-time-series-our', 'figure'),
-            [dash.dependencies.Input('wps-main-graph-our', 'hoverData'),
-             dash.dependencies.Input('wps-crossfilter-xaxis-type', 'value')])(self.update_pop_timeseries)
+            [dash.dependencies.Input('wps-main-graph-our', 'hoverData')])(self.update_pop_timeseries)
 
-    def update_graph(self, pays, xaxis_type, year):
+    def update_graph(self, pays, unit_type, year):
         dfg = self.df[self.df.Time == year]
         dfg = dfg[dfg['Pays'].isin(pays)]
         fig = px.scatter(dfg, x = "PIB", y = "TAXES", 
                          #title = f"{year}", cliponaxis=False,
-                         size = "T_HAB", size_max=40, 
-                         color = "T_HAB", 
+                         size = unit_type, size_max=40, 
+                         color = unit_type, 
                          hover_name="Pays")
         fig.update_layout(
                  xaxis = dict(title='Pourcentage du PIB utilisé pour l\'environnement',
-                              type= 'linear' if xaxis_type == 'Linéaire' else 'log',
-                              range=(0,6) if xaxis_type == 'Linéaire' 
-                                              else (np.log10(1), np.log10(10)) 
+                              type= 'linear',
+                              range=(0,6)  
                              ),
                  yaxis = dict(title="Pourcentage des taxes pour l'environnement", range=(0,17)),
                  margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
@@ -201,7 +198,7 @@ class EuropeanEnvironmentStudies():
              )
         return fig
 
-    def create_time_series(self, country, what, axis_type, y_label):
+    def create_time_series(self, country, what, y_label):
         return {
             'data': [go.Scatter(
                 x = self.years,
@@ -212,7 +209,7 @@ class EuropeanEnvironmentStudies():
                 'height': 300,
                 'margin': {'l': 50, 'b': 20, 'r': 10, 't': 20},
                 'yaxis': {'title':y_label,
-                          'type': 'linear' if axis_type == 'Linéaire' else 'log'},
+                          'type': 'linear'},
                 'xaxis': {'showgrid': False}
             }
         }
@@ -227,19 +224,21 @@ class EuropeanEnvironmentStudies():
         return f"Evolution des données informatives en : {self.get_country(hoverData)}"
 
     # graph incomes vs years
-    def update_income_timeseries(self, hoverData, xaxis_type):
+    def update_income_timeseries(self, hoverData, unit_type):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'T_HAB', xaxis_type, 'Tonnes par habitants')
+        if unit_type == "T_HAB":
+            return self.create_time_series(country, 'T_HAB','Tonnes par habitants')
+        return self.create_time_series(country, "I90", "Indice 1990 = 100")
 
     # graph children vs years
-    def update_fertility_timeseries(self, hoverData, xaxis_type):
+    def update_fertility_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'PIB', xaxis_type, "PIB investi (en %)")
+        return self.create_time_series(country, 'PIB', "PIB investi (en %)")
 
     # graph population vs years
-    def update_pop_timeseries(self, hoverData, xaxis_type):
+    def update_pop_timeseries(self, hoverData):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'TAXES', xaxis_type, 'Taxes environnementale (en %)')
+        return self.create_time_series(country, 'TAXES', 'Taxes environnementale (en %)')
 
        # start and stop the movie
     def button_on_click(self, n_clicks, text):
