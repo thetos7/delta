@@ -41,7 +41,7 @@ class Cancer():
                         '75-79',
                         '80-84',
                         '85+',
-                        'Uknown']
+                        'Unknown']
         #Insérer la valeur du main layout représentant la page html elle même.
         #self.main_layout = None
         
@@ -57,36 +57,49 @@ class Cancer():
         self.df1 = px.data.tips()
         self.main_layout = html.Div(children=[
             html.H3(children='Répartition des Cancers entre les pays'),
-            html.Div([dcc.Graph(id='cancer-main-graph'), ], style={'width':'100%', }),
-            dcc.Checklist(
+            html.Div([dcc.Graph(id='cancer-main-graph'), 
+                      dcc.Checklist(
                             id='continent-id',
                             options=[{'label': i, 'value': i} for i in sorted(self.continent)],
                             value=['Asia','Europe','North-america'],
                             labelStyle={'display':'block'},
                             style={'display': 'inline-block'}),
-            dcc.Dropdown(
+                    dcc.Dropdown(
                             id='cancer-dropdown-id',
                             options=[{'label': i, 'value': i} for i in (self.cancers)],
                             value=['Lung','Breast','Brain','Stomach','Liver'],
                             multi=True,
-                            style={verticalAlign="middle"}
-            ),
+                            style={'width':'40%','verticalAlign':'middle'}
+            )], style={'width':'100%', })
+            ,
             html.Div([
-                html.Div([
                     dcc.Graph(id='cancer-by-sex',
                             style={'width':'100%', 'display':'inline-block'}),
                     dcc.RangeSlider(
-                            id='cancer-by-sex-slider',
+                            id='cancer-by-age-slider',
                             min=0,
                             max=18,
                             step=1,
-                            marks={0:'0-4',1:'5-9',2:'10-14',3:'15-19',4:'20-24',5:'25-29',6:'30-34',7:'35-39',8:'40-44',9:'45-49',10:'50-54',11:'55-59',12:'60-64',13:'65-69',14:'70 -74',15:'75-79',16:'80-84',17:'85+',18:'Unnown'},
+                            marks={0:'0-4',1:'5-9',2:'10-14',3:'15-19',4:'20-24',5:'25-29',6:'30-34',7:'35-39',8:'40-44',9:'45-49',10:'50-54',11:'55-59',12:'60-64',13:'65-69',14:'70 -74',15:'75-79',16:'80-84',17:'85+',18:'Unknown'},
                             value=[4,7])],
-                style={'display':'inline-block', 'width':"50%"}),
+                style={'display':'block', 'width':"50%"}),
+            html.Div(children=[
+                html.Div([
                 dcc.Graph(id='cancer-by-age',
                             style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
+                dcc.RadioItems(id='sex-radioitem', 
+                                     options=[{'label':'Male', 'value':'Male'},
+                                              {'label':'Female', 'value':'Female'}, 
+                                              ],
+                                    value='Female',
+                                    style={'display':'block'})]),
+                
+                
+                
+                html.Div([
                 dcc.Graph(id='cancer-by-country-selected-continent',
                             style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
+                ]),
                 ], style={ 'display':'flex', 
                            'borderTop': 'thin lightgrey solid',
                            'borderBottom': 'thin lightgrey solid',
@@ -102,14 +115,19 @@ class Cancer():
         self.app.callback(dash.dependencies.Output('cancer-by-sex','figure'),
                           dash.dependencies.Input('continent-id', 'value'),
                           dash.dependencies.Input('cancer-dropdown-id','value'),
-                          dash.dependencies.Input('cancer-by-sex-slider','value')
+                          dash.dependencies.Input('cancer-by-age-slider','value')
+                          )(self.update_graph_age)
+        
+        self.app.callback(dash.dependencies.Output('cancer-by-age','figure'),
+                          dash.dependencies.Input('continent-id', 'value'),
+                          dash.dependencies.Input('cancer-dropdown-id','value'),
+                          dash.dependencies.Input('sex-radioitem','value'),
                           )(self.update_graph_sex)
         
-#         self.app.callback(dash.dependencies.Output('cancer-by-age','figure'),
-#                           dash.dependencies.Input('continent-id', 'value'),
-#                           dash.dependencies.Input('cancer-dropdown-id','value'),
-#                           dash.dependencies.Input('marginal-option-id','value'),
-#                           )(self.update_graph)
+        self.app.callback(dash.dependencies.Output('cancer-by-country','figure'),
+                          dash.dependencies.Input('continent-id', 'value'),
+                          dash.dependencies.Input('cancer-dropdown-id','value'),
+                          )(self.update_graph_country)
         
 #         self.app.callback(dash.dependencies.Output('cancer-by-country-selected-continent','figure'),
 #                           dash.dependencies.Input('continent-id', 'value'),
@@ -123,7 +141,7 @@ class Cancer():
         fig = px.histogram(self.df, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Continent'],text_auto=True)
         return fig
     
-    def update_graph_sex(self,continent_id,column_x,selected_age_group):
+    def update_graph_age(self,continent_id,column_x,selected_age_group):
         selected_age_group_l = [self.age_group[i] for i in range(selected_age_group[0], selected_age_group[1])]
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
@@ -131,6 +149,18 @@ class Cancer():
         fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Age group'],text_auto=True)
         return fig
     
+    def update_graph_sex(self,continent_id,column_x,selected_sex):
+        sub_df= self.World[self.World['Continent'].isin(continent_id)]
+        sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
+        sub_df = sub_df[sub_df['Sex'] == selected_sex]
+        fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Sex'],text_auto=True)
+        return fig
+    
+    def update_graph_country(self,continent_id,column_x):
+        sub_df= self.World[self.World['Continent'].isin(continent_id)]
+        sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
+        fig = px.histogram(self.df1, x=sub_df['Country'],y=sub_df['Number of cases'],labels={'x':'Country', 'y':'Number of cases'},color=sub_df['Type of Cancer'],text_auto=True)
+        return fig
     # def update_graph(self, current_df, column_x, column_y, marginal_option):
     #     df = px.data.tips()
     #     if marginal_option == 'violin' or marginal_option == 'rug' or marginal_option == 'box':
