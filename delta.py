@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from ybjd_deces_en_france_selon_le_revenu_par_departement import ybjd_deces_en_france_selon_le_revenu_par_departement as ybjd
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+drd = ybjd.DecesFranceRevenu(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -26,9 +28,12 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
+                              dcc.Link(html.Button('Décès selon le revenu', style={'width':"100%"}), href='/ybjd_deces_en_france_selon_le_revenu_par_departement'),
                               html.Br(),
                               html.Br(),
-                              html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
+                              html.Br(),
+                              html.Br(),
+                              html.Center(html.A('Code source', href='https://github.com/4yann/delta')),
                           ]),
                  html.Div(id='page_content', className="ten columns"),
             ]),
@@ -36,6 +41,7 @@ main_layout = html.Div([
 
 
 home_page = html.Div([
+    html.Br(),
     html.Br(),
     html.Br(),
     html.Br(),
@@ -66,6 +72,8 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/ybjd_deces_en_france_selon_le_revenu_par_departement':
+        return drd.main_layout
     else:
         return home_page
 
