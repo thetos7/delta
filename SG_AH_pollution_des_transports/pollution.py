@@ -294,12 +294,13 @@ class Pollution():
 
         fig = px.choropleth_mapbox(dfg, geojson=countries,
                                    locations='Pays', featureidkey='properties.name',  # join keys
-                                   color='Taux de pollution', color_continuous_scale="matter",
+                                   color='Taux de pollution', color_continuous_scale="jet",
                                    mapbox_style="carto-positron",
                                    zoom=2.5, center={"lat": 53, "lon": 3},
                                    opacity=0.7,
                                    labels={
-                                       'Taux de pollution': 'Taux de pollution en %'}
+                                       'Taux de pollution': f'Poucentage de pollution de {name}'},
+                                    range_color=[50,300]
                                    )
         fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
         return fig
