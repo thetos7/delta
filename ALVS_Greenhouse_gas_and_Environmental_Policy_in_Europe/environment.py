@@ -105,6 +105,16 @@ class EuropeanEnvironmentStudies():
                        'borderBottom': 'thin lightgrey solid',
                        'justifyContent':'center', }),
             
+            html.Br(),
+            dcc.Markdown("""
+            #### À propos
+            ##### Sources
+            * [Dépenses nationales pour la protection de l’environnement](https://ec.europa.eu/eurostat/databrowser/view/ten00135/default/table?lang=fr)
+            * [Émissions de gaz à effet de serre par secteur source (source: AEE)](https://ec.europa.eu/eurostat/databrowser/view/sdg_13_10/default/table?lang=fr)
+            ##### Auteurs
+            * (c) 2022 Alexandre Lemonnier & Victor Simonin
+            """),
+           
             
             
             
@@ -163,7 +173,7 @@ class EuropeanEnvironmentStudies():
         fig = px.scatter(dfg, x = "PIB", y = "TAXES", 
                          #title = f"{year}", cliponaxis=False,
                          size = "T_HAB", size_max=40, 
-                         color = "Pays", 
+                         color = "T_HAB", 
                          hover_name="Pays")
         fig.update_layout(
                  xaxis = dict(title='Pourcentage du PIB utilisé pour l\'environnement',
@@ -178,7 +188,7 @@ class EuropeanEnvironmentStudies():
              )
         return fig
 
-    def create_time_series(self, country, what, axis_type, title):
+    def create_time_series(self, country, what, axis_type, y_label):
         return {
             'data': [go.Scatter(
                 x = self.years,
@@ -186,9 +196,9 @@ class EuropeanEnvironmentStudies():
                 mode = 'lines+markers',
             )],
             'layout': {
-                'height': 225,
+                'height': 300,
                 'margin': {'l': 50, 'b': 20, 'r': 10, 't': 20},
-                'yaxis': {'title':title,
+                'yaxis': {'title':y_label,
                           'type': 'linear' if axis_type == 'Linéaire' else 'log'},
                 'xaxis': {'showgrid': False}
             }
@@ -201,22 +211,22 @@ class EuropeanEnvironmentStudies():
         return hoverData['points'][0]['hovertext']
 
     def country_chosen(self, hoverData):
-        return self.get_country(hoverData)
+        return f"Evolution des données informatives en : {self.get_country(hoverData)}"
 
     # graph incomes vs years
     def update_income_timeseries(self, hoverData, xaxis_type):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'T_HAB', xaxis_type, 'T_HAB')
+        return self.create_time_series(country, 'T_HAB', xaxis_type, 'Tonnes par habitants')
 
     # graph children vs years
     def update_fertility_timeseries(self, hoverData, xaxis_type):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'PIB', xaxis_type, "PIB")
+        return self.create_time_series(country, 'PIB', xaxis_type, "PIB investi (en %)")
 
     # graph population vs years
     def update_pop_timeseries(self, hoverData, xaxis_type):
         country = self.get_country(hoverData)
-        return self.create_time_series(country, 'TAXES', xaxis_type, 'TAXES')
+        return self.create_time_series(country, 'TAXES', xaxis_type, 'Taxes environnementale (en %)')
 
        # start and stop the movie
     def button_on_click(self, n_clicks, text):
