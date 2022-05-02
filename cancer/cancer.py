@@ -82,7 +82,7 @@ class Cancer():
                             step=1,
                             marks={0:'0-4',1:'5-9',2:'10-14',3:'15-19',4:'20-24',5:'25-29',6:'30-34',7:'35-39',8:'40-44',9:'45-49',10:'50-54',11:'55-59',12:'60-64',13:'65-69',14:'70 -74',15:'75-79',16:'80-84',17:'85+',18:'Unknown'},
                             value=[4,7])],
-                style={'display':'block', 'width':"50%"}),
+                style={'display':'block', 'width':"100%"}),
             html.Div([
                 dcc.Graph(id='cancer-by-age', 
                           style={'width':'50%', 'display':'inline-block'}),
