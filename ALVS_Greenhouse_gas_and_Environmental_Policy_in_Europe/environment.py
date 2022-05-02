@@ -24,7 +24,7 @@ class EuropeanEnvironmentStudies():
 
             html.Div('La comparaison se base notamment sur les pourcentage respectifs du PIB de chaque pays européen utilisé pour l\'environnement et sur leurs \
                     recettes fiscales, donc l\'argent récolté par les différentes taxes environnementales. \
-                        La quantité de gaz à effet de serre est exprimée en Tonnes par Habitant'),
+                        La quantité de gaz à effet de serre est exprimée en Tonnes par Habitant.'),
 
             html.Br(),
 
