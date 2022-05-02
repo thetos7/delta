@@ -17,14 +17,14 @@ class EuropeanEnvironmentStudies():
         self.years = sorted(set(self.df.Time.values))
         self.pays = list(self.df.Pays.unique())
         self.main_layout = html.Div(children=[
-            html.H3(children='Évolution des émissions de gaz à effet de serre et politiques environnementales en Europe'),
+            html.H3(children='Politique environnementale et émission de gaz à effet de serre'),
 
             html.Div('Les graphiques suivant ont pour objectif de montrer l\'évolution des émissions de gaz à effet de serre selon les politiques \
                 environnementales menées en Europe depuis 1995.'),
 
-            html.Div('La comparaison se base notamment sur les pourcentage respectifs du PIB de chaque pays européen utilisé pour l\'environnement et sur leurs \
-                    recettes fiscales, donc l\'argent récolté par les différentes taxes environnementales. \
-                        La quantité de gaz à effet de serre est exprimée en Tonnes par Habitant.'),
+            html.Div('La comparaison se base notamment sur les pourcentages respectifs du PIB de chaque pays européen utilisé pour l\'environnement et sur leurs \
+                    recettes fiscales, soit l\'argent récolté par les différentes taxes environnementales. \
+                    La quantité de gaz à effet de serre est exprimée en Tonnes par Habitant ou avec l\'indice I90, qui a pour base 100=1990.'),
 
             html.Br(),
 
@@ -33,8 +33,9 @@ class EuropeanEnvironmentStudies():
             - Les axes X et Y représentent la politique environnementale, avec respectivement le pourcentage du PIB utilisé et le pourcentage des taxes environnementales.
             - La taille des bulles et leur couleur représentent la quantité d'émission de gaz à effet de serre, l'unité est modifiable dans la légende. 
             """),
-            html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'), 
-
+            html.Br(),
+            html.H5(id='wps-graph-title'),
+            html.Div('Déplacez la souris sur une bulle pour avoir les graphiques des informations du pays en bas.'), 
             html.Div([
                     html.Div([ dcc.Graph(id='wps-main-graph-our'), ], style={'width':'90%', }),
 
@@ -48,7 +49,7 @@ class EuropeanEnvironmentStudies():
                             labelStyle={'display':'block'},
                         )], style={'maxHeight':'300px', 'overflow':'scroll','width':'10em'}),
                         html.Br(),
-                        html.Div('Unité de mesure'),
+                        html.Div('Unité'),
                         dcc.RadioItems(
                             id='wps-crossfilter-unit-type',
                             options=[{'label': i, 'value': i} for i in ['T_HAB', 'I90']],
@@ -95,16 +96,13 @@ class EuropeanEnvironmentStudies():
                     'width':'100%'
                 }),
 
-            html.Br(),
-
-            html.Div("Obtenez plus d'information sur un pays en passant votre curseur dessus sur le graphique ci-dessus."),
-
+            
             html.Br(),
             html.Div("Les différents graphiques ci-dessous nous permettent de mieux comprendre l'évolution des données en prenant un pays en particulier."),
             html.Div("On voit donc l'évolution des émissions de gaz à effet de serre, le poucentage du PIB investi et le pourcentage des taxes environnementales."),
 
             html.Br(),
-            html.Div(id='wps-div-country-our'),
+            html.H5(id='wps-div-country-our'),
 
             html.Div([
                 dcc.Graph(id='wps-income-time-series-our', 
@@ -120,6 +118,16 @@ class EuropeanEnvironmentStudies():
             
             html.Br(),
             dcc.Markdown("""
+            #### Analyse
+            Notre hypothèse de départ était d'observer une corrélation franche entre les investissement 
+            et les émissions de gaz à effet de serre d'un pays.  
+            A partir de 2009, nous observons légèrement cette corrélation sur le graphique, avec des pays
+            polluant moins et dépensant plus en haut à droite du graphique, et des pays polluant plus et
+            dépensant moins en bas à gauche.
+            Cependant, cette observation reste peu concluante, car certains pays dépensent peu et polluent peu.  
+            On peut penser que d'autres facteurs rentrent en jeu, notamment la population d'un pays,
+            la croissance de la demande énergétique, le type de production énergétique...
+            
             #### À propos
             ##### Sources
             * [Dépenses nationales pour la protection de l’environnement](https://ec.europa.eu/eurostat/databrowser/view/ten00135/default/table?lang=fr)
@@ -143,7 +151,7 @@ class EuropeanEnvironmentStudies():
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
 
-        # I link callbacks here since @app decorator does not work inside a class
+        # I link callbacks here since @app decorator does not work inside a clasaphiques ci-dessous nous permettent de mieux comprendre l'évolution des données en prenant un pays en particulier."),
         # (somhow it is more clear to have here all interaction between functions and components)
         self.app.callback(
             dash.dependencies.Output('wps-main-graph-our', 'figure'),
@@ -152,7 +160,10 @@ class EuropeanEnvironmentStudies():
               dash.dependencies.Input('wps-crossfilter-year-slider-our', 'value')])(self.update_graph)
         self.app.callback(
             dash.dependencies.Output('wps-div-country-our', 'children'),
-            dash.dependencies.Input('wps-main-graph-our', 'hoverData'))(self.country_chosen)
+            dash.dependencies.Input('wps-main-graph-our', 'hoverData'))(self.timeseries_title)
+        self.app.callback(
+            dash.dependencies.Output('wps-graph-title', 'children'),
+            dash.dependencies.Input('wps-crossfilter-year-slider-our', 'value'))(self.graph_title)
         self.app.callback(
             dash.dependencies.Output('wps-button-start-stop-our', 'children'),
             dash.dependencies.Input('wps-button-start-stop-our', 'n_clicks'),
@@ -206,7 +217,7 @@ class EuropeanEnvironmentStudies():
                 mode = 'lines+markers',
             )],
             'layout': {
-                'height': 300,
+                'height': 260,
                 'margin': {'l': 50, 'b': 20, 'r': 10, 't': 20},
                 'yaxis': {'title':y_label,
                           'type': 'linear'},
@@ -220,8 +231,11 @@ class EuropeanEnvironmentStudies():
             return self.df['Pays'].iloc[np.random.randint(len(self.df))]
         return hoverData['points'][0]['hovertext']
 
-    def country_chosen(self, hoverData):
-        return f"Evolution des données informatives en : {self.get_country(hoverData)}"
+    def timeseries_title(self, hoverData):
+        return f"Evolution des données informatives pour le pays suivant : {self.get_country(hoverData)}"
+    
+    def graph_title(self, slider_value):
+         return f"Évolution des émissions de gaz à effet de serre et politiques environnementales en Europe en {slider_value}"
 
     # graph incomes vs years
     def update_income_timeseries(self, hoverData, unit_type):
