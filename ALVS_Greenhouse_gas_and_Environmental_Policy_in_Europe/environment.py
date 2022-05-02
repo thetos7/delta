@@ -3,6 +3,7 @@ import dash
 import flask
 from dash import dcc
 from dash import html
+from .get_data import get_cleaned_data
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
@@ -13,7 +14,7 @@ class EuropeanEnvironmentStudies():
     STOP  = 'Stop'
 
     def __init__(self, application = None):
-        self.df = pd.read_csv('ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe/data/europeanEnvTaxesPIB.csv')
+        self.df = get_cleaned_data()
         self.years = sorted(set(self.df.Time.values))
         self.pays = list(self.df.Pays.unique())
         self.main_layout = html.Div(children=[
