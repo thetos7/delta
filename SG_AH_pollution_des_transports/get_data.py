@@ -74,7 +74,6 @@ def get_air_pollution_schools():
 
     # remove useless columns
     df = df.drop(['ID', 'ville', 'CP', 'type', 'geometry'], axis=1)
-    df.to_csv("e")
     # Seperate according to the type of pollution
     df_no2 = df.filter(regex="nom|departement|NO2.*")
     df_pm10 = df.filter(regex="nom|departement|PM10.*")

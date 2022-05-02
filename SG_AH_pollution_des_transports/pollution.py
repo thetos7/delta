@@ -1,3 +1,4 @@
+from statistics import mean
 import dash
 import pandas as pd
 import plotly.express as px
@@ -99,12 +100,11 @@ class Pollution():
                 children="Émission de CO2 des véhicules neufs entre 2000 et 2020 en Europe"),
             html.Div([dcc.Graph(id="pol-europe-cars-graph")]),
             html.Div([
-                html.Div([html.Div('Échelle'),
+                html.Div([html.Div('Choix de visualisation'),
                           dcc.RadioItems(
                     id='pol-all-europe-choice',
-                    options=[{'label': 'Moyenne sur toute l\'Europe', 'value': 'mean'},
-                             {'label': 'Tous les pays', 'value': 'all_countries'},
-                             {'label': 'Par pays', 'value': 'by_country'}],
+                    options=[{'label': 'Un pays par rapport à toute l\'Europe', 'value': 'mean'},
+                             {'label': 'Tous les pays', 'value': 'all_countries'}],
                     value='all_countries',
                     labelStyle={'display': 'block'},
                 )], style={'width': '20em'}),
@@ -248,10 +248,18 @@ class Pollution():
         df, mean_eu = self.pollution_vehicules_eu
 
         if all_europe == 'mean':
-            return px.line(mean_eu, x='Année', y='Taux de pollution', color="Pays", title='Moyenne des émissions de CO2 pour toute l\'Europe')
+            df = df.loc[df['Pays'] == country]
+            # For all Europe we have data starting at 2007 
+            min_year = 2007
+            
+            # BUT for certain countries the analysis starts later
+            if df['Année'].min() > 2007:
+                min_year = df['Année'].min()
+                mean_eu = mean_eu.loc[mean_eu['Année'] >= min_year]
 
-        elif all_europe == 'by_country':
-            return px.line(df.loc[df['Pays'] == country], x='Année', y='Taux de pollution', color="Pays", title=f'Moyenne des émissions de CO2 en {country}')
+            mean_eu = pd.concat([mean_eu, df.loc[df['Année'] >= min_year]], ignore_index=True)
+            fig = px.line(mean_eu, x='Année', y='Taux de pollution', color="Pays", title=f"Comparaison entre la moyenne des émissions de CO2 pour toute l\'Europe et en {country}")
+            return fig
 
         return px.line(df, x='Année', y='Taux de pollution', color="Pays", title='Moyenne des émissions de CO2 pour chacun des pays d\'Europe')
 
@@ -321,7 +329,7 @@ class Pollution():
 
     # Enables of disables the poll for countries
     def disable_choice_country(self, info):
-        return (info != 'by_country',)
+        return (info != 'mean',)
 
 
 def transform_energ_names(df, col):
