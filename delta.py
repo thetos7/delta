@@ -28,6 +28,10 @@ main_layout = html.Div([
                               html.Br(),
                               html.Br(),
                               html.Br(),
+                              dcc.Link(html.Button('Ukraine', style={'width':"100%"}), href='/ukraine'),
+                              html.Br(),
+                              html.Br(),
+                              html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
                           ]),
                  html.Div(id='page_content', className="ten columns"),
@@ -65,6 +69,8 @@ def display_page(pathname):
     elif pathname == '/population':
         return pop.main_layout
     elif pathname == '/deces':
+        return dec.main_layout
+    elif pathname == '/ukraine':
         return dec.main_layout
     else:
         return home_page
