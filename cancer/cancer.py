@@ -133,6 +133,7 @@ class Cancer():
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
         fig = px.histogram(self.df, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Continent'],text_auto=True)
+        fig.update_layout(xaxis_title="Type of Cancer", yaxis_title="Number of cases")
         return fig
     
     def update_graph_age(self,continent_id,column_x,selected_age_group):
@@ -141,6 +142,7 @@ class Cancer():
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
         sub_df = sub_df[sub_df['Age group'].isin(selected_age_group_l)]
         fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Age group'],text_auto=True)
+        fig.update_layout(xaxis_title="Type of Cancer", yaxis_title="Number of cases")
         return fig
     
     def update_graph_sex(self,continent_id,column_x,selected_sex):
@@ -148,12 +150,14 @@ class Cancer():
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
         sub_df = sub_df[sub_df['Sex'] == selected_sex]
         fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},text_auto=True)
+        fig.update_layout(xaxis_title="Type of Cancer", yaxis_title="Number of cases")
         return fig
     
     def update_graph_country(self,continent_id,column_x):
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
         fig = px.histogram(self.df1, x=sub_df['Country'],y=sub_df['Number of cases'],labels={'x':'Country', 'y':'Number of cases'},color=sub_df['Type of Cancer'],text_auto=True)
+        fig.update_layout(xaxis_title="Country", yaxis_title="Number of cases")
         return fig
     # def update_graph(self, current_df, column_x, column_y, marginal_option):
     #     df = px.data.tips()
