@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from ukraine import ukraine
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+ukr = ukraine.Ukraine(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -71,7 +73,7 @@ def display_page(pathname):
     elif pathname == '/deces':
         return dec.main_layout
     elif pathname == '/ukraine':
-        return dec.main_layout
+        return ukr.main_layout
     else:
         return home_page
 
