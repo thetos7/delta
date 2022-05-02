@@ -33,10 +33,14 @@ del pollution["NO2 AQI"]
 pollution['Date'] = pd.to_datetime(pollution['Date'], format='%Y-%m-%d')
 
 # sort data by date
-pollution = pollution.sort_values(["Date"])
+pollution = pollution.sort_values(['Date'])
 
 # getting the mean of values at each date, ignoring the states where the data was taken from
 pollution = pollution.resample('d', on='Date').mean()
+pollution.rename(columns={'CO Mean': 'Concentration moyenne en CO'}, inplace=True)
+pollution.rename(columns={'NO2 Mean': 'Concentration moyenne en NO2'}, inplace=True)
+pollution.rename(columns={'O3 Mean': 'Concentration moyenne en O3'}, inplace=True)
+pollution.rename(columns={'SO2 Mean': 'Concentration moyenne en SO2'}, inplace=True)
 
 # saving dataframes
 pollution.to_pickle("ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant/data/pollution.pkl")
@@ -53,7 +57,7 @@ prices['Date'] = pd.to_datetime(prices['Date'], format='%m/%d/%Y')
 
 # removing dates too old
 prices = prices.loc[(prices['Date'] >= '2000-01-03')]
-prices.rename(columns={'Regular All Formulations Retail Gasoline Prices Dollars per Gallon': 'Gasoline Dollars per Gallon'}, inplace=True)
+prices.rename(columns={'Regular All Formulations Retail Gasoline Prices Dollars per Gallon': 'Prix moyen en dollar du gallon de gazole'}, inplace=True)
 
 # saving dataframes
 prices.to_pickle("ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant/data/prices.pkl")
@@ -69,9 +73,9 @@ for f in filenames:
     df = pd.read_csv(f, engine = 'python', parse_dates = True)
     df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
     df = df.loc[(df['Date'] >= '2000-01-03')]
-    df['average_celsius'] = (df[['tmax', 'tmin']].mean(axis=1) - 32)/1.8
+    df['Température moyenne en °C'] = (df[['tmax', 'tmin']].mean(axis=1) - 32)/1.8
     df['prcp'] = df['prcp']/2.54
-    df.rename(columns={'prcp': 'prcp_cm'}, inplace=True)
+    df.rename(columns={'prcp': 'Précipitation moyenne en cm'}, inplace=True)
     del df['tmax']
     del df['tmin']
     df = df.iloc[: , 1:]
