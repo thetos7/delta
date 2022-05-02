@@ -82,7 +82,7 @@ class Cancer():
                             step=1,
                             marks={0:'0-4',1:'5-9',2:'10-14',3:'15-19',4:'20-24',5:'25-29',6:'30-34',7:'35-39',8:'40-44',9:'45-49',10:'50-54',11:'55-59',12:'60-64',13:'65-69',14:'70 -74',15:'75-79',16:'80-84',17:'85+',18:'Unknown'},
                             value=[4,7])],
-                style={'display':'block', 'width':"50%"}),
+                style={'display':'block', 'width':"100%"}),
             html.Div([
                 dcc.Graph(id='cancer-by-sex', 
                           style={'width':'50%', 'display':'inline-block'}),
@@ -132,7 +132,8 @@ class Cancer():
     def update_main_graph(self,continent_id,column_x):
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
-        fig = px.histogram(self.df, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'cases'},color=sub_df['Continent'],text_auto=True)
+        fig = px.histogram(self.df, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Continent'],text_auto=True)
+        fig.update_layout(xaxis_title="Type of Cancer", yaxis_title="Number of cases")
         return fig
     
     def update_graph_age(self,continent_id,column_x,selected_age_group):
@@ -140,21 +141,23 @@ class Cancer():
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
         sub_df = sub_df[sub_df['Age group'].isin(selected_age_group_l)]
-        fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'cases'},color=sub_df['Age group'],text_auto=True)
+        fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Age group'],text_auto=True)
+        fig.update_layout(xaxis_title="Type of Cancer", yaxis_title="Number of cases")
         return fig
     
     def update_graph_sex(self,continent_id,column_x,selected_sex):
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
         sub_df = sub_df[sub_df['Sex'].isin(selected_sex)]
-        sub_df = sub_df.sort_values(by=['Number of cases'],ascending=False)
-        fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'cases'},color=sub_df['Sex'],text_auto=True)
+        fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Sex'],text_auto=True)
+        fig.update_layout(xaxis_title="Type of Cancer", yaxis_title="Number of cases")
         return fig
     
     def update_graph_country(self,continent_id,column_x):
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
-        fig = px.histogram(self.df1, x=sub_df['Country'],y=sub_df['Number of cases'],labels={'x':'Country', 'y':'cases'},color=sub_df['Type of Cancer'],text_auto=True)
+        fig = px.histogram(self.df1, x=sub_df['Country'],y=sub_df['Number of cases'],labels={'x':'Country', 'y':'Number of cases'},color=sub_df['Type of Cancer'],text_auto=True)
+        fig.update_layout(xaxis_title="Country", yaxis_title="Number of cases")
         return fig
     # def update_graph(self, current_df, column_x, column_y, marginal_option):
     #     df = px.data.tips()
