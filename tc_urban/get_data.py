@@ -42,4 +42,4 @@ df = pd.merge(indicators_df, countries_df, on = ["CountryCode", "CountryName"])
 RegionName_Column = df.pop("RegionName")
 df.insert(3, 'RegionName', RegionName_Column)
 
-df.to_csv('data/countriesData.csv', encoding = "utf-8")
+df.to_pickle('data/countriesData.pkl')
