@@ -6,8 +6,6 @@ import requests
 import io
 
 # Urls default to data from 2018
-IMMATRICULATION_URL = os.environ.get(
-    "IMMATRICULATION_URL", "https://www.data.gouv.fr/fr/datasets/r/5ec2789d-585a-4a4a-9efd-c47f6f085b64")
 LIEUX_URL = os.environ.get(
     "LIEUX_URL", "https://www.data.gouv.fr/fr/datasets/r/d9d65ca1-16a3-4ea3-b7c8-2412c92b69d9")
 USAGERS_URL = os.environ.get(
@@ -21,8 +19,6 @@ POP_URL = os.environ.get(
 POP_CSV_FILENAME = os.environ.get(
     "POP_CSV_FILENAME", f"{'.'.join(POP_URL.split('/')[-1].split('.')[:-1])}.CSV")
 
-print("Reading immatriculation data...")
-immatriculations = pd.read_csv(IMMATRICULATION_URL, sep=";")
 print("Reading location data...")
 lieux = pd.read_csv(LIEUX_URL)
 print("Reading user data...")
@@ -40,7 +36,6 @@ pop = pd.read_csv(zip.open(POP_CSV_FILENAME), sep=';')
 # ...
 
 print("Writing final file(s)...")
-immatriculations.to_csv("immatriculation-2018.csv", sep=';')
 lieux.to_csv("lieux-2018.csv")
 usagers.to_csv("usagers-2018.csv")
 vehicules.to_csv("vehicules-2018.csv")
