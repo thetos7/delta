@@ -28,7 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
-                              dcc.Link(html.Button('Mariages et Divorces', style={'width':"100%"}), href='/EC_DC_Mariages_et_Divorces_en_France'),
+                              dcc.Link(html.Button('Mariages', style={'width':"100%"}), href='/EC_DC_Mariages_et_Divorces_en_France'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),

@@ -95,7 +95,7 @@ class Mariage():
                            labels={self.year:'Nombre de Mariages'}
                           )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-        self.fig_histo = px.histogram(graph2, x = 'MMAR', y = ['HH', 'FF', 'HF'], barmode='group',)
+        self.fig_histo = px.histogram(graph2, x = 'MMAR', y = ['HH', 'FF', 'HF'], barmode='group')
         self.fig.update_layout(
             title = 'Mariages en France depuis 2014',
             xaxis = dict(title = 'Année du mariage'),
@@ -126,31 +126,50 @@ class Mariage():
                        'borderBottom': 'thin lightgrey solid',
                        'justifyContent':'center', }),
             html.Div([
-                dcc.Graph(
-                    id='mdf-histo-graph',
-                    figure=self.fig_histo
-                    , style={'width':'100%', }),
-                dcc.Slider(id='mdf-crossfilter-year-slider',
-                    min=2014,
-                    max=2020,
-                    step=1,
-                    value=2014,
-                    marks={str(year): str(year) for year in range(2014, 2021)},),
-                dcc.Interval(
-                    id='mdf-auto-stepper',
-                    interval=1000,
-                    max_intervals = -1,
-                    n_intervals = 0
-                    ),
-                    ], style={
-                        'padding': '0px 50px', 
-                        'width':'100%'
-                    }),
+                    dcc.Slider(id='mdf-crossfilter-year-slider',
+                        min=2014,
+                        max=2020,
+                        step=1,
+                        value=2014,
+                        marks={str(year): str(year) for year in range(2014, 2021)},),
+                    dcc.Interval(
+                        id='mdf-auto-stepper',
+                        interval=1000,
+                        max_intervals = -1,
+                        n_intervals = 0
+                        ),
+                        ], style={
+                            'padding': '0px 50px', 
+                            'width':'90%'
+                        }),
             html.Button(
                 self.START,
                 id='mdf-button-start-stop', 
                 style={'display':'inline-block'}),
-            ]),
+            html.Div([
+                dcc.Graph(
+                    id='mdf-histo-graph',
+                    figure=self.fig_histo
+                    , style={'width':'100%', })
+                    ]),
+                        html.Br(),
+            dcc.Markdown(
+                """
+                La carte est interactive. En cliquant sur un département, l'histogramme affichera les données sur le département sélectionné. 
+                Notes :
+               * 17 mai 2013
+               * HH : Mariage Homme-Homme
+               * FF : Mariage Femme-Femme
+               * HF : Mariage Homme-Femme
+            #### À propos
+            * Sources : https://www.insee.fr/fr/statistiques
+            * (c) 2022 Elodine Coquelet & Calliopee Desenfans
+            """)
+            ], style={
+            'backgroundColor': 'white',
+             'padding': '10px 50px 10px 50px',
+             }
+        )
 
         if application:
             self.app = application
