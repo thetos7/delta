@@ -85,13 +85,20 @@ class RGPD():
                                options=[{'label': i, 'value': i} for i in ['Linéaire', 'Logarithmique']],
                                value="Linéaire"
                            ),
-                         ], style={'width': '12em'})
+                         ], style={'width': '18em'})
                 ], style={
                             'padding': '10px 50px', 
                             'display':'flex',
                             'flexDirection':'row',
                             'justifyContent':'flex-start',
                         }),
+
+            html.Br(),
+            html.Br(),
+
+            html.H4(children="Les actions de la CNIL"),
+            html.Div([ dcc.Graph(figure=self.update_3_data()) ], style={'width':'100%', }),
+            html.Div([ dcc.Graph(figure=self.update_3_vs()) ], style={'width':'100%', }),
 
             dcc.Markdown("""
             #### À propos
@@ -177,9 +184,7 @@ class RGPD():
             showlegend=False
         )
         return fig
-
     
-
     def update_2_argent(self, echelle):
         df = self.budget_cnil_sanctions
         df.columns = ["Budget de la CNIL", "Somme des montants des sanctions"]
@@ -188,11 +193,44 @@ class RGPD():
 
         fig.update_layout(
             title = "Évolution du budget de la CNIL par rapport au montants des sanctions",
-            yaxis = dict( title = "Montant en €", type= 'linear' if echelle == 'Linéaire' else 'log',),),
+            yaxis = dict( title = "Montant en €", type= 'linear' if echelle == 'Linéaire' else 'log',),
             xaxis = dict( title = "Année"),
             height=450,
             hovermode='closest',
             legend = {'title': 'Légende'},
+        )
+        return fig
+    
+    def update_3_data(self):
+        df = self.sanc_avert_mise_en_demeure_controles
+
+        fig = px.line(df)
+
+        fig.update_layout(
+            title = "Évolution du nombre d'actions",
+            yaxis = dict( title = "Nombre"),
+            xaxis = dict( title = "Année"),
+            height=450,
+            hovermode='closest',
+            legend = {'title': 'Type d\'action'},
+        )
+        return fig
+    
+    def update_3_vs(self):
+        df = self.sanc_avert_mise_en_demeure_controles.copy()
+
+        df2 = df.iloc[:, :3].div(df["controles"], axis=0)
+        df2.columns = [col_name + "/controles" for col_name in df2.columns]
+
+        fig = px.line(df2)
+
+        fig.update_layout(
+            title = "Fréquence du nombre d'actions par rapport au nombre de contrôles",
+            yaxis = dict( title = "Nombre d'actions par rapport au nombre de contrôles"),
+            xaxis = dict( title = "Année"),
+            height=450,
+            hovermode='closest',
+            legend = {'title': 'Rapport'},
         )
         return fig
 
