@@ -14,10 +14,6 @@ VEHICULES_URL = os.environ.get(
     "VEHICULES_URL", "https://www.data.gouv.fr/fr/datasets/r/b4aaeede-1a80-4d76-8f97-543dad479167")
 CARACS_URL = os.environ.get(
     "CARACS_URL", "https://www.data.gouv.fr/fr/datasets/r/6eee0852-cbd7-447e-bd70-37c433029405")
-POP_URL = os.environ.get(
-    "POP_URL", "https://www.insee.fr/fr/statistiques/fichier/5395878/BTT_TD_POP1A_2018.zip")
-POP_CSV_FILENAME = os.environ.get(
-    "POP_CSV_FILENAME", f"{'.'.join(POP_URL.split('/')[-1].split('.')[:-1])}.CSV")
 
 print("Reading location data...")
 lieux = pd.read_csv(LIEUX_URL)
@@ -28,10 +24,6 @@ vehicules = pd.read_csv(VEHICULES_URL)
 print("Reading accident caracteristics data...")
 caracs = pd.read_csv(CARACS_URL, encoding='iso-8859-1')
 
-zip = zf.ZipFile(io.BytesIO(requests.get(POP_URL).content))
-pop = pd.read_csv(zip.open(POP_CSV_FILENAME), sep=';')
-
-
 # TODO process data, cleanup, join...
 # ...
 
@@ -40,6 +32,5 @@ lieux.to_csv("lieux-2018.csv")
 usagers.to_csv("usagers-2018.csv")
 vehicules.to_csv("vehicules-2018.csv")
 caracs.to_csv("caracteristiques-2018.csv")
-pop.to_csv("pop-2018.csv", sep=';')
 print()
 print("Done.")
