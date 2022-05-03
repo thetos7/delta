@@ -32,7 +32,7 @@ class RGPD():
         self.INSEE_to_secteur = {insee: secteur for insee, secteur in self.nomenclature_INSEE}
         self.secteur_to_INSEE = {secteur: insee for insee, secteur in self.nomenclature_INSEE}
 
-        self.insee = pd.DataFrame.from_dict({"Nomenclature de l'INSEE": [nomenclature for nomenclature, _ in self.INSEE_to_secteur.items()], "Secteur d'activité": [activite for _, activite in self.INSEE_to_secteur.items()]})
+        self.insee = pd.DataFrame.from_dict({"Nomenclature de l'INSEE": [nomenclature for nomenclature, _ in self.INSEE_to_secteur.items()], "Secteur d'activité": [activite for _, activite in self.INSEE_to_secteur.items()]}).transpose()
         self.dpo = pd.read_pickle('tpmm_RGPD/data/1_data_dpo.pkl')
         self.notification = pd.read_pickle('tpmm_RGPD/data/1_data_notification.pkl')
         self.budget_cnil_sanctions = pd.read_pickle('tpmm_RGPD/data/2_budget_cnil_sanctions.pkl')
@@ -42,7 +42,7 @@ class RGPD():
             html.H3(children="Évolution de l'application du RGPD en France"),
             html.H4(children="Authors: Marc Monteil et Théo Perinet"),
 
-            html.Div([ html.P(self.update_1_insee()) ], style={'width':'100%', }),
+            html.Div([ dcc.Graph(figure=self.update_1_insee())], style={'width':'100%', }),
             html.Div([ dcc.Graph(id='rgpd-1-donnees'), ], style={'width':'100%', }),
             html.Div([
                 html.Div([ html.Div('Type d\'informations'),
@@ -96,6 +96,7 @@ class RGPD():
     
     def update_1_insee(self):
         fig = go.Figure(data=[go.Table(
+                    columnwidth = [80, 400],
                     header=dict(values=list(self.insee.index),
                     align='left'),
                 cells=dict(values=self.insee,
