@@ -19,4 +19,4 @@ class Accidents:
 
 if __name__ == '__main__':
     acc = Accidents()
-    acc.app.run_server(debug=True, port=8888)
+    acc.app.run_server(debug=True, port=8880)
