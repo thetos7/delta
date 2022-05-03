@@ -67,6 +67,8 @@ class RGPD():
                             'justifyContent':'flex-start',
                         }),
 
+            html.Div([ dcc.Graph(figure=self.update_1_vs()) ], style={'width':'100%', }),
+
             html.Br(),
             dcc.Markdown("""
             #### À propos
@@ -123,9 +125,6 @@ class RGPD():
 
         fig = px.bar(df)
 
-        for c in df.columns:
-            fig.add_scatter(x = df.index, y=df[c], mode='lines', name=c, text=self.INSEE_to_secteur[c], hoverinfo='x+y+text')
-
         fig.update_layout(
             title = "Nombre de DPO enregistrés / notifications envoyées",
             yaxis = dict( title = cur_ytitle),
@@ -133,6 +132,18 @@ class RGPD():
             height=450,
             hovermode='closest',
             legend = {'title': 'Secteur d\'activité'},
+        )
+        return fig
+
+    def update_1_vs(self):
+        fig = (self.notification.sum(axis=1).cumsum() / self.dpo.sum(axis=1).cumsum()).to_frame().plot()
+
+        fig.update_layout(
+            title = "Nombre de notifications par rapport au nombre de DPOs",
+            yaxis = dict( title = "Nombre de notifications par DPO"),
+            xaxis = dict( title = "Date"),
+            height=450,
+            hovermode='closest'
         )
         return fig
 
