@@ -13,26 +13,12 @@ from scipy import stats
 from scipy import fft
 import datetime
 import json
-"""
-    departements = json.load(open('data/departements-version-simplifiee.geojson'))
-
-    fig = px.choropleth_mapbox(prix_dep,#database ?
-                           geojson=departements,#idem
-                           locations='département',#idem ?
-                           featureidkey = 'properties.code', # join keys #idem
-                           color='prix',#colonne à afficher
-                           color_continuous_scale="Viridis",#style couleur
-                           mapbox_style="carto-positron",#idem au dessus
-                           zoom=4.6, center = {"lat": 47, "lon": 2},
-                           opacity=0.5,
-                           labels={'prix':'Prix E10'}#nom barre à droite
-                          )
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-"""
 
 class DecesFranceRevenu():
+    departements = json.load(open('ybjd_deces_en_france_selon_le_revenu_par_departement/data/departements-version-simplifiee.geojson'))
+
     def get_data(self):
-        url_mort = "data/2022-01-28_deces_quotidiens_departement.xlsx"
+        url_mort = "ybjd_deces_en_france_selon_le_revenu_par_departement/data/2022-01-28_deces_quotidiens_departement.xlsx"
         Excel_mort = pd.ExcelFile(url_mort)
         mort_france = pd.DataFrame({"Numéro département": [], "Morts": []})
 
@@ -69,54 +55,16 @@ class DecesFranceRevenu():
         return tot
 
     def __init__(self, application = None):
-        #self.df = self.get_data()
-
-
-
-
-        df = pd.concat([pd.read_pickle(f) for f in glob.glob('data/morts_par_jour-*')])
-        df = df.groupby('deces').sum()
-        df.sort_index(inplace=True)
-        last_month = "02/2022"
-        now = np.datetime64(datetime.datetime.now()).astype('datetime64[M]')
-        df = df.loc['1973':now - np.timedelta64(2, 'M')]
-
-        # calcul de la moyenne journalière avec des fenêtres
-        # 2 passages pour retirer les valeurs qui dépassent l'écart type par rapport au sinus
-        width = 10
-        df2 = df.copy()
-        for _ in range(2):
-            prediction = pd.DataFrame({'x':np.zeros(len(df))}, index=df.index)
-            prediction_nb = pd.DataFrame({'x':np.zeros(len(df))}, index=df.index)
-            for step in range(1970, df.index[-1].year - width + 1):
-                dfp = df2.loc[f'{step}':f'{step+width}']
-                pente, v0 = np.polyfit(np.arange(len(dfp)), dfp.morts.values, 1)
-                y = fft.fft(dfp.morts)
-                y[y<30*len(dfp)] = 0
-                pred = fft.ifft(y)
-                pred -= dfp.morts.mean() - v0
-                pred += np.cumsum([pente,]*len(dfp))
-                prediction.loc[f'{step}':f'{step+width}', 'x'] += pred
-                prediction_nb.loc[f'{step}':f'{step+width}','x'] += 1
-            prediction = np.array([p.real for p in prediction.x]) / prediction_nb.x
-            std = np.std(df.morts - prediction)
-            df2.morts[df2.morts > prediction + std] = prediction.astype('int') + int(std)
-            df2.morts[df2.morts < prediction - std] = prediction.astype('int') - int(std)
-        del df2
-
-        self.df = df
-        self.day_mean = prediction
-
-
-
+        self.df = self.get_data()
+        print(self.df)
 
         self.main_layout = html.Div(children=[
             html.H3(children='Décès en France selon le revenu par département'),
             html.Div([ dcc.Graph(id='drd-main-graph'), ], style={'width':'100%', }),
-            html.Div([ dcc.RadioItems(id='drd-mean', 
+            html.Div([ dcc.RadioItems(id='drd-mean',
                                      options=[{'label':'Courbe seule', 'value':0},
-                                              {'label':'Courbe + Tendence générale', 'value':1}, 
-                                              {'label':'Courbe + Moyenne journalière (les décalages au 1er janv. indique la tendence)', 'value':2}], 
+                                              {'label':'Courbe + Tendence générale', 'value':1},
+                                              {'label':'Courbe + Moyenne journalière (les décalages au 1er janv. indique la tendence)', 'value':2}],
                                      value=2,
                                      labelStyle={'display':'block'}) ,
                                      ]),
@@ -137,26 +85,26 @@ class DecesFranceRevenu():
             self.app.layout = self.main_layout
 
         self.app.callback(
-                    dash.dependencies.Output('drd-main-graph', 'figure'),
-                    dash.dependencies.Input('drd-mean', 'value'))(self.update_graph)
+                dash.dependencies.Output('drd-main-graph', 'figure'),
+                dash.dependencies.Input('drd-mean', 'mean'))(self.update_graph)
+        print('end of __init__')
+
 
     def update_graph(self, mean):
-        fig = px.line(self.df, template='plotly_white')
-        fig.update_traces(hovertemplate='Bonjour', name='')
-        fig.update_layout(
-            xaxis = dict(title=""), 
-            yaxis = dict(title="Salut"), 
-            height=450,
-            showlegend=False,
-        )
-        if mean == 1:
-            reg = stats.linregress(np.arange(len(self.df)), self.df.morts)
-            fig.add_scatter(x=[self.df.index[0], self.df.index[-1]], y=[reg.intercept, reg.intercept + reg.slope * (len(self.df)-1)], mode='lines', marker={'color':'red'})
-        elif mean == 2:
-            fig.add_scatter(x=self.df.index, y=self.day_mean, mode='lines', marker={'color':'red'})
-
+        print("enter update_graph")
+        fig = px.choropleth_mapbox(self.df,
+                geojson=self.departements,
+                locations='Numéro département',
+                featureidkey = 'properties.code',
+                color='Morts',
+                color_continuous_scale="Viridis",
+                mapbox_style="carto-positron",
+                zoom=4.6, center = {"lat": 47, "lon": 2},
+                opacity=0.5,
+                labels={'Morts':'Morts'}
+                )
+        fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
         return fig
-
         
 if __name__ == '__main__':
     drd = DecesFranceRevenu()
