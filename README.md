@@ -8,8 +8,9 @@ L'exercice consiste à prendre des données ouvertes et à les mettre en forme p
 
 Ce dépôt GitHub propose des pages Jupyter et des service Dash pour analyser des données ouvertes. Les sous-dépôts sont :
 
-* [Natalité / revenus](https://github.com/oricou/delta/tree/main/population) : exemple classique qui montre la chute de natalité à travers le monde et la croissance des revenus
-* [Prix de l'énergie](https://github.com/oricou/delta/tree/main/energies) : compare le prix grand public de différentes énergies en France
+* [Natalité / revenus](https://github.com/nicolastrabet/delta/tree/main/population) : exemple classique qui montre la chute de natalité à travers le monde et la croissance des revenus
+* [Prix de l'énergie](https://github.com/nicolastrabet/delta/tree/main/energies) : compare le prix grand public de différentes énergies en France
+* Journeaux télévisées francais : montre les grands themes des journeaux télévisées et analyse des tendance 
 
 Note : le choix du français est volontaire, il s'agit de promouvoir l'usage
        des données ouvertes auprès du grand public en France. Cela étant il
