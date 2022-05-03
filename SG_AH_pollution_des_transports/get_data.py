@@ -1,5 +1,6 @@
 # Here is the script to get all the data needed in our project
 import pandas as pd
+import re
 
 def transform_energ_names(df,col):
     energ_name = {'ES ': 'Essence',
@@ -36,7 +37,7 @@ def transform_countries_names(df, col):
 import os
 def get_transport_pollution_eu():
     df = pd.read_csv("SG_AH_pollution_des_transports/data/emission_de_polluant_des_transports_1990-2020.csv")
-    
+
     # Remove the useless columns, keeping only:
     # The data (TIME_PERIOD), The country (geo), Pollution type (airpol), the value of the pollution (OBS_VALUE) 
     columns_to_keep = ['airpol', 'geo', 'TIME_PERIOD', 'OBS_VALUE']
@@ -46,7 +47,7 @@ def get_transport_pollution_eu():
     # Seperate data for all EUROPE
     df_all_eu = df.loc[df['Pays'] == 'EU27_2020']
     df = df[df['Pays'] != 'EU27_2020']
-    
+
     # Rename geo columns with right names
     df = transform_countries_names(df, 'Pays')
     return (df_all_eu, df)
@@ -73,13 +74,10 @@ def get_air_pollution_schools():
     df = pd.read_csv("SG_AH_pollution_des_transports/data/ecoles-creches-idf-prepared_2012-2017.csv")
 
     # remove useless columns
-    df = df.drop(['ID', 'ville', 'CP', 'type', 'geometry'], axis=1)
-    # Seperate according to the type of pollution
-    df_no2 = df.filter(regex="nom|departement|NO2.*")
-    df_pm10 = df.filter(regex="nom|departement|PM10.*")
-    df_pm25 = df.filter(regex="nom|departement|PM25.*")
-
-    return (df_no2, df_pm10, df_pm25)
+    df = df.drop(['ID', 'ville', 'CP', 'type'], axis=1)
+    df['lon'] = df["geometry"].map(lambda x : float(re.match("POINT\((.*) ", x)[1]))
+    df['lat'] = df["geometry"].map(lambda x : float(re.match(".* (.*)\)", x)[1]))
+    return df.drop(["geometry"],axis = 1)
 
 def get_pollution_per_vehicules_in_france():
     df = pd.read_csv("SG_AH_pollution_des_transports/data/vehicules_polluant_france_2015.csv",sep=";",encoding="latin1")
