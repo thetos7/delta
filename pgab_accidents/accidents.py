@@ -20,12 +20,25 @@ class Accidents:
             html.Iframe(
                 srcDoc=map_html,
                 style={
-                    'min-height': '80vh'
+                    'min-height': '60vh',
+                    'min-width': '40vw',
+                    'align-self': 'center'
                 }
             ) if map_html is not None else dcc.Markdown("""
             Map HTML file is missing.  
             It may not have generated correctly.
             """),
+            dcc.Markdown("""
+            Carte intéractive des accidents de la route entre 2016 et 2020. Utilisez le slider afin de sélectionner l'année.
+            La carte comporte plusieurs calques:
+            * Heatmap des accidents
+            * Emplacements exacts
+
+            #### À propos
+            * Données: [data.gouv.fr](https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2020/)
+
+            &copy; 2022 Paul Galand & Ancelin Bouchet
+            """, style={'margin-top': '3rem'})
         ], style={
             'backgroundColor': 'white',
             'padding': '10px 50px 10px 50px',
