@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 # 1. nb_notif vs nb_dpo
 
@@ -246,17 +247,3 @@ df = pd.merge(df, controles, left_index=True, right_index=True)
 
 ## Save sanc_avert_mise_en_demeure_controles datas
 df.to_pickle("3_sanc_avert_mise_en_demeure_controles.pkl")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
