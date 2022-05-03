@@ -188,7 +188,7 @@ class RGPD():
 
         fig.update_layout(
             title = "Évolution du budget de la CNIL par rapport au montants des sanctions",
-            yaxis = dict( title = "Montant en €"),
+            yaxis = dict( title = "Montant en €", type= 'linear' if echelle == 'Linéaire' else 'log',),),
             xaxis = dict( title = "Année"),
             height=450,
             hovermode='closest',
