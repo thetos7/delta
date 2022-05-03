@@ -1,3 +1,3 @@
-authors:
+Authors:
 - Théo Perinet
 - Marc Monteil
