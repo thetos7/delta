@@ -286,8 +286,23 @@ class Pollution:
                     },
                 ),
                 dcc.Markdown(
-                    """Insérer description
-            """
+                    """
+                    Le graphique représente la moyenne des émissions des véhicules circulant en France
+                    selon les informations données par les constructeurs.
+                    """
+                ),
+                dcc.Markdown(
+                    """
+                    Le graphe permet de trier en fonction des différentes émissions des véhicules
+                    ainsi que de leur types ou de leur marques.
+                    """
+                ),
+                dcc.Markdown(
+                    """
+                    Pour certaines émissions, il manque des valeurs leurs donnant la moyenne de 0
+                    Cela peut aussi venir de leur non émission avec les voitures électriques par example.
+                    Ces valeurs sont donc mis tout à la fin pour informer le lecteur d'un potentielle problème.
+                    """
                 ),
                 html.Br(),
                 html.H3(
@@ -345,8 +360,21 @@ class Pollution:
                     style={"padding": "0px 50px", "width": "100%"},
                 ),
                 dcc.Markdown(
-                    """ Insérer description
-            """
+                    """
+                    La carte permet de visualiser la pollution aérienne au abords de chaque école.
+                    """
+                ),
+                dcc.Markdown(
+                    """
+                    Il est possible de choisir le type de pollution et de suivre son évolution au fil des ans.
+                    """
+                ),
+                dcc.Markdown(
+                    """
+                    Le graph prend comme valeur centrale l'objectif de qualité donné par l'OMS
+                    ce qui explique pourquoi certaines échelle vont en dessous de 0 lorsque
+                    les valeurs maximales deviennent trop élevés.
+                    """
                 ),
                 html.Br(),
                 html.H2(children="À propos"),
@@ -357,6 +385,7 @@ class Pollution:
                         * [Emissions de CO2 et de polluants des véhicules commercialisés en France] (https://www.data.gouv.fr/fr/datasets/emissions-de-co2-et-de-polluants-des-vehicules-commercialises-en-france/)
                         * [Base de données de la pollution aérienne aux abords des écoles et crèches d’Île-de-France] (https://www.data.gouv.fr/fr/datasets/base-de-donnees-de-la-pollution-aerienne-aux-abords-des-ecoles-et-creches-dile-de-france/)
                         * [Moyenne des émissions de CO2 par kilomètre provenant de véhicules particuliers neufs (source: AEE, DG CLIMA)] (https://ec.europa.eu/eurostat/databrowser/view/sdg_12_30/default/table?lang=fr)
+                        * [Norme de Qualité de l'air] (https://www.ecologie.gouv.fr/sites/default/files/01_Tableau-Normes-Seuils%20r%C3%A9glementaires.pdf)
                     * (c) 2022 Sarah Gutierez et Adrien Houpert
                         """
                 ),
@@ -502,7 +531,7 @@ class Pollution:
             agg,
             y=col,
             x=axis,
-            title=f"Moyenne d'{col} pour les modèles par marque",
+            title=f"Moyenne d'{col} pour les modèles par {axis}",
             color_discrete_sequence=["purple"] * len(agg),
         )
         fig.update_traces(
