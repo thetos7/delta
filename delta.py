@@ -3,6 +3,7 @@ from dash import dcc
 from dash import html
 from energies import energies
 from population import population
+from tc_urban import urban
 from deces import deces
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -10,6 +11,7 @@ from deces import deces
 app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
 server = app.server
 pop = population.WorldPopulationStats(app)
+urb = urban.UrbanPolutionStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
 
@@ -23,6 +25,8 @@ main_layout = html.Div([
                               dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
                               html.Br(),
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
+                              html.Br(),
+                              dcc.Link(html.Button('CO₂ vs population urbaine', style={'width':"100%"}), href='/tc_urban'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
@@ -64,6 +68,8 @@ def display_page(pathname):
         return nrg.main_layout
     elif pathname == '/population':
         return pop.main_layout
+    elif pathname == '/tc_urban':
+        return urb.main_layout
     elif pathname == '/deces':
         return dec.main_layout
     else:

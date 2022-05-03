@@ -22,9 +22,6 @@ indicators_df = indicators_df[(indicators_df.IndicatorCode == "SP.POP.TOTL") |
     (indicators_df.IndicatorCode == "SP.URB.TOTL") |
     (indicators_df.IndicatorCode == "EN.ATM.CO2E.KT")]
 
-# With a five years step
-indicators_df = indicators_df[indicators_df.Year % 5 == 0]
-
 # Get a clean dataframe
 indicators_df['CO2 emissions (kt)'] = indicators_df.apply(lambda row: (row.Value, 0)[row.IndicatorCode != "EN.ATM.CO2E.KT"], axis = 1)
 indicators_df['Total population'] = indicators_df.apply(lambda row: (row.Value, 0)[row.IndicatorCode != "SP.POP.TOTL"], axis = 1)
@@ -34,12 +31,14 @@ indicators_df['Urban population'] = indicators_df.apply(lambda row: (row.Value, 
 indicators_df = indicators_df.drop(['IndicatorName', 'IndicatorCode', 'Value'], axis = 1)
 indicators_df = indicators_df.groupby(['Year', 'CountryCode', 'CountryName'], as_index=False).sum()
 
-# Remove line where there is no CO2 information
-indicators_df = indicators_df[indicators_df['CO2 emissions (kt)'] != 0]
+# Remove line where there is no CO2 or urban population information
+indicators_df = indicators_df[(indicators_df['CO2 emissions (kt)'] != 0) & (indicators_df['Urban population'] != 0)]
 
 # Main dataframe
 df = pd.merge(indicators_df, countries_df, on = ["CountryCode", "CountryName"])
 RegionName_Column = df.pop("RegionName")
 df.insert(3, 'RegionName', RegionName_Column)
+df = df.sort_values(by = ['Year', 'CountryName'])
+df = df.set_index('Year')
 
 df.to_pickle('data/countriesData.pkl')

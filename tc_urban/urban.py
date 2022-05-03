@@ -1,0 +1,266 @@
+import sys
+import dash
+import flask
+from dash import dcc
+from dash import html
+import pandas as pd
+import numpy as np
+import plotly.graph_objs as go
+import plotly.express as px
+
+class UrbanPolutionStats():
+    START = 'Start'
+    STOP  = 'Stop'
+
+    def __init__(self, application = None):
+        self.df = pd.read_pickle('tc_urban/data/countriesData.pkl')
+        self.french = {'Asia':'Asie', 'Europe':'Europe', 'Africa':'Afrique', 'Oceania':'Océanie', 'Americas':'Amériques'}
+        self.region_colors = {'Asia':'gold', 'Europe':'green', 'Africa':'brown', 'Oceania':'red', 'Americas':'navy'}
+        self.years = sorted(set(self.df.index.values))
+
+        self.main_layout = html.Div(
+            children = [
+                html.H3('Évolution des émissions de CO₂ vs la population en zone urbaine par pays'),
+                html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'),
+
+                # Main graph
+                html.Div(
+                    children = [
+                        html.Div(dcc.Graph(id='ups-main-graph'), style={'width':'90%'}),
+                        html.Div(
+                            children = [
+                                html.Div('Region'),
+                                dcc.Checklist(
+                                    id='ups-crossfilter-which-region',
+                                    options=[{'label': self.french[i], 'value': i} for i in sorted(self.region_colors.keys())],
+                                    value=sorted(self.region_colors.keys()),
+                                    labelStyle={'display':'block'},
+                                ),
+                                html.Br(),
+                                html.Div('Échelle en X'),
+                                dcc.RadioItems(
+                                    id='ups-crossfilter-xaxis-type',
+                                    options=[{'label': i, 'value': i} for i in ['Linéaire', 'Log']],
+                                    value='Log',
+                                    labelStyle={'display':'block'},
+                                ),
+                                html.Br(),
+                                html.Br(),
+                                html.Br(),
+                                html.Br(),
+                                html.Button(
+                                    self.START,
+                                    id='ups-button-start-stop', 
+                                    style={'display':'inline-block'}
+                                ),
+                            ],
+                            style = {
+                                'margin-left':'15px',
+                                'width': '7em',
+                                'float':'right'
+                            }
+                        ),
+                    ],
+                    style={
+                        'padding': '10px 50px', 
+                        'display':'flex',
+                        'justifyContent':'center'
+                    }
+                ),
+
+                # Years slider
+                html.Div(
+                    children = [
+                        html.Div(
+                            dcc.Slider(
+                                id='ups-crossfilter-year-slider',
+                                min=self.years[0],
+                                max=self.years[-1],
+                                step = 1,
+                                value=self.years[0],
+                                marks={str(year): str(year) for year in self.years[::5]},
+                            ),
+                            style = {
+                                'display':'inline-block',
+                                'width':"90%"
+                            }
+                        ),
+                        dcc.Interval(
+                            id='ups-auto-stepper',
+                            interval=500,
+                            max_intervals = -1,
+                            n_intervals = 0
+                        ),
+                    ],
+                    style = {
+                        'padding': '0px 50px', 
+                        'width':'100%'
+                    }
+                ),
+
+                html.Br(),
+                html.Div(id='ups-div-country'),
+
+                html.Div(
+                    children = [
+                        dcc.Graph(id='ups-emission-time-series', style={'width':'33%', 'display':'inline-block'}),
+                        dcc.Graph(id='ups-urbanpop-time-series', style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
+                        dcc.Graph(id='ups-pop-time-series', style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
+                    ],
+                    style = {
+                        'display':'flex', 
+                        'borderTop': 'thin lightgrey solid',
+                        'borderBottom': 'thin lightgrey solid',
+                        'justifyContent':'center'
+                    }
+                ),
+                      
+                html.Br(),
+                dcc.Markdown("""
+                    #### À propos
+
+                    Données :
+
+                    * [Kaggle](https://www.kaggle.com/kaggle/world-development-indicators?select=Indicators.csv)
+                    * [Kaggle](https://www.kaggle.com/datasets/andreshg/countries-iso-codes-continent-flags-url?resource=download&select=countries_continents_codes_flags_url.csv)
+                """)
+            ],
+            style = {
+                'padding': '10px 50px 10px 50px',
+            }
+        )
+
+        if application:
+            self.app = application
+        else:
+            self.app = dash.Dash(__name__)
+            self.app.layout = self.main_layout
+        
+        self.app.callback(
+            dash.dependencies.Output('ups-main-graph', 'figure'),
+            [ dash.dependencies.Input('ups-crossfilter-which-region', 'value'),
+              dash.dependencies.Input('ups-crossfilter-xaxis-type', 'value'),
+              dash.dependencies.Input('ups-crossfilter-year-slider', 'value')])(self.update_graph)
+        self.app.callback(
+            dash.dependencies.Output('ups-div-country', 'children'),
+            dash.dependencies.Input('ups-main-graph', 'hoverData'))(self.country_chosen)
+        self.app.callback(
+            dash.dependencies.Output('ups-button-start-stop', 'children'),
+            dash.dependencies.Input('ups-button-start-stop', 'n_clicks'),
+            dash.dependencies.State('ups-button-start-stop', 'children'))(self.button_on_click)
+        self.app.callback(
+            dash.dependencies.Output('ups-auto-stepper', 'max_interval'),
+            [dash.dependencies.Input('ups-button-start-stop', 'children')])(self.run_movie)
+        self.app.callback(
+            dash.dependencies.Output('ups-crossfilter-year-slider', 'value'),
+            dash.dependencies.Input('ups-auto-stepper', 'n_intervals'),
+            [dash.dependencies.State('ups-crossfilter-year-slider', 'value'),
+             dash.dependencies.State('ups-button-start-stop', 'children')])(self.on_interval)
+        self.app.callback(
+            dash.dependencies.Output('ups-emission-time-series', 'figure'),
+            [dash.dependencies.Input('ups-main-graph', 'hoverData'),
+             dash.dependencies.Input('ups-crossfilter-xaxis-type', 'value')])(self.update_emission_timeseries)
+        self.app.callback(
+            dash.dependencies.Output('ups-urbanpop-time-series', 'figure'),
+            [dash.dependencies.Input('ups-main-graph', 'hoverData'),
+             dash.dependencies.Input('ups-crossfilter-xaxis-type', 'value')])(self.update_urbanpop_timeseries)
+        self.app.callback(
+            dash.dependencies.Output('ups-pop-time-series', 'figure'),
+            [dash.dependencies.Input('ups-main-graph', 'hoverData'),
+             dash.dependencies.Input('ups-crossfilter-xaxis-type', 'value')])(self.update_pop_timeseries)
+
+    def update_graph(self, regions, xaxis_type, year):
+        dfg = self.df.loc[year]
+        dfg = dfg[dfg['RegionName'].isin(regions)]
+        fig = px.scatter(
+            dfg, x = "Urban population", y = "CO2 emissions (kt)", 
+            size = "Urban population", size_max = 60,
+            color = "RegionName", color_discrete_map = self.region_colors,
+            hover_name = "CountryName", log_x = True
+        )
+
+        x_min = 10 ** int("{:e}".format(dfg['Urban population'].min())[-1])
+        x_max = 10 ** (int("{:e}".format(dfg['Urban population'].max())[-1]) + 1)
+        y_min = 10 ** int("{:e}".format(dfg['CO2 emissions (kt)'].min())[-1])
+        y_max = 10 ** (int("{:e}".format(dfg['CO2 emissions (kt)'].max())[-1]) + 1)
+
+        fig.update_layout(
+            xaxis = dict(
+                title ='Nombre d\'habitant en zone urbaine',
+                type = 'linear' if xaxis_type == 'Linéaire' else 'log',
+                autorange = True 
+            ),
+            yaxis = dict(
+                title = "Émissions de CO₂ (en kt)",
+                autorange = True
+            ),
+            margin = {'l': 40, 'b': 30, 't': 10, 'r': 0},
+            hovermode = 'closest',
+            showlegend = False
+        )
+        return fig
+
+    def create_time_series(self, country, what, axis_type, title):
+        return {
+            'data': [go.Scatter(
+                x = self.years,
+                y = self.df[self.df["CountryName"] == country][what],
+                mode = 'lines+markers',
+            )],
+            'layout': {
+                'height': 225,
+                'margin': {'l': 50, 'b': 20, 'r': 10, 't': 20},
+                'yaxis': {'title':title,
+                          'type': 'linear' if axis_type == 'Linéaire' else 'log'},
+                'xaxis': {'showgrid': False}
+            }
+        }
+
+    def get_country(self, hoverData):
+        if hoverData == None:
+            return self.df['CountryName'].iloc[np.random.randint(len(self.df))]
+        return hoverData['points'][0]['hovertext']
+
+    def country_chosen(self, hoverData):
+        return self.get_country(hoverData)
+
+    def update_emission_timeseries(self, hoverData, xaxis_type):
+        country = self.get_country(hoverData)
+        return self.create_time_series(country, 'CO2 emissions (kt)', xaxis_type, 'Émissions de CO₂ (en kt)')
+
+    def update_urbanpop_timeseries(self, hoverData, xaxis_type):
+        country = self.get_country(hoverData)
+        return self.create_time_series(country, 'Urban population', xaxis_type, "Population en zone urbaine")
+
+    def update_pop_timeseries(self, hoverData, xaxis_type):
+        country = self.get_country(hoverData)
+        return self.create_time_series(country, 'Total population', xaxis_type, 'Population totale')
+
+    def button_on_click(self, n_clicks, text):
+        if text == self.START:
+            return self.STOP
+        else:
+            return self.START
+
+    def run_movie(self, text):
+        if text == self.START:
+            return 0 
+        else:
+            return -1
+
+    def on_interval(self, n_intervals, year, text):
+        if text == self.STOP:
+            if year == self.years[-1]:
+                return self.years[0]
+            else:
+                return year + 1
+        else:
+            return year
+
+    def run(self, debug=False, port=8050):
+        self.app.run_server(host="0.0.0.0", debug=debug, port=port)
+
+
+if __name__ == '__main__':
+    ups = UrbanPolutionStats()
+    ups.run(port=8055)
