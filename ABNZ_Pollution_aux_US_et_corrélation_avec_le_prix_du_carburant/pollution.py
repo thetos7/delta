@@ -37,7 +37,7 @@ class Pollution():
         figPollution.add_trace(go.Scatter(
         x=pollution.index,
         y=pollution['Concentration moyenne en CO x 40'],
-        name='CO'))
+        name='CO x 40'))
         figPollution.add_trace(go.Scatter(
         x=pollution.index,
         y=pollution['Concentration moyenne en NO2'],
@@ -45,11 +45,11 @@ class Pollution():
         figPollution.add_trace(go.Scatter(
         x=pollution.index,
         y=pollution['Concentration moyenne en O3 x 700'],
-        name='03'))
+        name='03 x 700'))
         figPollution.add_trace(go.Scatter(
         x=pollution.index,
         y=pollution['Concentration moyenne en SO2 x 5'],
-        name='SO2'))
+        name='SO2 x 5'))
 
         figPollution.update_layout(
         title='Concentration moyenne de SO2, NO2, O3 et CO de 2000 à 2022 en ppmd',
@@ -63,7 +63,7 @@ class Pollution():
         figPollutionSmoothed.add_trace(go.Scatter(
         x=pollution.index,
         y=signal.savgol_filter(pollution['Concentration moyenne en CO x 40'], 101, 3),
-        name='CO'))
+        name='CO x 40'))
         figPollutionSmoothed.add_trace(go.Scatter(
         x=pollution.index,
         y=signal.savgol_filter(pollution['Concentration moyenne en NO2'], 101, 3),
@@ -71,11 +71,11 @@ class Pollution():
         figPollutionSmoothed.add_trace(go.Scatter(
         x=pollution.index,
         y=signal.savgol_filter(pollution['Concentration moyenne en O3 x 700'], 101, 3),
-        name='03'))
+        name='03 x 700'))
         figPollutionSmoothed.add_trace(go.Scatter(
         x=pollution.index,
         y=signal.savgol_filter(pollution['Concentration moyenne en SO2 x 5'], 101, 3),
-        name='SO2'))
+        name='SO2 x 5'))
 
         figPollutionSmoothed.update_layout(
         title='Concentration moyenne de SO2, NO2, O3 et CO de 2000 à 2022 en ppmd, version graphique lissée',
@@ -97,7 +97,7 @@ class Pollution():
         self.main_layout = html.Div(children=[
             html.H3(children='Pollution/Petrole'),
             dcc.Markdown("""Le but de ce sujet va être de regarder et tenter de comprendre les valeurs de pollution atmosphérique moyennes aux Etats-Unis relatives aux gas émis par la combustion d'hydrocarbures. Bien que portant sur l'étude de données recueillies aux Etats-Unis, la compréhension de l'évolution de ces valeurs pourra facilement être généralisée aux autres pays développés."""),
-            dcc.Markdown("""Voici donc les valeurs sur lesquelles nous allons travailler :"""),
+            dcc.Markdown("""Nous avons multiplié certaines concentration pour les faire apparaître sur une échelle similaire, car ce qui va nous intéresser est l'évolution des valeurs et leurs possibles relations entre elles. Nous avons précisé cela dans la légende de chaque graphique. Voici donc les valeurs sur lesquelles nous allons travailler :"""),
             html.Div([ dcc.Graph(figure=figPollution), ], style={'width':'100%', }),
             dcc.Markdown("""Comme cela manque de clareté on lisse donc les valeurs :"""),
             html.Div([ dcc.Graph(figure=figPollutionSmoothed), ], style={'width':'100%', }),
