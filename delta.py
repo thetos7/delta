@@ -1,4 +1,3 @@
-from winreg import REG_OPENED_EXISTING_KEY
 import dash
 from dash import dcc
 from dash import html
@@ -29,7 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
-                              dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/rgpd'),
+                              dcc.Link(html.Button('RGPD', style={'width':"100%"}), href='/rgpd'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
