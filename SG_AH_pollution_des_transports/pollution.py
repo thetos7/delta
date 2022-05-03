@@ -35,7 +35,7 @@ class Pollution():
         self.pollution_vehicules_eu = get_pollution_per_vehicules_eu()
         self.pollution_vehicules_france = get_pollution_per_vehicules_in_france()
         self.pollution_schools_idf = get_air_pollution_schools()
-
+        self.years_school = [ x for x in range(2012, 2018)]
         self.years = [x for x in range(1990, 2020)]
         self.pays = ['Allemagne', 'Autriche', 'Belgique', 'Bulgarie', 'Chypre',
                      'Croatie', 'Danemark', 'Espagne', 'Estonie', 'Finlande',
@@ -210,6 +210,50 @@ class Pollution():
             html.Br(),
             html.H3(
                 children='Pollution aérienne des écoles et crêches en Île de France entre 2012 et 2017'),
+            html.Div([dcc.Graph(id="pol-school-graph")]),
+            html.Div([
+                html.Div([html.Div('Type de Pollution'),
+                          dcc.RadioItems(
+                    id='pol-idf-type',
+                    options=[{'label': 'PM10', 'value': "PM10"},
+                {'label': 'PM2,5',
+                             'value': "PM25"},
+                         {'label': 'NO2', 'value': "NO2"}],
+                    value="NO2",
+                    labelStyle={'display': 'block'},
+                ), ]),
+                html.Br(),
+                html.Button(
+                    'Start',
+                    id='pol-idf-button-start-stop',
+                    style={'display': 'inline-block'}
+                ),
+                html.Div()
+
+            ]),
+            html.Div([
+                html.Div(
+                    dcc.Slider(
+                        id='pol-idf-year-slider',
+                        min=2012,
+                        max=2017,
+                        step=1,
+                        value=2012,
+                        marks={str(year): str(year)
+                               for year in self.years_school},
+                    ),
+                    style={'display': 'inline-block', 'width': "90%"}
+                ),
+                dcc.Interval(            # fire a callback periodically
+                    id='pol-idf-auto-stepper',
+                    interval=1500,       # in milliseconds
+                    max_intervals=-1,  # start running
+                    n_intervals=0
+                ),
+            ], style={
+                'padding': '0px 50px',
+                'width': '100%'
+            }),
             dcc.Markdown(""" Insérer description
             """),
             html.Br(),
@@ -257,6 +301,19 @@ class Pollution():
             [dash.dependencies.State('pol-europe-year-slider', 'value'),
              dash.dependencies.State('pol-button-start-stop', 'children')])(self.on_interval)
 
+        self.app.callback(
+            dash.dependencies.Output('pol-idf-button-start-stop', 'children'),
+            dash.dependencies.Input('pol-idf-button-start-stop', 'n_clicks'),
+            dash.dependencies.State('pol-idf-button-start-stop', 'children'))(self.button_on_click)
+        self.app.callback(
+            dash.dependencies.Output('pol-idf-auto-stepper', 'max_interval'),
+            [dash.dependencies.Input('pol-idf-button-start-stop', 'children')])(self.run_time)
+        self.app.callback(
+            dash.dependencies.Output('pol-idf-year-slider', 'value'),
+            dash.dependencies.Input('pol-idf-auto-stepper', 'n_intervals'),
+            [dash.dependencies.State('pol-idf-year-slider', 'value'),
+             dash.dependencies.State('pol-idf-button-start-stop', 'children')])(self.on_interval_idf)
+
         # Callbacks for vehicules in EU
         self.app.callback(
             dash.dependencies.Output("pol-europe-cars-graph", "figure"),
@@ -277,6 +334,14 @@ class Pollution():
                 dash.dependencies.Input("pol-choice", "value"),
             ],
         )(self.update_graph_cars)
+
+        #Callbacks for schools graph of France
+        self.app.callback(dash.dependencies.Output('pol-school-graph','figure'),
+                [
+                dash.dependencies.Input("pol-idf-year-slider", "value"),
+                dash.dependencies.Input('pol-idf-type', 'value'),
+                    ]
+                )(self.update_graph_schools)
 
     def update_graph_europe_cars(self, all_europe='all_countries', country='France'):
         df, mean_eu = self.pollution_vehicules_eu
@@ -341,6 +406,20 @@ class Pollution():
         fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
         return fig
 
+    def update_graph_schools(self,year=2012,name_seuil= "PM25"):
+        dfg = self.pollution_schools_idf
+        col = f'{name_seuil}_{year}'
+        title = "mg/m3 de " +name_seuil
+        dfg = dfg.rename(columns = {col : title})
+        num = 40 if name_seuil == "NO2" else 30 if name_seuil == "PM10" else 10
+        fig = px.scatter_mapbox(dfg, lat=dfg.lat, lon=dfg.lon, hover_name="nom",
+        color=title,  color_continuous_scale=px.colors.cyclical.IceFire,
+        size=title, size_max = 15, color_continuous_midpoint=num
+        )
+        fig.update_layout(mapbox_style="stamen-terrain")
+        fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+        return fig
+
     # start and stop the time
     def button_on_click(self, n_clicks, text):
         if text == 'Start':
@@ -359,6 +438,15 @@ class Pollution():
         if text == 'Stop':  # we run
             if year == self.years[-1]:
                 return self.years[0]
+            else:
+                return year + 1
+        else:
+            return year
+
+    def on_interval_idf(self, n_intervals, year, text):
+        if text == 'Stop':  # we run
+            if year == self.years_school[-1]:
+                return self.years_school[0]
             else:
                 return year + 1
         else:

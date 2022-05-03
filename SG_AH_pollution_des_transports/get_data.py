@@ -92,5 +92,5 @@ def get_pollution_per_vehicules_in_france():
     #df = df[(df['geo'] != 'EU27_2020') & (df['geo'] != 'EU27_2007') & (df['geo'] != 'EU28')]
     # Rename geo columns with right names
     df = transform_energ_names(df, "Carburant")
-    df["Hybride"].replace({"non ": False,"oui ": True}, inplace = True)
+    df["Hybride"].replace({"non ": "non Hybride","oui ": "Hybride"}, inplace = True)
     return df
