@@ -42,6 +42,10 @@ class RGPD():
             html.H3(children="Évolution de l'application du RGPD en France"),
             html.H4(children="Authors: Marc Monteil et Théo Perinet"),
 
+            html.Br(),
+            html.Br(),
+
+            html.H4(children="Évolution du nombre de notifications et DPOs"),
             html.Div([ dcc.Graph(figure=self.update_1_insee())], style={'width':'100%', }),
             html.Div([ dcc.Graph(id='rgpd-1-donnees'), ], style={'width':'100%', }),
             html.Div([
@@ -70,6 +74,25 @@ class RGPD():
             html.Div([ dcc.Graph(figure=self.update_1_vs()) ], style={'width':'100%', }),
 
             html.Br(),
+            html.Br(),
+
+            html.H4(children="Le budget de la CNIL et les montants des sanctions"),
+            html.Div([ dcc.Graph(id='rgpd-2-budget-sanctions'), ], style={'width':'100%', }),
+            html.Div([
+                html.Div([ html.Div('Échelle de l\'axe des ordonnées'),
+                           dcc.Dropdown(
+                               id='rgpd-2-budget-sanctions-echelle',
+                               options=[{'label': i, 'value': i} for i in ['Linéaire', 'Logarithmique']],
+                               value="Linéaire"
+                           ),
+                         ], style={'width': '12em'})
+                ], style={
+                            'padding': '10px 50px', 
+                            'display':'flex',
+                            'flexDirection':'row',
+                            'justifyContent':'flex-start',
+                        }),
+
             dcc.Markdown("""
             #### À propos
 
@@ -95,6 +118,10 @@ class RGPD():
                     dash.dependencies.Output('rgpd-1-donnees', 'figure'),
                     [ dash.dependencies.Input('rgpd-1-which-info', 'value'),
                       dash.dependencies.Input('rgpd-1-which-mode', 'value')])(self.update_1_info_graph)
+
+        self.app.callback(
+                    dash.dependencies.Output('rgpd-2-budget-sanctions', 'figure'),
+                    [ dash.dependencies.Input('rgpd-2-budget-sanctions-echelle', 'value')])(self.update_2_argent)
     
     def update_1_insee(self):
         fig = go.Figure(data=[go.Table(
@@ -136,16 +163,39 @@ class RGPD():
         return fig
 
     def update_1_vs(self):
-        fig = (self.notification.sum(axis=1).cumsum() / self.dpo.sum(axis=1).cumsum()).to_frame().plot()
+        df = (self.notification.sum(axis=1).cumsum() / self.dpo.sum(axis=1).cumsum()).to_frame()
+        df.columns = ["Notifications par DPO"]
+
+        fig = px.line(df)
 
         fig.update_layout(
             title = "Nombre de notifications par rapport au nombre de DPOs",
             yaxis = dict( title = "Nombre de notifications par DPO"),
             xaxis = dict( title = "Date"),
             height=450,
-            hovermode='closest'
+            hovermode='closest',
+            showlegend=False
         )
         return fig
+
+    
+
+    def update_2_argent(self, echelle):
+        df = self.budget_cnil_sanctions
+        df.columns = ["Budget de la CNIL", "Somme des montants des sanctions"]
+
+        fig = px.line(df)
+
+        fig.update_layout(
+            title = "Évolution du budget de la CNIL par rapport au montants des sanctions",
+            yaxis = dict( title = "Montant en €"),
+            xaxis = dict( title = "Année"),
+            height=450,
+            hovermode='closest',
+            legend = {'title': 'Légende'},
+        )
+        return fig
+
 
 
 if __name__ == '__main__':
