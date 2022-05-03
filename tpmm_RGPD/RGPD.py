@@ -42,7 +42,7 @@ class RGPD():
             html.H3(children="Évolution de l'application du RGPD en France"),
             html.H4(children="Authors: Marc Monteil et Théo Perinet"),
 
-            html.Div([ dcc.Graph(id='rgpd-1-INSEE'), ], style={'width':'100%', }),
+            html.Div([ html.P(self.update_1_insee()) ], style={'width':'100%', }),
             html.Div([ dcc.Graph(id='rgpd-1-donnees'), ], style={'width':'100%', }),
             html.Div([
                 html.Div([ html.Div('Type d\'informations'),
@@ -88,10 +88,6 @@ class RGPD():
         else:
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
-
-        self.app.callback(
-                    dash.dependencies.Output('rgpd-1-insee', 'figure'),
-                    [])(self.update_1_insee)
 
         self.app.callback(
                     dash.dependencies.Output('rgpd-1-donnees', 'figure'),
