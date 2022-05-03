@@ -12,15 +12,37 @@ import dateutil as du
 class RGPD():
 
     def __init__(self, application = None):
-        self.dpo = pd.read_pickle('data/1_data_dpo.pkl')
-        self.notification = pd.read_pickle('data/1_data_notification.pkl')
-        self.budget_cnil_sanctions = pd.read_pickle('data/2_budget_cnil_sanctions.pkl')
-        self.sanc_avert_mise_en_demeure_controles = pd.read_pickle('data/3_sanc_avert_mise_en_demeure_controles.pkl')
+
+        # Nomenclature utilisée par l'INSEE
+        self.nomenclature_INSEE = [["A", "Agriculture, sylviculture et pêche"], ["B", "Industries extractives"],
+                            ["C", "Industrie manufacturière"],
+                            ["D", "Production et distribution d'électricité, de gaz, de vapeur et d'air conditionné"],
+                            ["E", "Production et distribution d'eau ; assainissement, gestion des déchets et dépollution"],
+                            ["F", "Construction"], ["G", "Commerce ; réparation d'automobiles et de motocycles"],
+                            ["H", "Transports et entreposage"], ["I", "Hébergement et restauration"],
+                            ["J", "Information et communication"], ["K", "Activités financières et d'assurance"],
+                            ["L", "Activités immobilières"], ["M", "Activités spécialisées, scientifiques et techniques"],
+                            ["N", "Activités de services administratifs et de soutien"], ["O", "Administration publique"],
+                            ["P", "Enseignement"], ["Q", "Santé humaine et action sociale"],
+                            ["R", "Arts, spectacles et activités récréatives"], ["S", "Autres activités de services"],
+                            ["T", "Activités des ménages en tant qu'employeurs ; activités indifférenciées des ménages en tant que producteurs de biens et services pour usage propre"],
+                            ["U", "Activités extra-territoriales"], ["X", "Inconnu"]]
+
+        # dictionnaires permettant la convertion de la nomenclature utilisée par l'INSEE
+        self.INSEE_to_secteur = {insee: secteur for insee, secteur in self.nomenclature_INSEE}
+        self.secteur_to_INSEE = {secteur: insee for insee, secteur in self.nomenclature_INSEE}
+
+        self.insee = pd.DataFrame.from_dict({"Nomenclature de l'INSEE": [nomenclature for nomenclature, _ in self.INSEE_to_secteur.items()], "Secteur d'activité": [activite for _, activite in self.INSEE_to_secteur.items()]})
+        self.dpo = pd.read_pickle('tpmm_RGPD/data/1_data_dpo.pkl')
+        self.notification = pd.read_pickle('tpmm_RGPD/data/1_data_notification.pkl')
+        self.budget_cnil_sanctions = pd.read_pickle('tpmm_RGPD/data/2_budget_cnil_sanctions.pkl')
+        self.sanc_avert_mise_en_demeure_controles = pd.read_pickle('tpmm_RGPD/data/3_sanc_avert_mise_en_demeure_controles.pkl')
 
         self.main_layout = html.Div(children=[
             html.H3(children="Évolution de l'application du RGPD en France"),
             html.H4(children="Authors: Marc Monteil et Théo Perinet"),
 
+            html.Div([ dcc.Graph(id='rgpd-1-INSEE'), ], style={'width':'100%', }),
             html.Div([ dcc.Graph(id='rgpd-1-donnees'), ], style={'width':'100%', }),
             html.Div([
                 html.Div([ html.Div('Type d\'informations'),
@@ -29,14 +51,15 @@ class RGPD():
                                options=[{'label': i, 'value': i} for i in ['DPOs', 'Notifications']],
                                value="DPOs"
                            ),
-                         ], style={'width': '8em'}),
+                         ], style={'width': '12em'}),
+                html.Div(style={'width':'2em'}),
                 html.Div([ html.Div('Mode d\'affichage'),
                            dcc.Dropdown(
                                id='rgpd-1-which-mode',
                                options=[{'label': i, 'value': i} for i in ['Données brut', 'Somme cumulée']],
                                value='Somme cumulée'
                            ),
-                         ], style={'width': '8em', 'padding':'2em 0px 0px 0px'} )
+                         ], style={'width': '12em'} )
                 ], style={
                             'padding': '10px 50px', 
                             'display':'flex',
@@ -67,28 +90,48 @@ class RGPD():
             self.app.layout = self.main_layout
 
         self.app.callback(
+                    dash.dependencies.Output('rgpd-1-insee', 'figure'),
+                    [])(self.update_1_insee)
+
+        self.app.callback(
                     dash.dependencies.Output('rgpd-1-donnees', 'figure'),
                     [ dash.dependencies.Input('rgpd-1-which-info', 'value'),
                       dash.dependencies.Input('rgpd-1-which-mode', 'value')])(self.update_1_info_graph)
     
+    def update_1_insee(self):
+        fig = go.Figure(data=[go.Table(
+                    header=dict(values=list(self.insee.index),
+                    align='left'),
+                cells=dict(values=self.insee,
+                    fill_color='lavender',
+                    align='left'))
+                    ])
+        fig.update_layout(
+            title = "Correspondance entre la nomenclature de l'INSEE et le secteure d'activité",
+        )
+        return fig
+
     def update_1_info_graph(self, info, mode):
         if info == None or info == "DPOs":
             df = self.dpo.copy()
-            cur_title = "Nombre de DPO enregistrés"
+            cur_ytitle = "Nombre de DPO enregistrés"
         else:
             df = self.notification.copy()
-            cur_title = "Nombre de notifications envoyées"
+            cur_ytitle = "Nombre de notifications envoyées"
 
         if mode == None or mode == 'Somme cumulée':
             df = df.cumsum()
         else:
-            cur_title += " durant le mois"
+            cur_ytitle += " durant le mois"
 
         fig = px.bar(df)
 
+        for c in df.columns:
+            fig.add_scatter(x = df.index, y=df[c], mode='lines', name=c, text=self.INSEE_to_secteur[c], hoverinfo='x+y+text')
+
         fig.update_layout(
-            title = cur_title,
-            yaxis = dict( title = "Nombre"),
+            title = "Nombre de DPO enregistrés / notifications envoyées",
+            yaxis = dict( title = cur_ytitle),
             xaxis = dict( title = "Date"),
             height=450,
             hovermode='closest',
