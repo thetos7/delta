@@ -28,6 +28,7 @@ class Independance_Petrole():
         self.years = list_years(self.impor)
 
         self.partners = [item for item in self.impor["partner"].unique() if item == item]
+        self.countries = [item for item in self.impor["geo"].unique() if item == item]
 
         with open("resources/europe.geo.json", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
             self.europe = json.load(f)
@@ -79,6 +80,15 @@ class Independance_Petrole():
                 html.Div([
                     html.Div('Les plus gros importateurs de pétrole:'),
                     html.Div([ dcc.Graph(id='big-import-graph'), ], style={'width': '110em' })])
+            ], style={'display': 'flex', 'justify-content': 'space-between'}),
+            html.Div([
+                    html.Div([
+                        'Selectionner le pays dont on souhaite voir d\'ou viennent les importations',
+                        dcc.Dropdown(
+                            id='specific-importation-of-country',
+                            options=[{"label":country_code[i], "value": i} for i in self.countries]
+                           ),
+                    html.Div([ dcc.Graph(id='specific-import-graph'), ], style={'width': '110em' })])
             ], style={'display': 'flex', 'justify-content': 'space-between'})
         ], style={
             'backgroundColor': 'white',
@@ -117,6 +127,11 @@ class Independance_Petrole():
                     dash.dependencies.Output('big-import-graph', 'figure'),
                     [dash.dependencies.Input('year', 'value'),
                     dash.dependencies.Input('excluded-countries', 'value')])(self.update_biggest_importators)
+        self.app.callback(
+                    dash.dependencies.Output('specific-import-graph', 'figure'),
+                    [dash.dependencies.Input('year', 'value'),
+                    dash.dependencies.Input('excluded-countries', 'value'),
+                    dash.dependencies.Input('specific-importation-of-country', 'value')])(self.update_importators)
     
     def update_graph_import(self, year, excluded_countries):
         year = self.years[year]
@@ -228,6 +243,17 @@ class Independance_Petrole():
         year = self.years[year]
         df = self.impor[~self.impor.partner.isin(excluded_countries)]
         df = df[df.TIME_PERIOD == year].groupby("partner")["OBS_VALUE"].sum()
+        df = df.reset_index()
+        df = df[df.OBS_VALUE != 0]
+        df.sort_values(by=['OBS_VALUE'], inplace=True, ascending=False)
+        fig = px.scatter(df, x="partner", y="OBS_VALUE")
+
+        return fig
+
+    def update_importators(self, year, excluded_countries, country):
+        year = self.years[year]
+        df = self.impor[~self.impor.partner.isin(excluded_countries)]
+        df = df[df.TIME_PERIOD == year][df.geo == country].groupby("partner")["OBS_VALUE"].sum()
         df = df.reset_index()
         df = df[df.OBS_VALUE != 0]
         df.sort_values(by=['OBS_VALUE'], inplace=True, ascending=False)
