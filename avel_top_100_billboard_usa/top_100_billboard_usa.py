@@ -50,20 +50,25 @@ class Top100BillboardUSA:
             html.H3('Informations à propos des données'),
             dcc.Markdown(f'''
             
-            Il s'agit d'un tableau de {self.song_count} chansons de la Billboard des USA.
-            
-            Il y a {self.artist_count} artistes dans la liste.
+            Il s'agit d'un tableau des classements de la Billboard Hebdomadaire des USA de 1958 à 2021,   
+            comprenant {len(self.df)} entrées dont {self.song_count} chansons et {self.artist_count} artistes uniques.
             
             
             '''),
             dcc.Graph(id='new_artist_on_board_fig', figure=self.get_new_artist_on_board_fig()),
             dcc.Graph(id='weeks-on-board-plot', figure=self.get_weeks_on_board_fig()),
             dcc.Markdown('''
-            **TODO: METTRE POURQUOI C'EST SI HAUT EN 20 ET EN 52**
+            Un large pic est visible à la 20e semaine.   
+            En grossissant on voit également la 52e semaine sortant de la tendance.   
+            Regardons ce même graphique par année. => lien autre page ?   
+            Il semblerait que le début des années 90 marque l'arrivée de cette tendance non proportionelle.   
+            Il s'avère qu'à la fin de l'année 1991, le Billboard a institué une "règle de récurrence",   
+            stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si elles se classent en dessous de la 50e place.   
+            De même pour les chansons au classement depuis 1 an, si elles se trouvent en dessous de la 25e position.   
             '''),
 
             html.H3('Graphs by artist'),
-            dcc.Dropdown(id="artist-dropdown", options=self.df.artist.unique().tolist(), value=''),
+            dcc.Dropdown(id="artist-dropdown", options=self.df.artist.unique().tolist(), value='Michael Jackson'),
             html.Div(id='artist-dropdown-output'),
             # html.Div([
             #     "Input: ",
@@ -73,7 +78,8 @@ class Top100BillboardUSA:
 
             html.H3('Notes'),
             dcc.Markdown('''
-            Sources
+            ### Sources   
+            https://www.billboard.com/billboard-charts-legend/
             '''),
 
         ])
@@ -93,13 +99,13 @@ class Top100BillboardUSA:
         def update_artist_dropdown(input_value):
             return self.generate_table(self.df[self.df['artist'] == input_value])
 
-        # Example callback
-        @self.app.callback(Output("foo", "children"), Input('my-input', 'value'))
-        def update_graph(input_value):
-            return html.Div([
-                html.H2(input_value),
-                self.generate_table(self.df),
-            ])
+        # # Example callback
+        # @self.app.callback(Output("foo", "children"), Input('my-input', 'value'))
+        # def update_graph(input_value):
+        #     return html.Div([
+        #         html.H2(input_value),
+        #         self.generate_table(self.df),
+        #     ])
 
     @staticmethod
     def generate_table(dataframe: pd.DataFrame, max_rows: int = 10):
@@ -137,8 +143,8 @@ class Top100BillboardUSA:
         name = "Count"
         fig.update_layout(showlegend=False)
 
-        fig.update_layout(title="Number of weeks the songs remained on the Billboard")
-        fig.update_layout(xaxis_title="Number of weeks on the billboard", yaxis_title="Number of songs")
+        fig.update_layout(title="Nombre de semaines consécutives qu'une musique reste au Billboard, de 1958 à 2021")
+        fig.update_layout(xaxis_title="Nombre de semaines consécutives", yaxis_title="Nombre de musiques")
         fig.update_layout()
         return fig
         # # Adding the data
@@ -170,7 +176,7 @@ class Top100BillboardUSA:
             x.append(year), y.append(artistes_distincts_decade)
 
         # Creating the figure
-        return px.line(x=x, y=y, labels={'x': 'Year', 'y': 'Number of new artists'})
+        return px.line(title="Nombre de nouvels artistes chaque année", x=x, y=y, labels={'x': 'Années', 'y': 'Nombre de nouvels artistes'})
 
 
         # # Adding the data
