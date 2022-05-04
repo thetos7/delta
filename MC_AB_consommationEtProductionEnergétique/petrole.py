@@ -39,7 +39,18 @@ class Petrole():
         
         self.main_layout = html.Div(children=[
             html.H3(children='Petrole'),
-            dcc.Markdown("""Independance Européene face au Pétrole comme energie fossile"""),
+            dcc.Markdown("""
+            # Independance Européene face au Pétrole comme énergie fossile
+            
+            Ici nous pouvons voir les statistiques entre 1990 et 2020 sur les exportations, importations, consommations et productions de prétrole en Europe.
+            Les Importations peuvent venir de pays hors Europe.
+            
+            Plus bas, il est possible de voir une carte qui montre l'excedent, positif ou négatif, de pétrole pour chaque pays d'Europe chaque année.
+            Un excedent négatif signifie que le pays tourne sur ses réserves, positif qu'il stock des barils.
+            
+            Enfin, il est possible de simuler à une certaine année un pays qui met fin à ses exportations de pétrole, et donc de voir si il passe dans le vert, et si il faire passer des autres dans le rouge.
+            
+            Il est possible de s'aider des dernier graphes montrant qui sont les gros importateurs de pétrole en Europe, et pour chaque pays, d'où vient son approvisionnement."""),
             html.Div([ html.Div('Année ref.'),
                           dcc.Slider(0, len(self.years) -1, 1,
                                id='year',
@@ -53,6 +64,7 @@ class Petrole():
                                value=[],
                                multi=True
                            ),
+                           html.P('L\' unité de "OBS_VALUE" est en milliers de tonnes de pétrole.'),
                          ], style={'position': 'sticky', 'top': 0, 'zIndex': 1, 'backgroundColor': 'white', 'width': '100%', 'padding':'4em 0px 0px 0px'}), # bas D haut G
             html.Div([
                 html.Div([
@@ -84,14 +96,14 @@ class Petrole():
                     html.Div([ dcc.Graph(id='big-import-graph'), ], style={'width': '100em' })])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
-                    html.Div([
-                        'Selectionner le pays dont on souhaite voir d\'où viennent les importations',
+                    html.H2('Selectionner le pays dont on souhaite voir d\'où viennent les importations'),
                         dcc.Dropdown(
                             id='specific-importation-of-country',
-                            options=[{"label":country_code[i], "value": i} for i in self.countries]
+                            options=[{"label":country_code[i], "value": i} for i in self.countries],
+                            value='FR'
                            ),
-                    html.Div([ dcc.Graph(id='specific-import-graph'), ], style={'width': '100em' })])
-            ], style={'display': 'flex', 'justify-content': 'space-between'})
+                    html.Div([ dcc.Graph(id='specific-import-graph'), ], style={'width': '100em' })
+            ], style={})
         ], style={
             'backgroundColor': 'white',
             'padding': '10px 50px 10px 50px',
@@ -222,7 +234,6 @@ class Petrole():
         impor = impor[self.impor.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
 
         df = prod + impor - export - cons
-        max_val = max(df)
         df = df.reset_index()
 
 
