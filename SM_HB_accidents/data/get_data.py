@@ -1,5 +1,6 @@
 import requests
 import os
+import pandas as pd
 
 url_lieux = [
         {"lieux_2015.csv" : "https://www.data.gouv.fr/fr/datasets/r/31db21ef-4328-4c5e-bf3d-66a8fe82e6a2"},
@@ -22,7 +23,7 @@ url_carac = [
 try:
     os.mkdir("Lieux")
     os.mkdir("Caracteristiques")
-except FilesExistError:
+except FileExistsError:
     pass
 
 for item in url_lieux:
@@ -34,3 +35,25 @@ for item in url_carac:
     for name, link in item.items():
         response = requests.get(link)
         open("Caracteristiques/" + name, "wb").write(response.content)
+
+solver = {'voie' : 'O'}
+df_2015 = pd.read_csv("Lieux/lieux_2015.csv")
+df_2016 = pd.read_csv("Lieux/lieux_2016.csv", dtype=solver)
+df_2017 = pd.read_csv("Lieux/lieux_2017.csv", dtype=solver)
+df_2018 = pd.read_csv("Lieux/lieux_2018.csv", dtype=solver)
+df_2019 = pd.read_csv("Lieux/lieux_2019.csv", sep=";")
+df_2020 = pd.read_csv("Lieux/lieux_2020.csv", sep=";")
+a = pd.read_csv("Caracteristiques/caracteristiques_2015.csv", encoding="latin-1")
+b = pd.read_csv("Caracteristiques/caracteristiques_2016.csv", encoding="latin-1")
+c = pd.read_csv("Caracteristiques/caracteristiques_2017.csv", encoding="latin-1")
+d = pd.read_csv("Caracteristiques/caracteristiques_2018.csv", encoding="latin-1")
+e = pd.read_csv("Caracteristiques/caracteristiques_2019.csv", sep=";")
+f = pd.read_csv("Caracteristiques/caracteristiques_2020.csv", sep=";")
+df_lieux = pd.concat([df_2015, df_2016, df_2017, df_2018, df_2019, df_2020])
+df_carac = pd.concat([a, b, c, d, e, f])
+
+df_final = df_lieux.merge(df_carac, on="Num_Acc", how="left",)
+column_list = ["catr", "prof", "surf", "col","atm", "int", "lum", "plan"]
+df_final = df_final[column_list]
+df_final.to_csv("final_df.csv")
+df_final.head()
