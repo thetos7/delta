@@ -24,6 +24,9 @@ class UrbanPolutionStats():
             children = [
                 html.H3('Évolution des émissions de CO₂ vs la population en zone urbaine par pays'),
 
+                html.Br(),
+                html.Br(),
+
                 # Years slider
                 html.Div(
                     children = [
@@ -53,7 +56,7 @@ class UrbanPolutionStats():
                             style = {
                                 'display':'inline-block',
                                 'width':"10%",
-                                'vertical-align':'center'
+                                'vertical-align':'top'
                             }
                         ),
                     ],
@@ -80,7 +83,6 @@ class UrbanPolutionStats():
                     }
                 ),
 
-                html.Br(),
                 html.Br(),
 
                 html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'),
@@ -226,12 +228,12 @@ class UrbanPolutionStats():
     def update_urbanpop_map(self, year):
         dfg = self.df.loc[year]
         fig = px.choropleth_mapbox(dfg, geojson=self.map, 
-                                locations='CountryName', featureidkey = 'properties.name', # join keys
-                                color='Urban population (%)', color_continuous_scale="Viridis",
-                                mapbox_style="carto-positron",
-                                zoom=0, center = {"lat": 47, "lon": 2},
-                                opacity=0.5,
-                                labels={'Urban population (%)':'Urban population (%)'}
+                                locations = 'CountryName', featureidkey = 'properties.name', # join keys
+                                color = 'Urban population (%)', color_continuous_scale = "Viridis",
+                                mapbox_style = "carto-positron",
+                                zoom = 0, center = {"lat": 47, "lon": 2},
+                                opacity = 0.5, range_color = (0, 100),
+                                labels = {'Urban population (%)':'Urban population (%)'}
                                 )
         fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
         return fig
@@ -240,12 +242,12 @@ class UrbanPolutionStats():
     def update_emission_map(self, year):
         dfg = self.df.loc[year]
         fig = px.choropleth_mapbox(dfg, geojson=self.map, 
-                                locations='CountryName', featureidkey = 'properties.name', # join keys
-                                color='CO2 emissions per person (t)',
-                                mapbox_style="carto-positron",
-                                zoom=0, center = {"lat": 47, "lon": 2},
-                                opacity=0.5,
-                                labels={'CO2 emissions per person (t)':'CO2 emissions per person (t)'}
+                                locations = 'CountryName', featureidkey = 'properties.name', # join keys
+                                color = 'CO2 emissions per person (t)',
+                                mapbox_style = "carto-positron",
+                                zoom = 0, center = {"lat": 47, "lon": 2},
+                                opacity = 0.5, range_color = (0, 25),
+                                labels = {'CO2 emissions per person (t)':'CO2 emissions per person (t)'}
                                 )
         fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
         return fig
