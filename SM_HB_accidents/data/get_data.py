@@ -57,5 +57,12 @@ column_list = ["catr", "prof", "surf", "col","atm", "int", "lum", "plan", "mois"
 df_final = df_final[column_list]
 for column in df_final:
     df_final = df_final.loc[df_final[column] >= 0]
+dates = {15 : 2015,
+         16 : 2016,
+         17 : 2017,
+         18 : 2018}
+    
+for a,b in dates.items():
+    df_final['an'].mask(df_final['an'] == a, b, inplace=True)    
 
 df_final.to_csv("final_df.csv")
