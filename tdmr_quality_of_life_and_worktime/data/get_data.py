@@ -69,7 +69,7 @@ def get_hapiness_feelings_dataframe() -> pd.DataFrame:
 
         hapiness_feelings_frequency_df.drop(columns=["isced11","sex","age","TIME_PERIOD"], inplace=True)
         hapiness_feelings_frequency_df["frequenc"].replace({"ALW": "Toujours", "MOST": "La plupart du temps", "SMT": "Parfois", "RAR": "Rarement", "NVR": "Jamais"}, inplace=True)
-        hapiness_feelings_frequency_df.rename(columns={"frequenc":"Fréquence", "OBS_VALUE":"Fréquence du sentiment de bonheur au cours du dernier mois"}, inplace=True)
+        hapiness_feelings_frequency_df.rename(columns={"frequenc":"Fréquence", "OBS_VALUE":"Fréquence du sentiment de bonheur (% de réponse)"}, inplace=True)
         hapiness_feelings_frequency_df.to_csv(hapiness_feelings_frequency_clean)
     
     else:

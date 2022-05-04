@@ -141,7 +141,7 @@ class Tdmr():
         fig = px.scatter(    
             self.hapiness_dataframe,    
             x=self.hapiness_dataframe["Temps de travail par semaine"],    
-            y=self.hapiness_dataframe["Fréquence du sentiment de bonheur au cours du dernier mois"],
+            y=self.hapiness_dataframe["Fréquence du sentiment de bonheur (% de réponse)"],
             color=self.hapiness_dataframe["Fréquence"],
             trendline="ols",
             category_orders={"Fréquence": ["Toujours", "La plupart du temps", "Parfois", "Rarement", "Jamais"]}
