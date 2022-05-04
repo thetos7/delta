@@ -43,7 +43,7 @@ class Tdmr():
             
             html.H4(children="Proportion de symptomes dépressifs et temps de travail hebdomadaire moyen par pays"),
             html.Div([ dcc.Graph(id='depression_graph'), ], style={'width':'100%', }),
-            html.P("Malheureusement ce graphique n'apporte pas de réelle preuve de relation entre le temps de travail moyen et les symptomes dépressifs recensés par pays, plusieurs approches via différentes lignes de tendance ne nous ont pas permi de fournir une représentation montrant quoi que ce soit."),
+            html.P("Malheureusement ce graphique ne montre pas l'existence d'une relation entre le temps de travail moyen et les symptomes dépressifs recensés par pays, plusieurs approches via différentes lignes de tendance ne nous ont pas permis de fournir une représentation montrant quoi que ce soit."),
             html.Br(),
             
             html.H4(children="Espérance de vie et temps de travail hebdomadaire moyen par pays"),
