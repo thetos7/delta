@@ -10,15 +10,15 @@ import json
 class Song():
     
     def __init__(self, application = None):
-        self.s_artists = pd.read_csv("data/artists.zip", converters={2:ast.literal_eval})
+        self.s_artists = pd.read_csv("efm_sujet/data/artists.zip", converters={2:ast.literal_eval})
         self.s_artists = self.s_artists.rename(columns={"name":"artists"})
 
-        self.songs = pd.read_csv("data/tracks.zip")
+        self.songs = pd.read_csv("efm_sujet/data/tracks.zip")
         self.songs.drop(self.songs[self.songs["popularity"] == 0].index, inplace = True)
         self.songs.drop(columns=["time_signature", "tempo", "valence", "liveness", "instrumentalness", "acousticness", "speechiness", "mode", "loudness", "key", "energy", "duration_ms"], inplace=True)
         self.songs.drop_duplicates(subset=["name", 'artists'], inplace=True)
 
-        self.df = pd.read_csv("data//album_ratings.zip")
+        self.df = pd.read_csv("efm_sujet/data/album_ratings.zip")
         self.df.rename(columns={"Artist": "artists"}, inplace=True)
 
         self.songs['id_artists'] = self.songs['id_artists'].astype(str)
@@ -39,7 +39,7 @@ class Song():
         self.Tracks.sort_values(by="danceability", inplace=True, ascending=False)
         
         #???
-        self.songs_pays = pd.read_csv("data/songsbycountry.zip")
+        self.songs_pays = pd.read_csv("efm_sujet/data/songsbycountry.zip")
         
         self.songs_pays.drop(self.songs_pays[self.songs_pays["Country"] == "Global"].index, inplace = True)
         self.songs_pays.drop(columns= ["Continent", "Explicit", "Duration"], inplace=True)
@@ -50,7 +50,7 @@ class Song():
         
         self.songpopularity = self.songs_pays.merge(self.Tracks, how="inner", on=["artists", "name"])
         
-        self.mymap = json.load(open('custom.geo_1.json'))
+        self.mymap = json.load(open('efm_sujet/custom.geo_1.json'))
         
         
         self.main_layout = html.Div(children=[
