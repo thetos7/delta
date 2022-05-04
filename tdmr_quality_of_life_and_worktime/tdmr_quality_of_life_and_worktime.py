@@ -26,26 +26,26 @@ class Tdmr():
             html.Br(),
             html.H4(children="Note moyenne de satisfaction dans la vie et temps de travail hebdomadaire moyen par pays"),
             html.Div([ dcc.Graph(id='satisfaction_graph'), ], style={'width':'100%', }),
+            html.P("Les longs temps de travail semblent impacter négativement la note moyenne que les gens attribuent à leur satisfaction de vie, la régression linéaire affichée représente assez bien la baisse de satisfaction en concordance avec l'augmentation des heures de travail."),
+            html.Br(),
             
             html.H4(children="Proportion de symptomes dépressifs et temps de travail hebdomadaire moyen par pays"),
             html.Div([ dcc.Graph(id='depression_graph'), ], style={'width':'100%', }),
-            html.P("Grace aux deux graphiques précédents et à la régression linéaire affichée on voit une légère tendance se dessiner."),
-            html.P("Les longs temps de travail semblent impacter négativement la note moyenne que les gens attribuent à leur satisfaction."),
-            html.P("D'un autre côté ces mêmes longs temps de travail semblent impacter positivement le taux de symptomes dépressifs en les réduisant."),
-            html.P("Naivement on pourrait penser grace à ces données européennes que les gens perçoivent les longs temps de travail comme un poids sur leur satisfaction mais également qu'ils pourraient être un frein au temps libre et à l'introspection, rendant moins courante l'appartion de symptomes dépressifs."),
+            html.P("Malheureusement ce graphique n'apporte pas de réelle preuve de relation entre le temps de travail moyen et les symptomes dépressifs recensés par pays, plusieurs approches via différentes lignes de tendance ne nous ont pas permi de fournir une représentation simplifiée fidèle montrant quoi que ce soit."),
             html.Br(),
             
             html.H4(children="Espérance de vie et temps de travail hebdomadaire moyen par pays"),
             html.Div([ dcc.Graph(id='expectancy_graph'), ], style={'width':'100%', }),
-            html.P("Il semble se dessiner ici que l'espérance de vie moyenne est négativement impactée par les longs temps de travail hebdomadaire."),
+            html.P("On voit se dessiner grace à la trendline (LOWESS) que l'espérance de vie moyenne d'un pays semble impacter par le temps de travail moyen. Plus précisémment les pays qui ont plus de 38 heures hebdomadaires de travail moyen ont une espérance de vie moyenne significativement inférieure en Europe."),
             html.Br(),
             
             html.H4(children="Fréquence de sentiment de bonheur et temps de travail hebdomadaire moyen par pays"),
             html.Div([ dcc.Graph(id='hapiness_graph'), ], style={'width':'100%', }),
-            html.P("Ce dernier graphe vient renforcer l'idée offerte par le premier en y apportant des détails. Analysons le en deux points :"),
+            html.P("Ce dernier graphe se base sur une étude demandant aux participants à quelle fréquence ils ont ressenti des sentiments de bonheur au cours du dernier mois."),
+            html.P("Il vient renforcer l'idée offerte par le premier en y apportant des détails. Chaque couleur désigne ici une des cinq réponses possibles et les régressions linéaires associées leur leur tendance évolutive en fonction du temps de travail moyen par semaine. Nous pouvous donc les diviser en deux parties :"),
             html.Ul(children=[
-                html.Li("On voit que dans les pays avec un temps de travail moyen inférieur les gens donnent plus souvent des réponses positives comme toujours ou la plupart du temps, visible à leur deux pents descendentes"),
-                html.Li("A l'inverse les autres réponses plus négatives sont toutes en moyenne plus présentes dans les pays où le temps de travail moyen est plus élevé"),
+                html.Li("Les deux courbes descendantes qui représentent les réponses 'positives', moins fréquentes en moyenne dans les pays où le temps de travail moyen est élevé"),
+                html.Li("À contrario les réponses plus négatives représentées par une courbe ascendante marquant en moyenne de sentiments de bonheur moins fréquents dans les pays à temps de travail élevé."),
             ]),
             html.P(""),
             html.Br(),
@@ -121,8 +121,8 @@ class Tdmr():
             x=self.complete_dataframe["Temps de travail par semaine"],    
             y=self.complete_dataframe["Part de symptomes dépressifs (%)"],
             color=self.complete_dataframe["Pays"],
-            trendline="lowess",
-            trendline_scope="overall"
+            #trendline="ols",
+            #trendline_scope="overall"
         )
         return fig
     
@@ -132,7 +132,7 @@ class Tdmr():
             x=self.complete_dataframe["Temps de travail par semaine"],    
             y=self.complete_dataframe["Espérance de vie"],
             color=self.complete_dataframe["Pays"],
-            trendline="ols",
+            trendline="lowess",
             trendline_scope="overall"
         )
         return fig
