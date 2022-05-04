@@ -13,13 +13,16 @@ TRAIN_PATH = PATH_RESOURCES / "meilleurs-temps-des-parcours-des-trains.csv"
 POPUL_PATH = PATH_RESOURCES / "base-pop-historiques-1876-2019.xlsx"
 CITIE_PATH = PATH_RESOURCES / "cities.json"
 
+Coords = Tuple[float, float]
+
+
 def get_train_data() -> pd.DataFrame:
     train_df = pd.read_csv(TRAIN_PATH, sep=";")
     train_df.sort_values("Année", inplace=True)
 
     return train_df.groupby("Relations")
 
-def get_cities() -> dict[str, Tuple[float, float]]:
+def get_cities() -> dict[str, Coords]:
     with open(CITIE_PATH, "r") as f:
         cities = json.load(f)
 
