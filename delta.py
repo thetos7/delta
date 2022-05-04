@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-
+from efm_sujet import Music
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
@@ -12,6 +12,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+mus = Music.Song(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -26,9 +27,10 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
+                              dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/music'),
                               html.Br(),
                               html.Br(),
-                              html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
+                              html.Center(html.A('Source Code', href='https://github.com/Stratcher/delta')),
                           ]),
                  html.Div(id='page_content', className="ten columns"),
             ]),
@@ -52,7 +54,7 @@ app.layout = main_layout
 # "complete" layout (not sure that I need that)
 app.validation_layout = html.Div([
     main_layout,
-    to_be_done_page,
+    mus.main_layout,
     pop.main_layout,
 ])
 
@@ -66,6 +68,8 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/music':
+        return mus.main_layout
     else:
         return home_page
 
