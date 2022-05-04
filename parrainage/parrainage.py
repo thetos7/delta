@@ -16,18 +16,18 @@ class Parrainage():
         self.candidats_list = self.candidats_occurences[self.candidats_occurences > 500].keys()
         
         self.main_layout = html.Div(children=[
-            html.H3(children='Évolution du taux de natalité vs le niveau moyen de revenu par pays'),
-
-            html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'), 
+            html.H3(children='Évolution du nombre de parrainages par candidat à la présidentielle'),
 
             html.Div([
                     html.Div([ dcc.Graph(id='par-main-graph'), ], style={'width':'80%', }),
                     html.Div([
+                        html.Br(),
+                        html.Br(),
                         html.Div('Candidat'),
                         dcc.RadioItems(
                             id='par-candidat',
                             options=[{'label': candidat, 'value': candidat} for candidat in self.candidats_list],
-                            value='Log',
+                            value=self.candidats_list[0],
                             labelStyle={'display':'block'},
                         ),
                         html.Br()
@@ -66,58 +66,32 @@ class Parrainage():
         # (somhow it is more clear to have here all interaction between functions and components)
         self.app.callback(
             dash.dependencies.Output('par-main-graph', 'figure'),
-            [ dash.dependencies.Input('par-crossfilter-xaxis-type', 'value'),
-              dash.dependencies.Input('par-crossfilter-year-slider', 'value')])(self.update_graph)
-        self.app.callback(
-            dash.dependencies.Output('par-div-country', 'children'),
-            dash.dependencies.Input('par-main-graph', 'hoverData'))(self.country_chosen)
-        self.app.callback(
-            dash.dependencies.Output('par-button-start-stop', 'children'),
-            dash.dependencies.Input('par-button-start-stop', 'n_clicks'),
-            dash.dependencies.State('par-button-start-stop', 'children'))(self.button_on_click)
-        # this one is triggered by the previous one because we cannot have 2 outputs for the same callback
-        self.app.callback(
-            dash.dependencies.Output('par-auto-stepper', 'max_interval'),
-            [dash.dependencies.Input('par-button-start-stop', 'children')])(self.run_movie)
-        # triggered by previous
-        self.app.callback(
-            dash.dependencies.Output('par-crossfilter-year-slider', 'value'),
-            dash.dependencies.Input('par-auto-stepper', 'n_intervals'),
-            [dash.dependencies.State('par-crossfilter-year-slider', 'value'),
-             dash.dependencies.State('par-button-start-stop', 'children')])(self.on_interval)
-        self.app.callback(
-            dash.dependencies.Output('par-income-time-series', 'figure'),
-            [dash.dependencies.Input('par-main-graph', 'hoverData'),
-             dash.dependencies.Input('par-crossfilter-xaxis-type', 'value')])(self.update_income_timeseries)
-        self.app.callback(
-            dash.dependencies.Output('par-fertility-time-series', 'figure'),
-            [dash.dependencies.Input('par-main-graph', 'hoverData'),
-             dash.dependencies.Input('par-crossfilter-xaxis-type', 'value')])(self.update_fertility_timeseries)
-        self.app.callback(
-            dash.dependencies.Output('par-pop-time-series', 'figure'),
-            [dash.dependencies.Input('par-main-graph', 'hoverData'),
-             dash.dependencies.Input('par-crossfilter-xaxis-type', 'value')])(self.update_pop_timeseries)
+            [dash.dependencies.Input('par-candidat', 'value')])(self.update_graph)
 
 
-    def update_graph(self, regions, xaxis_type, year):
-        dfg = self.df.loc[year]
-        dfg = dfg[dfg['region'].isin(regions)]
-        fig = px.scatter(dfg, x = "incomes", y = "fertility", 
-                         #title = f"{year}", cliponaxis=False,
-                         size = "population", size_max=60, 
-                         color = "region", color_discrete_map = self.continent_colors,
-                         hover_name="Country Name", log_x=True)
+    def update_graph(self, candidat):
+        # Select candidate
+        parrainages = self.df[self.df['Candidat'] == candidat]
+
+        count_by_date = parrainages.groupby(["Date de publication"]).size()
+
+        index = count_by_date.index
+        index.name = 'date'
+
+        df_count_by_date = pd.DataFrame(
+            {"Parrainages": count_by_date, "Parrainages total": count_by_date.cumsum()}, index=index)
+
+        df_count_by_date = df_count_by_date.reset_index().melt('date', var_name="Catégorie", value_name="y")
+
+        fig = px.line(df_count_by_date, template='plotly_white', x='date', y='y', color='Catégorie')
+        fig.update_traces(hovertemplate='%{y} parrainages le %{x:%d/%m/%y}')
+        fig.update_layout(hovermode="x unified")
         fig.update_layout(
-                 xaxis = dict(title='Revenus net par personnes (en $ US de 2020)',
-                              type= 'linear' if xaxis_type == 'Linéaire' else 'log',
-                              range=(0,100000) if xaxis_type == 'Linéaire' 
-                                              else (np.log10(50), np.log10(100000)) 
-                             ),
-                 yaxis = dict(title="Nombre d'enfants par femme", range=(0,9)),
-                 margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
-                 hovermode='closest',
-                 showlegend=False,
-             )
+            xaxis = dict(title="Date de publication"),
+            yaxis = dict(title="Nombre parrainages"), 
+            height=450,
+            showlegend=True,
+        )
         return fig
 
     def create_time_series(self, country, what, axis_type, title):
