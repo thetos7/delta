@@ -15,17 +15,14 @@ countries_df.rename(columns = {'country': 'CountryName', 'alpha-3': 'CountryCode
 # Keep only the good indicators for us :
 #   - CO2 emission : EN.ATM.CO2E.KT
 #   - Total population : SP.POP.TOTL
-#   - Rural population : SP.RUR.TOTL
 #   - Urban population : SP.URB.TOTL
 indicators_df = indicators_df[(indicators_df.IndicatorCode == "SP.POP.TOTL") |
-    (indicators_df.IndicatorCode == "SP.RUR.TOTL") |
     (indicators_df.IndicatorCode == "SP.URB.TOTL") |
     (indicators_df.IndicatorCode == "EN.ATM.CO2E.KT")]
 
 # Get a clean dataframe
 indicators_df['CO2 emissions (kt)'] = indicators_df.apply(lambda row: (row.Value, 0)[row.IndicatorCode != "EN.ATM.CO2E.KT"], axis = 1)
 indicators_df['Total population'] = indicators_df.apply(lambda row: (row.Value, 0)[row.IndicatorCode != "SP.POP.TOTL"], axis = 1)
-indicators_df['Rural population'] = indicators_df.apply(lambda row: (row.Value, 0)[row.IndicatorCode != "SP.RUR.TOTL"], axis = 1)
 indicators_df['Urban population'] = indicators_df.apply(lambda row: (row.Value, 0)[row.IndicatorCode != "SP.URB.TOTL"], axis = 1)
 
 indicators_df = indicators_df.drop(['IndicatorName', 'IndicatorCode', 'Value'], axis = 1)
@@ -38,6 +35,9 @@ indicators_df = indicators_df[(indicators_df['CO2 emissions (kt)'] != 0) & (indi
 df = pd.merge(indicators_df, countries_df, on = ["CountryCode", "CountryName"])
 RegionName_Column = df.pop("RegionName")
 df.insert(3, 'RegionName', RegionName_Column)
+df['Urban population (%)'] = df.apply(lambda row: (row['Urban population'] / row['Total population']) * 100, axis = 1)
+df['CO2 emissions per person (t)'] = df.apply(lambda row: (row['CO2 emissions (kt)'] / row['Total population']) * 1000, axis = 1)
+
 df = df.sort_values(by = ['Year', 'CountryName'])
 df = df.set_index('Year')
 

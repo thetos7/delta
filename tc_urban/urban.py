@@ -37,13 +37,16 @@ class UrbanPolutionStats():
                                     labelStyle={'display':'block'},
                                 ),
                                 html.Br(),
-                                html.Div('Échelle en X'),
                                 dcc.RadioItems(
                                     id='ups-crossfilter-xaxis-type',
                                     options=[{'label': i, 'value': i} for i in ['Linéaire', 'Log']],
-                                    value='Log',
-                                    labelStyle={'display':'block'},
+                                    value='Linéraire',
+                                    labelStyle={'display':'none'},
                                 ),
+                                html.Br(),
+                                html.Br(),
+                                html.Br(),
+                                html.Br(),
                                 html.Br(),
                                 html.Br(),
                                 html.Br(),
@@ -118,11 +121,10 @@ class UrbanPolutionStats():
                 html.Br(),
                 dcc.Markdown("""
                     #### À propos
-
                     Données :
 
-                    * [Kaggle](https://www.kaggle.com/kaggle/world-development-indicators?select=Indicators.csv)
-                    * [Kaggle](https://www.kaggle.com/datasets/andreshg/countries-iso-codes-continent-flags-url?resource=download&select=countries_continents_codes_flags_url.csv)
+                    * [World developement indicators](https://www.kaggle.com/kaggle/world-development-indicators?select=Indicators.csv)
+                    * [Countries region](https://www.kaggle.com/datasets/andreshg/countries-iso-codes-continent-flags-url?resource=download&select=countries_continents_codes_flags_url.csv)
                 """)
             ],
             style = {
@@ -173,26 +175,21 @@ class UrbanPolutionStats():
         dfg = self.df.loc[year]
         dfg = dfg[dfg['RegionName'].isin(regions)]
         fig = px.scatter(
-            dfg, x = "Urban population", y = "CO2 emissions (kt)", 
-            size = "Urban population", size_max = 60,
+            dfg, x = "Urban population (%)", y = "CO2 emissions per person (t)", 
+            size = "Total population", size_max = 60,
             color = "RegionName", color_discrete_map = self.region_colors,
             hover_name = "CountryName", log_x = True
         )
 
-        x_min = 10 ** int("{:e}".format(dfg['Urban population'].min())[-1])
-        x_max = 10 ** (int("{:e}".format(dfg['Urban population'].max())[-1]) + 1)
-        y_min = 10 ** int("{:e}".format(dfg['CO2 emissions (kt)'].min())[-1])
-        y_max = 10 ** (int("{:e}".format(dfg['CO2 emissions (kt)'].max())[-1]) + 1)
-
         fig.update_layout(
             xaxis = dict(
-                title ='Nombre d\'habitant en zone urbaine',
-                type = 'linear' if xaxis_type == 'Linéaire' else 'log',
-                autorange = True 
+                title ='Poucentage de la population résidant en zone urbaine',
+                type = 'linear',
+                range = (0, 105) 
             ),
             yaxis = dict(
-                title = "Émissions de CO₂ (en kt)",
-                autorange = True
+                title = "Émissions de CO₂ par personne (en t)",
+                range = (-3, 25)
             ),
             margin = {'l': 40, 'b': 30, 't': 10, 'r': 0},
             hovermode = 'closest',
