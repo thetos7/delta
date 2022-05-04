@@ -86,23 +86,23 @@ class DecesFranceRevenu():
         tot = pd.merge(temp, salaire, how = 'left', on='Numéro département')
         tot = tot[['Numéro département', 'Département', 'Population', 'Nombre de morts', 'Nombre de ménages fiscaux', 'Ménages fiscaux imposés (en %)', 'Revenu médian']]
 
-        print(mort_france)
-        print(population)
-        print(salaire)
-        print(temp)
-        print(tot)
 
         list = []
         for i in range (0, 97):
             list.append(100 * tot.iat[i, 3] / tot.iat[i, 2])
         tot['Pourcentage de morts'] = list
-        print(tot)
 
         list = []
         for i in range(0, 97):
-            list.append(tot.iat[i, 6] / tot.iat[i, 7])
+            list.append(tot.iat[i, 6] / tot.iat[i, 3])
+        tot['Revenu/Nombre de morts'] = list
+
+        list = []
+        for i in range(0, 97):
+            list.append(int(tot.iat[i, 6] / tot.iat[i, 7]))
         tot['Revenu/Pourcentage de morts'] = list
-        tot = tot[['Numéro département', 'Département', 'Population', 'Nombre de morts', 'Pourcentage de morts', 'Nombre de ménages fiscaux', 'Ménages fiscaux imposés (en %)', 'Revenu médian', 'Revenu/Pourcentage de morts']]
+
+        tot = tot[['Numéro département', 'Département', 'Population', 'Nombre de morts', 'Pourcentage de morts', 'Nombre de ménages fiscaux', 'Ménages fiscaux imposés (en %)', 'Revenu médian', 'Revenu/Nombre de morts', 'Revenu/Pourcentage de morts']]
 
         return tot
 
@@ -112,11 +112,10 @@ class DecesFranceRevenu():
         self.main_layout = html.Div(children=[
             html.H3(children='Décès en France selon le revenu par département'),
             html.Div([ dcc.Graph(id='drd-main-graph'), ], style={'width':'100%', }),
-            html.Div([ dcc.RadioItems(id='drd-mean',
-                                     options=[{'label':'Courbe seule', 'value':0},
-                                              {'label':'Courbe + Tendence générale', 'value':1},
-                                              {'label':'Courbe + Moyenne journalière (les décalages au 1er janv. indique la tendence)', 'value':2}],
-                                     value=2,
+            html.Div([ dcc.RadioItems(id='drd-value',
+                                     options=[{'label':'Revenu/Pourcentage de morts', 'value':0},
+                                              {'label':'Revenu/Nombre de morts', 'value':1}],
+                                     value=0,
                                      labelStyle={'display':'block'}) ,
                                      ]),
             html.Br(),
@@ -137,23 +136,35 @@ class DecesFranceRevenu():
 
         self.app.callback(
                 dash.dependencies.Output('drd-main-graph', 'figure'),
-                dash.dependencies.Input('drd-mean', 'mean'))(self.update_graph)
+                dash.dependencies.Input('drd-value', 'value'))(self.update_graph)
 
 
-    def update_graph(self, mean):
-        temp = self.df[['Numéro département', 'Pourcentage de morts']]
-        print(temp)
-        fig = px.choropleth_mapbox(temp,
-                geojson=self.departements,
-                locations='Numéro département',
-                featureidkey = 'properties.code',
-                color='Pourcentage de morts',
-                color_continuous_scale="Viridis",
-                mapbox_style="carto-positron",
-                zoom=4.6, center = {"lat": 47, "lon": 2},
-                opacity=0.5,
-                labels={'Pourcentage de morts':'Pourcentage de morts'}
-                )
+    def update_graph(self, value):
+        if value == 0:
+            fig = px.choropleth_mapbox(self.df,
+                    geojson=self.departements,
+                    locations='Numéro département',
+                    featureidkey = 'properties.code',
+                    color='Revenu/Pourcentage de morts',
+                    color_continuous_scale="Viridis",
+                    mapbox_style="carto-positron",
+                    zoom=4.6, center = {"lat": 47, "lon": 2},
+                    opacity=0.5,
+                    labels={'Revenu/Pourcentage de morts':'Revenu/Pourcentage de morts'}
+                    )
+        else:
+            fig = px.choropleth_mapbox(self.df,
+                    geojson=self.departements,
+                    locations='Numéro département',
+                    featureidkey = 'properties.code',
+                    color='Revenu/Nombre de morts',
+                    color_continuous_scale="Viridis",
+                    mapbox_style="carto-positron",
+                    zoom=4.6, center = {"lat": 47, "lon": 2},
+                    opacity=0.5,
+                    labels={'Revenu/Nombre de morts':'Revenu/Nombre de morts'}
+                    )
+
         fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
         return fig
         
