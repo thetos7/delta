@@ -53,7 +53,9 @@ df_lieux = pd.concat([df_2015, df_2016, df_2017, df_2018, df_2019, df_2020])
 df_carac = pd.concat([a, b, c, d, e, f])
 
 df_final = df_lieux.merge(df_carac, on="Num_Acc", how="left",)
-column_list = ["catr", "prof", "surf", "col","atm", "int", "lum", "plan"]
+column_list = ["catr", "prof", "surf", "col","atm", "int", "lum", "plan", "mois", "an"]
 df_final = df_final[column_list]
+for column in df_final:
+    df_final = df_final.loc[df_final[column] >= 0]
+
 df_final.to_csv("final_df.csv")
-df_final.head()
