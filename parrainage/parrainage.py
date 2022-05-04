@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
+import json
 
 class Parrainage():
 
@@ -14,6 +15,10 @@ class Parrainage():
         self.df = pd.read_csv("parrainage/data/parrainagestotal.csv", sep=";")
         self.candidats_occurences = self.df['Candidat'].value_counts()
         self.candidats_list = self.candidats_occurences[self.candidats_occurences > 500].keys()
+
+        with open("parrainage/data/departements.geojson") as f:
+            self.departements_json = json.load(f)
+        self.df_candidat_elected_per_departement = self.df.groupby(["Département"])["Candidat"].value_counts().groupby(level=0, group_keys=False).head(1).to_frame(name="Score").reset_index()
         
         self.main_layout = html.Div(children=[
             html.H3(children='Évolution du nombre de parrainages par candidat à la présidentielle'),
@@ -37,8 +42,9 @@ class Parrainage():
                     'display':'flex',
                     'justifyContent':'center'
                 }),            
-            
             html.Br(),
+            html.Div([ dcc.Graph(id='par-main-map') ], style={'width':'80%', }),
+            html.Div([dcc.RadioItems(id='par-candidat-map')]),       
             dcc.Markdown("""
             #### À propos
 
@@ -54,6 +60,7 @@ class Parrainage():
                  'padding': '10px 50px 10px 50px',
                  }
         )
+
         
         if application:
             self.app = application
@@ -66,8 +73,15 @@ class Parrainage():
         # (somhow it is more clear to have here all interaction between functions and components)
         self.app.callback(
             dash.dependencies.Output('par-main-graph', 'figure'),
-            [dash.dependencies.Input('par-candidat', 'value')])(self.update_graph)
+            [dash.dependencies.Input('par-candidat', 'value')]
+        )(self.update_graph)
 
+        self.app.callback(
+            dash.dependencies.Output('par-main-map', 'figure'),
+            [dash.dependencies.Input('par-candidat-map', 'value')]
+        )(self.display_map)
+    
+        
 
     def update_graph(self, candidat):
         # Select candidate
@@ -92,72 +106,35 @@ class Parrainage():
             height=450,
             showlegend=True,
         )
+
         return fig
+    
+    def display_map(self, _):
+        fig_map = px.choropleth_mapbox(
+            self.df_candidat_elected_per_departement,
+            geojson=self.departements_json,
+            locations='Département',
+            featureidkey="properties.nom",
+            mapbox_style='carto-positron',
+            color="Candidat",
+            # color_discrete_sequence=[1],
+            hover_data={'Candidat': True, 'Score': True},
+            zoom=3.8,
+            center={'lat': 47, 'lon': 2},
+            opacity=1.0,
+        )
 
-    def create_time_series(self, country, what, axis_type, title):
-        return {
-            'data': [go.Scatter(
-                x = self.years,
-                y = self.df[self.df["Country Name"] == country][what],
-                mode = 'lines+markers',
-            )],
-            'layout': {
-                'height': 225,
-                'margin': {'l': 50, 'b': 20, 'r': 10, 't': 20},
-                'yaxis': {'title':title,
-                          'type': 'linear' if axis_type == 'Linéaire' else 'log'},
-                'xaxis': {'showgrid': False}
+        fig_map.update_layout(
+            title={
+                'text': f"Candidat parrainé par département",
+                'y':0.95,
+                'x':0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'
             }
-        }
+        )
 
-
-    def get_country(self, hoverData):
-        if hoverData == None:  # init value
-            return self.df['Country Name'].iloc[np.random.randint(len(self.df))]
-        return hoverData['points'][0]['hovertext']
-
-    def country_chosen(self, hoverData):
-        return self.get_country(hoverData)
-
-    # graph incomes vs years
-    def update_income_timeseries(self, hoverData, xaxis_type):
-        country = self.get_country(hoverData)
-        return self.create_time_series(country, 'incomes', xaxis_type, 'PIB par personne (US $)')
-
-    # graph children vs years
-    def update_fertility_timeseries(self, hoverData, xaxis_type):
-        country = self.get_country(hoverData)
-        return self.create_time_series(country, 'fertility', xaxis_type, "Nombre d'enfants par femme")
-
-    # graph population vs years
-    def update_pop_timeseries(self, hoverData, xaxis_type):
-        country = self.get_country(hoverData)
-        return self.create_time_series(country, 'population', xaxis_type, 'Population')
-
-    # start and stop the movie
-    def button_on_click(self, n_clicks, text):
-        if text == self.START:
-            return self.STOP
-        else:
-            return self.START
-
-    # this one is triggered by the previous one because we cannot have 2 outputs
-    # in the same callback
-    def run_movie(self, text):
-        if text == self.START:    # then it means we are stopped
-            return 0 
-        else:
-            return -1
-
-    # see if it should move the slider for simulating a movie
-    def on_interval(self, n_intervals, year, text):
-        if text == self.STOP:  # then we are running
-            if year == self.years[-1]:
-                return self.years[0]
-            else:
-                return year + 1
-        else:
-            return year  # nothing changes
+        return fig_map
 
     def run(self, debug=False, port=8050):
         self.app.run_server(host="0.0.0.0", debug=debug, port=port)
