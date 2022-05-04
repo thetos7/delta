@@ -1,21 +1,23 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import tarfile
 
 def get_data():
+
+    my_tar = tarfile.open('resources.tar.gz')
+    my_tar.extractall('.') # specify which folder to extract to
+    my_tar.close()
+
     usecols = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE', 'nrg_bal']
     usecols_import_export = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE', 'partner']
     prod_cons = pd.read_csv('resources/conso_production_petrole.csv', usecols=usecols)
     prod_cons = prod_cons[prod_cons.unit != "NR"]
-    prod_cons = prod_cons[prod_cons.geo != "EU27_2020"]
-    prod_cons = prod_cons[prod_cons.geo != "EA19"]
-    prod_cons = prod_cons[prod_cons.geo != "EU28"]
+    prod_cons = prod_cons[~prod_cons.geo.isin(["EU27_2020", "EA19", "EU28"])]
     prod = prod_cons[prod_cons.nrg_bal == "IPRD"]
     cons = prod_cons[prod_cons.nrg_bal == "FC"]
     export = pd.read_csv('resources/export_petrole.csv', usecols=usecols_import_export)
     export = export[export.unit != "NR"]
-    export = export[export.geo != "EU27_2020"]
-    export = export[export.geo != "EA19"]
-    export = export[export.geo != "EU28"]
+    export = export[~export.geo.isin(["EU27_2020", "EA19", "EU28"])]
     impor = pd.read_csv('resources/import_petrole.csv', usecols=usecols_import_export)
     impor = impor[impor.unit != "NR"]
     impor = impor[impor.partner != "TOTAL"]
