@@ -12,9 +12,15 @@ import dateutil as du
 from scipy import stats
 from scipy import fft
 from scipy import signal
+import base64
 
 # à commenter (pas besoin de regénérer les données à chaque fois)
 #import ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant.get_data
+
+def b64_image(image_filename):
+    with open(image_filename, 'rb') as f:
+        image = f.read()
+    return 'data:image/png;base64,' + base64.b64encode(image).decode('utf-8')
 
 
 class Pollution():
@@ -112,6 +118,8 @@ class Pollution():
             dcc.Markdown("""La courbe des températures semble suivre le même cycle saisonnier que les valeurs de concentration des gazs étudiés. Alors s'agit-il d'une simple coïncidence ? Eh bien pas tout à fait. Tout d'abord le chauffage au fioul implique une consommation plus grande d'hydrocarbures en hiver qu'en été, mais les basses températures favorisent également la stagnation des polluants dans l'air : http://www.atmo-grandest.eu/actualite/pourquoi-le-froid-favorise-la-pollution-atmospherique. Cela est notamment appuyé par les concentration en SO2 également en hausse en hiver alors que sa production reste relativement stable au cours de l'année.  
             Maintenant comment expliquer la courbe de l'O3 qui ne semble pas suivre celle du NO2 et du CO alors que ce gaz est un sous produit de dégradation de ces 2 derniers lorsque exposés aux ultraviolets ? Il se trouve que l'O3 n'est pas seulement créé à partir de NO2 et de CO, ces gazs peuvent aussi le dégrader lorsque les ultraviolets permettant sa création ne suffisent pas à compenser sa dégradation. Lorsque l'intensité des ultraviolets est basse comme en hiver ou ces derniers doivent pénétrer une couche plus grande d'atmosphère à cause de l'inclinaison de la Terre, les NOx et COV dégradent donc plus l'ozone qu'ils ne participent à sa production : https://www.irceline.be/fr/documentation/faq/pourquoi-les-concentrations-d2019ozones-sont-elles-plus-elevees-dans-les-campagnes-que-dans-les-villes  
             Les concentrations d'O3 baissent donc en hiver et augmentent en été, en accord avec les données recueillies."""),
+            dcc.Markdown("""Au sujet de la pollution en légère baisse, on ne peut que spéculer car la consommation d'hydrocarbures ne semble, elle, pas décroître d'après le graphique ci-dessous décrivant la consommation d\'hydrocarbures aux Etats-Unis de 1998 à 2020. On peut supposer que d'autres énergies fossiles combustibles comme le charbon sont en baisse d'utilisation."""),
+            html.Img(src=b64_image('ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant/data/consommation.png'), title='Consommation d\'hydrocarbures aux Etats-Unis de 1998 à 2020'),
             html.Br(),
             dcc.Markdown("""Sources du projet :  
             - Données de pollution : https://www.kaggle.com/datasets/alpacanonymous/us-pollution-20002021  
