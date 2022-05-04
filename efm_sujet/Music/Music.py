@@ -52,47 +52,61 @@ class Song():
         
         self.mymap = json.load(open('custom.geo_1.json'))
         
-        '''
-        self.country =  self.songpopularity[self.songpopularity["Country"] == "France"]
-        
-        #piechart
-        l = []
-        for c in list(self.country.genres):
-            t.extend(c)
-
-        piedata = pd.DataFrame(data = l, columns=["occ"])
-        piedata = pd.DataFrame(piedata.groupby("occ")['occ'].count())
-        '''
         
         self.main_layout = html.Div(children=[
+            
             dcc.Markdown('''
-            # BEST GENRE OVER THE YEAR
+            ## Facteurs de popularité des musiques
             '''),
+            
+            html.H3(children='BEST GENRE OVER THE YEAR'),
+
+                        
+
             html.Div([
                 dcc.Graph(id = "barplot"),
                 dcc.Dropdown(["AOTY Critic Score", "AOTY User Score", "Metacritic Critic Score", "Metacritic User Score"],
                              "AOTY Critic Score", id = "barplot_y"),
                 dcc.Dropdown(sorted(self.df["Release Year"].unique().tolist(), reverse=True), 2018, id = "barplot_year"),
-                dcc.Dropdown([5, 10, 20, 50 ], 10, id = "barplot_n")])
-               
+                dcc.Dropdown([5, 10, 20, 50 ], 10, id = "barplot_n")]),
+            
+            dcc.Markdown('''
+            ### Ajouter des commantaires ICI
+            ''')
         ])
 
         self.artists_layout = html.Div(children=[
+            html.H3(children='BEST GENRE OVER THE YEAR'),
             html.Div([
-                dcc.Markdown('''
-            # ARTISTS & THEIR FOLLOWERS
-            '''),
                 dcc.Graph(id = "corrplot", figure = self.createcorrplot())
-            ])
+            ]),
+            
+            dcc.Markdown('''
+            Ajouter des commantaires ici
+            ''')
         ])
         
-        self.country_layout = html.Div(children=[html.Div([
-                dcc.Markdown('''
-            # COUNTRY & MOST POPULAR GENRE
-            '''),
+        self.country_layout = html.Div(children=[
+            html.H3(children='COUNTRY & MOST POPULAR GENRE'),
+
+            html.Div([
                 dcc.Graph(id = "map", figure = self.createMap(), style={"padding" : "100px" }),
                 dcc.Graph(id = "pieChart")
-            ])
+            ]),
+            
+            dcc.Markdown('''
+                Ce graphique est interractif...
+            '''),
+            dcc.Markdown("""
+               #### À propos
+
+               * Données : 
+                   - [Spotify Dataset 1921-2020, 600k+ Tracks](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks)
+                   - [Contemporary album ratings and reviews](https://www.kaggle.com/datasets/kauvinlucas/30000-albums-aggregated-review-ratings)
+                   - [Top 50 Spotify songs BY EACH COUNTRY](https://www.kaggle.com/datasets/leonardopena/top-50-spotify-songs-by-each-country)
+               * (c) 2022 Alexandre Castello & Jacky Wu
+               """),
+
         ])
         
 
