@@ -3,7 +3,8 @@ from dash import dcc
 from dash import html
 from energies import energies
 from population import population
-from deces import deces
+from MC_AB_consommationEtProductionEnergétique import petrole
+#from deces import deces
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -11,7 +12,8 @@ app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # ,
 server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
-dec = deces.Deces(app)
+#dec = deces.Deces(app)
+pet = petrole.Petrole(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -26,6 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
+                              dcc.Link(html.Button('Pétrole en Europe', style={'width':"100%"}), href='/petrole'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -64,8 +67,10 @@ def display_page(pathname):
         return nrg.main_layout
     elif pathname == '/population':
         return pop.main_layout
-    elif pathname == '/deces':
-        return dec.main_layout
+    #elif pathname == '/deces':
+    #    return dec.main_layout
+    elif pathname == '/petrole':
+        return pet.main_layout
     else:
         return home_page
 
