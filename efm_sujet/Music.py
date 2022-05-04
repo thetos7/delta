@@ -10,45 +10,13 @@ import json
 class Song():
     
     def __init__(self, application = None):
-        self.s_artists = pd.read_csv("efm_sujet/data/artists.zip", converters={2:ast.literal_eval})
-        self.s_artists = self.s_artists.rename(columns={"name":"artists"})
-
-        self.songs = pd.read_csv("efm_sujet/data/tracks.zip")
-        self.songs.drop(self.songs[self.songs["popularity"] == 0].index, inplace = True)
-        self.songs.drop(columns=["time_signature", "tempo", "valence", "liveness", "instrumentalness", "acousticness", "speechiness", "mode", "loudness", "key", "energy", "duration_ms"], inplace=True)
-        self.songs.drop_duplicates(subset=["name", 'artists'], inplace=True)
-
-        self.df = pd.read_csv("efm_sujet/data/album_ratings.zip")
-        self.df.rename(columns={"Artist": "artists"}, inplace=True)
-
-        self.songs['id_artists'] = self.songs['id_artists'].astype(str)
-        self.songs['id_artists'] = self.songs['id_artists'].apply(lambda x: (x[2:])[:-2])
-        self.songs['artists'] = self.songs['artists'].astype(str)
-        self.songs['artists'] = self.songs['artists'].apply(lambda x: (x[2:])[:-2])
-        
-        #Join entre les datasets
-        self.artists = self.df.merge(self.s_artists, how="inner", on = "artists")
-        self.artists = self.artists.dropna()
-        self.artists = self.artists.rename(columns={"id": "id_artists"})
-
-        self.artists = self.artists.sort_values(by= "followers", ascending=False)
-
-        self.Tracks = self.songs.merge(self.artists, how="inner", on = ["artists", "id_artists"])
-        self.Tracks.drop_duplicates(subset="name", inplace=True, ignore_index=True)
-        
-        self.Tracks.sort_values(by="danceability", inplace=True, ascending=False)
-        
-        #???
-        self.songs_pays = pd.read_csv("efm_sujet/data/songsbycountry.zip")
-        
-        self.songs_pays.drop(self.songs_pays[self.songs_pays["Country"] == "Global"].index, inplace = True)
-        self.songs_pays.drop(columns= ["Continent", "Explicit", "Duration"], inplace=True)
-        self.songs_pays.rename(columns={"Title":"name", "Artists":"artists"}, inplace=True)
-
-        self.head_country = self.songs_pays[self.songs_pays["Rank"] == 1].reset_index()
-        self.head_country["index"] = self.head_country.index
-        
-        self.songpopularity = self.songs_pays.merge(self.Tracks, how="inner", on=["artists", "name"])
+        self.songs = pd.read_pickle("efm_sujet/data/songs.pkl")
+        self.df = pd.read_pickle("efm_sujet/data/df.pkl")
+        self.artists = pd.read_pickle("efm_sujet/data/artists.pkl")
+        self.Tracks = pd.read_pickle("efm_sujet/data/Tracks.pkl")
+        self.songs_pays = pd.read_pickle("efm_sujet/data/songs_pays.pkl")
+        self.head_country = pd.read_pickle("efm_sujet/data/head_country.pkl")
+        self.songpopularity = pd.read_pickle("efm_sujet/data/songpopularity.pkl")
         
         self.mymap = json.load(open('efm_sujet/custom.geo_1.json'))
         
