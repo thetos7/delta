@@ -220,7 +220,7 @@ class Eletricite():
                 * Nous pouvons observer les différents pic de production d'électricité entre les saisons hivernales et estival. Avec une plus grande production en hiver. Nous pouvons notamment le remarqué avec l'oscillation de la production de nucléaire.
                 * Sur quasimment tous les 25 décembre, il y a une chute de production d'électricité dans le nucléaire.  
                 * Avec la fermeture de la central nucléaire de Fessenheim courant 2020, la part de production du nucléaire a baissé et celle de l'hydraulique a augmenté.  
-                * En août 2018, il y a une baisse du prix de l'électricité grâce à la commission de régulation d'Énergie qui a recommandé au gouvernement Français de baisser les prix de 0.8% pour 
+                * En août 2018, il y a une baisse du prix de l'électricité grâce à la commission de régulation d'Énergie qui a recommandé au gouvernement Français de baisser les prix de 0.7% pour les particuliers et de 1.7% pour les professionnels.
                 * Le nucléaire représente la filière de production principale d'électricité en France, devant l'hydraulique  
                 \n
 
