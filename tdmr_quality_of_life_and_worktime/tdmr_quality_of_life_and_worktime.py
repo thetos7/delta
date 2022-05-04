@@ -20,7 +20,7 @@ class Tdmr():
         self.main_layout = html.Div(children=[
             html.H3(children="Impact du temps de travail sur la vie en Europe"),
             html.H5(children="Tanguy Desgouttes et Marc-Emmanuel Raiffe"),
-            html.P("L'idée derrière ce sujet inspirée entre autre par un subreddit (r/antiwork) est de voir si il se dégage une relation ou tendance générale entre le temps de travail moyen des habitants d'un pays et la qualité de leur vie."),
+            html.P("Le but est de voir s'il se dégage une relation ou une tendance générale entre le temps de travail moyen des habitants d'un pays et la qualité de leur vie. Ce sujet s'inspire en partie des idées de la communauté reddit 'antiwork' (reddit.com/r/antiwork/)."),
             html.P("Pour cela on compare ici la moyenne du temps de travail par pays en Europe différents facteurs."),
             
             html.Br(),
