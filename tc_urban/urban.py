@@ -7,12 +7,14 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
+import json
 
 class UrbanPolutionStats():
     START = 'Start'
     STOP  = 'Stop'
 
     def __init__(self, application = None):
+        self.map = json.load(open('tc_urban/data/custom.geo.json'))
         self.df = pd.read_pickle('tc_urban/data/countriesData.pkl')
         self.french = {'Asia':'Asie', 'Europe':'Europe', 'Africa':'Afrique', 'Oceania':'Océanie', 'Americas':'Amériques'}
         self.region_colors = {'Asia':'gold', 'Europe':'green', 'Africa':'brown', 'Oceania':'red', 'Americas':'navy'}
@@ -21,6 +23,66 @@ class UrbanPolutionStats():
         self.main_layout = html.Div(
             children = [
                 html.H3('Évolution des émissions de CO₂ vs la population en zone urbaine par pays'),
+
+                # Years slider
+                html.Div(
+                    children = [
+                        html.Div(
+                            dcc.Slider(
+                                id='ups-crossfilter-year-slider',
+                                min=self.years[0],
+                                max=self.years[-1],
+                                step = 1,
+                                value=self.years[0],
+                                marks={str(year): str(year) for year in self.years[::5]},
+                            ),
+                            style = {
+                                'display':'inline-block',
+                                'width':"80%"
+                            }
+                        ),
+                        dcc.Interval(
+                            id='ups-auto-stepper',
+                            interval=500,
+                            max_intervals = -1,
+                            n_intervals = 0
+                        ),
+                        html.Button(
+                            self.START,
+                            id='ups-button-start-stop', 
+                            style = {
+                                'display':'inline-block',
+                                'width':"10%",
+                                'vertical-align':'center'
+                            }
+                        ),
+                    ],
+                    style = {
+                        'padding': '0px 50px', 
+                        'width':'100%'
+                    }
+                ),
+
+                html.Br(),
+                html.Br(),
+
+                # Maps
+                html.Div(
+                    children = [
+                        dcc.Graph(id='ups-urbanpop-map', style={'width':'50%', 'display':'inline-block'}),
+                        dcc.Graph(id='ups-emission-map', style={'width':'50%', 'display':'inline-block'})
+                    ],
+                    style = {
+                        'display':'flex', 
+                        'borderTop': 'thin lightgrey solid',
+                        'borderBottom': 'thin lightgrey solid',
+                        'justifyContent':'center'
+                    }
+                ),
+
+                html.Br(),
+                html.Br(),
+
                 html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'),
 
                 # Main graph
@@ -43,19 +105,6 @@ class UrbanPolutionStats():
                                     value='Linéraire',
                                     labelStyle={'display':'none'},
                                 ),
-                                html.Br(),
-                                html.Br(),
-                                html.Br(),
-                                html.Br(),
-                                html.Br(),
-                                html.Br(),
-                                html.Br(),
-                                html.Br(),
-                                html.Button(
-                                    self.START,
-                                    id='ups-button-start-stop', 
-                                    style={'display':'inline-block'}
-                                ),
                             ],
                             style = {
                                 'margin-left':'15px',
@@ -68,36 +117,6 @@ class UrbanPolutionStats():
                         'padding': '10px 50px', 
                         'display':'flex',
                         'justifyContent':'center'
-                    }
-                ),
-
-                # Years slider
-                html.Div(
-                    children = [
-                        html.Div(
-                            dcc.Slider(
-                                id='ups-crossfilter-year-slider',
-                                min=self.years[0],
-                                max=self.years[-1],
-                                step = 1,
-                                value=self.years[0],
-                                marks={str(year): str(year) for year in self.years[::5]},
-                            ),
-                            style = {
-                                'display':'inline-block',
-                                'width':"90%"
-                            }
-                        ),
-                        dcc.Interval(
-                            id='ups-auto-stepper',
-                            interval=500,
-                            max_intervals = -1,
-                            n_intervals = 0
-                        ),
-                    ],
-                    style = {
-                        'padding': '0px 50px', 
-                        'width':'100%'
                     }
                 ),
 
@@ -125,6 +144,7 @@ class UrbanPolutionStats():
 
                     * [World developement indicators](https://www.kaggle.com/kaggle/world-development-indicators?select=Indicators.csv)
                     * [Countries region](https://www.kaggle.com/datasets/andreshg/countries-iso-codes-continent-flags-url?resource=download&select=countries_continents_codes_flags_url.csv)
+                    * [World map](https://geojson-maps.ash.ms/)
                 """)
             ],
             style = {
@@ -138,6 +158,12 @@ class UrbanPolutionStats():
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
         
+        self.app.callback(
+            dash.dependencies.Output('ups-urbanpop-map', 'figure'),
+            [dash.dependencies.Input('ups-crossfilter-year-slider', 'value')])(self.update_urbanpop_map)
+        self.app.callback(
+            dash.dependencies.Output('ups-emission-map', 'figure'),
+            [dash.dependencies.Input('ups-crossfilter-year-slider', 'value')])(self.update_emission_map)
         self.app.callback(
             dash.dependencies.Output('ups-main-graph', 'figure'),
             [ dash.dependencies.Input('ups-crossfilter-which-region', 'value'),
@@ -195,6 +221,33 @@ class UrbanPolutionStats():
             hovermode = 'closest',
             showlegend = False
         )
+        return fig
+
+    def update_urbanpop_map(self, year):
+        dfg = self.df.loc[year]
+        fig = px.choropleth_mapbox(dfg, geojson=self.map, 
+                                locations='CountryName', featureidkey = 'properties.name', # join keys
+                                color='Urban population (%)', color_continuous_scale="Viridis",
+                                mapbox_style="carto-positron",
+                                zoom=0, center = {"lat": 47, "lon": 2},
+                                opacity=0.5,
+                                labels={'Urban population (%)':'Urban population (%)'}
+                                )
+        fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+        return fig
+
+    
+    def update_emission_map(self, year):
+        dfg = self.df.loc[year]
+        fig = px.choropleth_mapbox(dfg, geojson=self.map, 
+                                locations='CountryName', featureidkey = 'properties.name', # join keys
+                                color='CO2 emissions per person (t)',
+                                mapbox_style="carto-positron",
+                                zoom=0, center = {"lat": 47, "lon": 2},
+                                opacity=0.5,
+                                labels={'CO2 emissions per person (t)':'CO2 emissions per person (t)'}
+                                )
+        fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
         return fig
 
     def create_time_series(self, country, what, axis_type, title):
