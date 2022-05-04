@@ -13,19 +13,75 @@ from scipy import stats
 from scipy import fft
 import datetime
 
+Y_AXIS_OPTIONS = [
+  {'label' : 'Postive', 'value' : 'pos'},
+  {'label' : 'Postive 7-jours', 'value' : 'pos_7j'},
+  {'label' : 'Hospitalisés', 'value' : 'hosp'},
+  {'label' : 'Réanimation', 'value' : 'rea'},
+  {'label' : 'Décès à l’hôpital', 'value' : 'incid_dchosp'},
+]
+
+MONTHS_YEARS = {
+  0 : '2020 May',
+  1 : '2020 June',
+  2 : '2020 July',
+  3 : '2020 August',
+  4 : '2020 September',
+  5 : '2020 October',
+  6 : '2020 November',
+  7 : '2020 December',
+  8 : '2021 January',
+  9 : '2021 February',
+  10 : '2021 March',
+  11 : '2021 April',
+  12 : '2021 May',
+  13 : '2021 June',
+  14 : '2021 July',
+  15 : '2021 August',
+  16 : '2021 September',
+  17 : '2021 October',
+  18 : '2021 November',
+  19 : '2021 December',
+  20 : '2022 January',
+  21 : '2022 February',
+  22 : '2022 March',
+  23 : '2022 April',
+  24 : '2022 May'
+}
 class CovidBasics():
     def __init__(self, application = None):
+        # Main df
         self.df = pd.read_pickle('data/covid-all-stats-departments.pkl')
+
+        # Sidescroll df
+        self.month_year_df = self.df.reset_index()
+        self.month_year_df['month'] = pd.to_datetime(self.month_year_df['date']).dt.month_name() 
+        self.month_year_df['year'] = pd.to_datetime(self.month_year_df['date']).dt.year
+        self.month_year_df = self.month_year_df.groupby(['year', 'month', 'lib_reg']).sum().reset_index()
+
+        # 2021
+        self.regions_2021 = self.df.reset_index()
+        self.regions_2021['month'] = pd.to_datetime(self.regions_2021['date']).dt.month_name() 
+        self.regions_2021['year'] = pd.to_datetime(self.regions_2021['date']).dt.year     
+        self.regions_2021 = self.regions_2021[self.regions_2021.year == 2021].groupby(['lib_reg', 'month']).mean().reset_index()
+
+        self.radio_options = [
+          { 'label': reg, 'value': reg }
+          for reg in self.df['lib_reg'].drop_duplicates().values
+        ]
+        self.radio_options.append({ 'label': 'France', 'value': 'France' })
 
         self.main_layout = html.Div(children=[
             html.H3(children='Covid Basics'),
             html.Div([ dcc.Graph(id='cvd-main-graph'), ], style={'width':'100%', }),
-            html.Div([ dcc.RadioItems(id='cvd-dep', 
-                                     options=[{'label':'Paris', 'value': '05'},
-                                              {'label':'Haute-Saône', 'value': '07'}], 
-                                     value='70',
-                                     labelStyle={'display':'block'}) ,
-                                     ]),
+            html.Div([
+              html.Div([ html.Div('Region'), dcc.Dropdown(id='cvd-region', 
+                                      options=self.radio_options,
+                                      value='Île-de-France')], style={'width': '15em', 'display': 'inline-block'}),
+              html.Div([ html.Div('Y Axis'), dcc.RadioItems(id='cvd-yaxis', 
+                                      options=Y_AXIS_OPTIONS,
+                                      value='pos_7j')], style={'width': '15em', 'display': 'inline-block'}),
+            ]),
             html.Br(),
             dcc.Markdown("""
             Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
@@ -35,8 +91,65 @@ class CovidBasics():
             
             Notes :
                * On observe qu'il n'y avait pas de recensement au début de l'épidémie.
-               * On peut notamment voir les deux pics de cas, Octobre-Novembre 2020, amenant au 2nd confinement, et Janvier 2022.
-            """)
+               * On peut notamment voir les deux pics de cas, Octobre-Novembre '2020', amenant au 2nd confinement, et Janvier 2022.
+            """),
+          html.Div([
+                    html.Div([ dcc.Graph(id='cvd-slider_grpah'), ], style={'width':'90%', }),
+                    html.Div([
+                        html.Div('Y Axis'),
+                        dcc.RadioItems(id='cvd-yaxis-slider', 
+                                      options=Y_AXIS_OPTIONS,
+                                      value='pos_7j')
+                    ], style={'margin-left':'15px', 'width': '7em', 'float':'right'}),
+                ], style={
+                    'padding': '10px 50px', 
+                    'display':'flex',
+                    'justifyContent':'center'
+                }),           
+            
+            html.Div([
+                html.Div(
+                    dcc.Slider(
+                            id='cvd-year-slider',
+                            marks={key : {"label": MONTHS_YEARS[key], "style": {"transform": "rotate(45deg)"}} for key in MONTHS_YEARS},
+                            step = 1,
+                            value = 0,
+                    ),
+                    style={'display':'inline-block', 'width':"80%"}
+                ),
+                ], style={
+                    'padding': '0px 50px', 
+                    'width':'100%'
+                }),
+            html.Br(),
+            dcc.Markdown("""
+            Right some shit here mr mec like how much of a bitch you are
+            Right some shit here mr mec like how much of a bitch you are
+            Right some shit here mr mec like how much of a bitch you are
+            Right some shit here mr mec like how much of a bitch you are
+            Right some shit here mr mec like how much of a bitch you are
+            """),
+            html.Div([
+                    html.Div([ dcc.Graph(id='cvd-2021-graph'), ], style={'width':'90%', }),
+                    html.Div([
+                        html.Div('Y Axis'),
+                        dcc.RadioItems(id='cvd-2021-yaxis', 
+                                      options=Y_AXIS_OPTIONS,
+                                      value='pos_7j')
+                    ], style={'margin-left':'15px', 'width': '7em', 'float':'right'}),
+                ], style={
+                    'padding': '10px 50px', 
+                    'display':'flex',
+                    'justifyContent':'center'
+                }),  
+          html.Br(),
+            dcc.Markdown("""
+            Right some shit here mr mec like how much of a bitch you are
+            Right some shit here mr mec like how much of a bitch you are
+            Right some shit here mr mec like how much of a bitch you are
+            Right some shit here mr mec like how much of a bitch you are
+            Right some shit here mr mec like how much of a bitch you are
+            """),
         ], style={
             'backgroundColor': 'white',
              'padding': '10px 50px 10px 50px',
@@ -53,29 +166,66 @@ class CovidBasics():
         # self.app.callback(dash.dependencies.Output('cvd-main-graph', 'figure'))(self.update_graph)
         self.app.callback(
                     dash.dependencies.Output('cvd-main-graph', 'figure'),
-                    dash.dependencies.Input('cvd-dep', 'value'))(self.update_graph)
+                    dash.dependencies.Input('cvd-region', 'value'),
+                    dash.dependencies.Input('cvd-yaxis', 'value'))(self.update_graph)
 
-    def update_graph(self, dep):
+        self.app.callback(
+                    dash.dependencies.Output('cvd-slider_grpah', 'figure'),
+                    dash.dependencies.Input('cvd-year-slider', 'value'),
+                    dash.dependencies.Input('cvd-yaxis-slider', 'value'))(self.slider_graph)
 
-        # deps = ['70', '05', '31', '50']
-        deps_df = self.df.loc[dep].reset_index()
+        self.app.callback(
+                    dash.dependencies.Output('cvd-2021-graph', 'figure'),
+                    dash.dependencies.Input('cvd-2021-yaxis', 'value'))(self.scatter_graph)
+
+    def scatter_graph(self, yaxis):
+      fig = px.line(
+          self.regions_2021,
+          template='plotly_white',
+          x='month',
+          y=yaxis,
+          color='lib_reg',
+          title='Mean results for 2021'
+        )
+      return fig
+
+    def slider_graph(self, slider, yaxis):
+      if slider == None:
+        slider = 0
+
+      month_year = MONTHS_YEARS[slider]
+      month, year = month_year.split(' ')[1], month_year.split(' ')[0]
+
+      df = self.month_year_df[
+        (self.month_year_df.year == int(year)) & 
+        (self.month_year_df.month == month)
+      ]
+
+      fig = px.bar(
+          df,
+          template='plotly_white',
+          x='lib_reg',
+          y=yaxis,
+          color='lib_reg',
+          title='Results per month'
+        )
+      fig.update_layout(showlegend=False)
+      return fig
+
+    def update_graph(self, region, yaxis):
+        if region == 'France':
+          regions_df = self.df.reset_index().groupby('date').sum().reset_index()
+        else:
+          regions_df = self.df[self.df['lib_reg'] == region].reset_index()\
+
         fig = px.line(
-          deps_df,
+          regions_df,
           template='plotly_white',
           x='date',
-          y='pos_7j',
-          # color='dep'
+          y=yaxis,
+          color='lib_dep' if region != 'France' else None,
+          title='Entire results from beginning of pandemic'
         )
-
-        # fig.update_traces(hovertemplate='%{y} décès le %{x:%d/%m/%y}', name='')
-        # fig.update_layout(
-        #     #title = 'Évolution des prix de différentes énergies',
-        #     xaxis = dict(title=""), # , range=['2010', '2021']), 
-        #     yaxis = dict(title="Nombre de décès par jour"), 
-        #     height=450,
-        #     showlegend=False,
-        # )
-       
         return fig
 
         
