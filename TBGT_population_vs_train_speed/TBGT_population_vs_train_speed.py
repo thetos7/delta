@@ -67,8 +67,8 @@ class TBGT:
 
         self.main_layout = html.Div(children=[
             html.H3(children=
-                "Évolution de la population par rapport au "
-                "développement des grandes lignes en France"
+                "Évolution de la population des villes françaises"
+                " vis-à-vis du développement des grandes lignes SNCF"
             ),
             dcc.Graph(id="map", figure=self._get_map()),
             self._get_relations_radio(),
