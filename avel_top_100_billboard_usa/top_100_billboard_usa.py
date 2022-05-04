@@ -3,6 +3,7 @@ import dash
 import flask
 from dash import dcc
 from dash import html, Dash, Output, Input, dash_table
+# import dash_design_kit as ddk
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
@@ -34,6 +35,16 @@ class Top100BillboardUSA:
         # Creating the Dash application
         self.app = Dash(__name__) if application is None else application
         self.app.layout = self.main_layout
+        app = dash.Dash(__name__)
+
+        """self.app.layout = ddk.App([
+            ddk.Header([
+                ddk.Menu(dcc.Link(page['name'], href=page['path']))
+                for page in dash.page_registry
+            ]),
+
+            dash.page_container
+        ])"""
 
         # Adding callbacks
         self.callbacks()
@@ -60,7 +71,7 @@ class Top100BillboardUSA:
             dcc.Markdown('''
             Un large pic est visible à la 20e semaine.   
             En grossissant on voit également la 52e semaine sortant de la tendance.   
-            Regardons ce même graphique par année. => lien autre page ?   
+            Regardons ce même graphique par année. => lien autre page ? [test](/recurrent_rule)   
             Il semblerait que le début des années 90 marque l'arrivée de cette tendance non proportionelle.   
             Il s'avère qu'à la fin de l'année 1991, le Billboard a institué une "règle de récurrence",   
             stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si elles se classent en dessous de la 50e place.   
