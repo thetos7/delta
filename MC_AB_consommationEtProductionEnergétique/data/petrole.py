@@ -35,7 +35,6 @@ class Independance_Petrole():
 
         for i in self.europe["features"]:
             fips = i["properties"]["iso_a2"]
-            #print(fips)
             i["id"] = fips
         
         self.main_layout = html.Div(children=[
@@ -57,28 +56,28 @@ class Independance_Petrole():
                          ], style={'position': 'sticky', 'top': 0, 'zIndex': 1, 'backgroundColor': 'white', 'width': '100%', 'padding':'4em 0px 0px 0px'}), # bas D haut G
             html.Div([
                 html.Div([
-                    html.Div('Importations de petrole par pays:'),
+                    html.H2('Importations de petrole par pays:'),
                     html.Div([ dcc.Graph(id='import-graph'), ], style={'width': '55em' })]),
                 html.Div([
-                    html.Div('Exportations de petrole par pays:'),
+                    html.H2('Exportations de petrole par pays:'),
                     html.Div([ dcc.Graph(id='export-graph'), ], style={'width': '55em'})])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
                 html.Div([
-                    html.Div('Consommation de petrole par pays:'),
+                    html.H2('Consommation de petrole par pays:'),
                     html.Div([ dcc.Graph(id='cons-graph'), ], style={'width': '55em' })]),
                 html.Div([
-                    html.Div('Production de petrole par pays:'),
+                    html.H2('Production de petrole par pays:'),
                     html.Div([ dcc.Graph(id='prod-graph'), ], style={'width': '55em'})])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
                 html.Div([
-                    html.Div('Excedent de petrole par pays, calculé par Exc = production + importation - exportation - consommation :'),
+                    html.H2('Excedent de petrole par pays, calculé par Exc = production + importation - exportation - consommation :'),
                     html.Div([ dcc.Graph(id='rel-graph'), ], style={'width': '110em' })])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
                 html.Div([
-                    html.Div('Les plus gros importateurs de pétrole:'),
+                    html.H2('Les plus gros importateurs de pétrole:'),
                     html.Div([ dcc.Graph(id='big-import-graph'), ], style={'width': '110em' })])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
@@ -105,20 +104,17 @@ class Independance_Petrole():
         
         self.app.callback(
                     dash.dependencies.Output('import-graph', 'figure'),
-                    [dash.dependencies.Input('year', 'value'),
-                    dash.dependencies.Input('excluded-countries', 'value')])(self.update_graph_import)
+                    [dash.dependencies.Input('year', 'value')])(self.update_graph_import)
         self.app.callback(
                     dash.dependencies.Output('export-graph', 'figure'),
                     [dash.dependencies.Input('year', 'value'),
                     dash.dependencies.Input('excluded-countries', 'value')])(self.update_graph_export)
         self.app.callback(
                     dash.dependencies.Output('cons-graph', 'figure'),
-                    [dash.dependencies.Input('year', 'value'),
-                    dash.dependencies.Input('excluded-countries', 'value')])(self.update_graph_cons)
+                    [dash.dependencies.Input('year', 'value')])(self.update_graph_cons)
         self.app.callback(
                     dash.dependencies.Output('prod-graph', 'figure'),
-                    [dash.dependencies.Input('year', 'value'),
-                    dash.dependencies.Input('excluded-countries', 'value')])(self.update_graph_prod)
+                    [dash.dependencies.Input('year', 'value')])(self.update_graph_prod)
         self.app.callback(
                     dash.dependencies.Output('rel-graph', 'figure'),
                     [dash.dependencies.Input('year', 'value'),
@@ -133,10 +129,9 @@ class Independance_Petrole():
                     dash.dependencies.Input('excluded-countries', 'value'),
                     dash.dependencies.Input('specific-importation-of-country', 'value')])(self.update_importators)
     
-    def update_graph_import(self, year, excluded_countries):
+    def update_graph_import(self, year):
         year = self.years[year]
-        df = self.impor[~self.impor.geo.isin(excluded_countries)]
-        df = df[self.impor.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
+        df = self.impor[self.impor.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
         max_val = max(df)
         df = df.reset_index()
 
@@ -170,10 +165,9 @@ class Independance_Petrole():
 
         return fig
 
-    def update_graph_cons(self, year, excluded_countries):
+    def update_graph_cons(self, year):
         year = self.years[year]
-        df = self.cons[~self.cons.geo.isin(excluded_countries)]
-        df = df[self.cons.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
+        df = self.cons[self.cons.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
         max_val = max(df)
         df = df.reset_index()
 
@@ -189,10 +183,9 @@ class Independance_Petrole():
 
         return fig
     
-    def update_graph_prod(self, year, excluded_countries):
+    def update_graph_prod(self, year):
         year = self.years[year]
-        df = self.prod[~self.prod.geo.isin(excluded_countries)]
-        df = df[self.prod.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
+        df = self.prod[self.prod.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
         max_val = max(df)
         df = df.reset_index()
 
@@ -210,17 +203,19 @@ class Independance_Petrole():
 
     def update_graph_reliability(self, year, excluded_countries):
         year = self.years[year]
-        cons = self.cons[~self.cons.geo.isin(excluded_countries)]
-        cons = cons[self.cons.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
+        #cons = self.cons[~self.cons.geo.isin(excluded_countries)]
+        cons = self.cons[self.cons.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
 
-        prod = self.prod[~self.prod.geo.isin(excluded_countries)]
-        prod = prod[self.prod.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
+        #prod = self.prod[~self.prod.geo.isin(excluded_countries)]
+        prod = self.prod[self.prod.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
 
-        export = self.export[~self.export.geo.isin(excluded_countries)]
-        export = export[self.export.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
+        #export = self.export[~self.export.geo.isin(excluded_countries)]
+        export = self.export[self.export.TIME_PERIOD == year]
+        export.loc[export.geo.isin(excluded_countries), "OBS_VALUE"] = 0
+        export = export.groupby("geo")["OBS_VALUE"].sum()
 
-        impor = self.impor[~self.impor.geo.isin(excluded_countries)]
-        impor = impor[~self.impor.partner.isin(excluded_countries)]
+        #impor = self.impor[~self.impor.geo.isin(excluded_countries)]
+        impor = self.impor[~self.impor.partner.isin(excluded_countries)]
         impor = impor[self.impor.TIME_PERIOD == year].groupby("geo")["OBS_VALUE"].sum()
 
         df = prod + impor - export - cons
