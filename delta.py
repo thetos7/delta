@@ -5,7 +5,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from electricite import electricite
+from afhy_electricite import electricite
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -30,7 +30,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
-                              dcc.Link(html.Button("Prix d'électricite", style={'width':"100%"}), href='/electricite'),
+                              dcc.Link(html.Button("Électricité", style={'width':"100%"}), href='/electricite'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
