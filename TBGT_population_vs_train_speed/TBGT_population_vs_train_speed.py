@@ -12,11 +12,13 @@ from .get_data import get_train_data, get_cities, Coords
 
 class TBGT:
     FRANCE_CENTER = (46.7110, 1.7191)
+    RELATION_DEFAULT = "TOUTES LES LIGNES"
 
     def _get_relations_radio(self) -> dcc.RadioItems:
-        relations = list(self.train_df.groups.keys())
+        relations = [self.RELATION_DEFAULT] + list(self.train_df.groups.keys())
         return dcc.RadioItems(
             relations,
+            value=self.RELATION_DEFAULT,
             id="relations",
             style={"font-size": "10px"}
         )
@@ -27,10 +29,10 @@ class TBGT:
             (self.cities[src][1], self.cities[dst][1])
         )
 
-    def _get_map(self, relation: str = None) -> go.Figure:
+    def _get_map(self, relation: str = RELATION_DEFAULT) -> go.Figure:
         lat_coords, lon_coords = [], []
         cities_name = []
-        if (relation is not None):
+        if (relation != self.RELATION_DEFAULT):
             cities_name = relation.split(" - ")
             lat_coords, lon_coords = self._get_coords(*cities_name)
 
@@ -66,9 +68,9 @@ class TBGT:
         self.cities = get_cities()
 
         self.main_layout = html.Div(children=[
-            html.H3(children=
-                "Évolution de la population des villes françaises"
-                " vis-à-vis du développement des grandes lignes SNCF"
+            html.H3(
+                "Évolution de la population des villes françaises "
+                "vis-à-vis du développement des grandes lignes SNCF"
             ),
             dcc.Graph(id="map", figure=self._get_map()),
             self._get_relations_radio(),
