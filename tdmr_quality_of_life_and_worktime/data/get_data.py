@@ -129,7 +129,6 @@ def get_life_satistaction_dataframe() -> pd.DataFrame:
 def get_life_expectancy_dataframe() -> pd.DataFrame:
     
     if (not os.path.exists(life_expectancy_clean)):
-        print("longrun")
         life_expectancy_df = pd.read_csv(life_expectancy, sep=',')
         life_expectancy_df.drop(columns=["DATAFLOW","LAST UPDATE","freq","unit","OBS_FLAG"], inplace=True)
 
@@ -144,7 +143,6 @@ def get_life_expectancy_dataframe() -> pd.DataFrame:
         life_expectancy_df.to_csv(life_expectancy_clean)
         
     else:
-        print("shortcut")
         life_expectancy_df = pd.read_csv(life_expectancy_clean)
     
     return life_expectancy_df
@@ -156,6 +154,4 @@ def get_complete_dataframes():
     depressive_symptoms_df = get_depressive_symptoms_dataframe()
     life_satistaction_df = get_life_satistaction_dataframe()
     life_expectancy_df = get_life_expectancy_dataframe()
-    return [pd.concat([avg_worktime_df.set_index("geo"), depressive_symptoms_df, life_satistaction_df, life_expectancy_df], axis=1), pd.merge(avg_worktime_df, hapiness_feelings_frequency_df, on="geo")]
-
-get_complete_dataframes()
+    return [pd.concat([avg_worktime_df.set_index("geo"), depressive_symptoms_df.set_index("geo"), life_satistaction_df.set_index("geo"), life_expectancy_df.set_index("geo")], axis=1), pd.merge(avg_worktime_df, hapiness_feelings_frequency_df, on="geo")]
