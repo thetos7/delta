@@ -33,42 +33,73 @@ class EnergyMix():
         self.coal_use = self.coal_use[self.coal_use.iso_code != 'OWID_WRL']
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Mix énergétique de différents pays du monde'),
-            html.Div([ dcc.Graph(id='graph1'), ], style={'width':'100%', }),
+            html.H1(children="Production d'électricité dans le monde : un enjeu climatique"),
+            dcc.Markdown("""
+                         [La base de donnée](https://www.kaggle.com/datasets/pralabhpoudel/world-energy-consumption) utilisée décrit la production, consommation 
+                         électrique de nombreux pays dans le monde en fonction de leur source (charbon, nucléaire, éolien, etc...)  
+                         Les enjeux climatiques actuels nécessitent la réduction de la production d'électricité à travers des énergies fossiles 
+                         au profit d'énergies renouvelables ou du nucléaire de la part de tous les pays du monde.  
+                         La COP21 a fixé un objectif d'une augmentation maximale de la température globale de 2°C d'ici 2100, la plupart des 
+                         pays du monde se sont engagés à réduire leur bilan carbone et l'arrêt des centrales à charbon, par exemple, est une façon efficace 
+                         d'atteindre cet objectif, cependant certain pays en développement ont des besoins en électricité toujours croissants et 
+                         n'ont pas les moyens d'arrêter les énergies fossiles qui ont un coût très bas et une demande technologique faible.
+                         
+                         A travers cette base de donnée nous allons pouvoir observer les bilans énergetiques des différents pays du monde depuis 
+                         1985, voir si le declin du charbon/pétrole est réellement envisageable, observer la réponse des pays en développement malgré 
+                         le challenge que la transition leur impose et quels pays ne jouent pas le jeu.
+                         
+                         Nous avons choisi de commencer les graphes à partir de 1985 car de nombreuses catégories étaient trop incomplètes avant cette 
+                         date pour produire quelquechose ayant un sens.
+                         
+                         La base de donnée différencie consommation et production, du au fait que certains pays vendent leurs électricité, nous utiliserons la 
+                         production pour nos graphes.
+                        """),
+            html.H3(children='Mix énergétique des différents pays du monde'),
             html.Div([
-                html.Div([ html.Div('Pays / Zone géographique'),
+                html.Div([ html.Div('Pays / Zone géographique', style={'width': '8em', 'display': 'inline-block'}),
                            dcc.Dropdown(
                                id='graph1_countries',
                                options=self.countries,
                                value='France',
                                searchable=True,
-                               clearable=False
+                               clearable=False,
+                               style={'width': '22em', 'display': 'inline-block'}
                            )
-                         ], style={'width': '9em'} )
+                         ], style={'width': '30em'} )
                 ], style={
                             'padding': '10px 50px', 
                             'display':'flex',
                             'flexDirection':'row',
                             'justifyContent':'flex-start',
             }),
+            html.Div([ dcc.Graph(id='graph1'), ], style={'width':'100%', }),
+            dcc.Markdown("""
+                          On constate que beaucoup de pays sont encore très dépendants aux énergies fossile pour leur production électrique.  
+                          Les pays avec un grosse croissance en production sont d'autant plus dépendants car ils doivent l'améliorer 
+                          rapidement et une il est plus facile de construire une centrale à charbon qu'un parc éolien.
+                          """),
             html.Br(),
-            html.H3(children="Plus grands pays consommateurs de charbon pour leur alimentation électrique"),
+            html.H3(children="Production électrique au charbon dans le monde"),
             html.Div([dcc.Graph(id='graph2'), ], style={'width': '100%'}),
             html.Div([
-                html.Div([html.Div('Année'),
+                html.Div([html.Div('Année', style={'width': '4em', 'display': 'inline-block'}),
                             dcc.Dropdown(
                                 id='graph2_year',
                                 options=[i for i in range(1985, 2019)],
                                 value=2017,
-                                clearable=False
-                            )], style={'width': '9em'}
-                            )
+                                clearable=False, 
+                                searchable=True,
+                                style={'width': '12em', 'diplay': 'inline-block'}
+                            )], 
+                            style={'width': '16em', 'display': 'flex'}
+                            ),
             ], style={
-                        'padding': '10px 50px', 
-                        'display':'flex',
-                        'flexDirection':'row',
-                        'justifyContent':'flex-start',
-                    })
+                    'padding': '10px 50px', 
+                    'display':'flex',
+                    'flexDirection':'row',
+                    'justifyContent':'flex-start',
+                    }),
+            html.Br()
         ], style={
             'backgroundColor': 'white',
              'padding': '10px 50px 10px 50px',
