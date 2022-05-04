@@ -246,6 +246,8 @@ class Independance_Petrole():
         df = df.reset_index()
         df = df[df.OBS_VALUE != 0]
         df.sort_values(by=['OBS_VALUE'], inplace=True, ascending=False)
+
+        df['partner'] = df['partner'].apply(lambda x: country_code[x])
         fig = px.scatter(df, x="partner", y="OBS_VALUE")
 
         return fig
@@ -257,6 +259,7 @@ class Independance_Petrole():
         df = df.reset_index()
         df = df[df.OBS_VALUE != 0]
         df.sort_values(by=['OBS_VALUE'], inplace=True, ascending=False)
+        df['partner'] = df['partner'].apply(lambda x: country_code[x])
         fig = px.scatter(df, x="partner", y="OBS_VALUE")
 
         return fig
