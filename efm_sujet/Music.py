@@ -58,15 +58,15 @@ class Song():
                 dcc.Markdown('''
                     Ce graphique est interractif...
                 '''),
-                dcc.Markdown("""
+                dcc.Markdown('''
                    #### À propos
 
                    * Données : 
-                   - [Spotify Dataset 1921-2020, 600k+ Tracks](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks)
-                   - [Contemporary album ratings and reviews](https://www.kaggle.com/datasets/kauvinlucas/30000-albums-aggregated-review-ratings)
-                   - [Top 50 Spotify songs BY EACH COUNTRY](https://www.kaggle.com/datasets/leonardopena/top-50-spotify-songs-by-each-country)
-               * (c) 2022 Alexandre Castello & Jacky Wu
-               """),
+                       - [Spotify Dataset 1921-2020, 600k+ Tracks](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks)
+                       - [Contemporary album ratings and reviews](https://www.kaggle.com/datasets/kauvinlucas/30000-albums-aggregated-review-ratings)
+                       - [Top 50 Spotify songs BY EACH COUNTRY](https://www.kaggle.com/datasets/leonardopena/top-50-spotify-songs-by-each-country)
+                   * (c) 2022 Alexandre Castello & Jacky Wu
+               ''')
 
             ])
 
