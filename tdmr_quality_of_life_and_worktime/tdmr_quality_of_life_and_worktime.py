@@ -1,5 +1,6 @@
 import sys
 import glob
+from traceback import print_tb
 import dash
 import flask
 from dash import dcc
@@ -21,22 +22,12 @@ class Tdmr():
             html.H3(children="Impact du temps de travail sur la vie en Europe"),
             html.H5(children="Tanguy Desgouttes et Marc-Emmanuel Raiffe"),
             html.P("Le but est de voir s'il se dégage une relation ou une tendance générale entre le temps de travail moyen des habitants d'un pays et la qualité de leur vie. Ce sujet s'inspire en partie des idées de la communauté reddit 'antiwork' (reddit.com/r/antiwork/)."),
-            html.P("Pour cela on compare ici la moyenne du temps de travail par pays en Europe différents facteurs."),
+            html.P("Pour cela on compare ici la moyenne du temps de travail par pays en Europe selon différents facteurs."),
             
             html.Br(),
             html.H4(children="Note moyenne de satisfaction dans la vie et temps de travail hebdomadaire moyen par pays"),
             html.Div([ dcc.Graph(id='satisfaction_graph'), ], style={'width':'100%', }),
             html.P("Les longs temps de travail semblent impacter négativement la note moyenne que les gens attribuent à leur satisfaction de vie, la régression linéaire affichée représente assez bien la baisse de satisfaction en concordance avec l'augmentation des heures de travail."),
-            html.Br(),
-            
-            html.H4(children="Proportion de symptomes dépressifs et temps de travail hebdomadaire moyen par pays"),
-            html.Div([ dcc.Graph(id='depression_graph'), ], style={'width':'100%', }),
-            html.P("Malheureusement ce graphique n'apporte pas de réelle preuve de relation entre le temps de travail moyen et les symptomes dépressifs recensés par pays, plusieurs approches via différentes lignes de tendance ne nous ont pas permi de fournir une représentation simplifiée fidèle montrant quoi que ce soit."),
-            html.Br(),
-            
-            html.H4(children="Espérance de vie et temps de travail hebdomadaire moyen par pays"),
-            html.Div([ dcc.Graph(id='expectancy_graph'), ], style={'width':'100%', }),
-            html.P("On voit se dessiner grace à la trendline (LOWESS) que l'espérance de vie moyenne d'un pays semble impacter par le temps de travail moyen. Plus précisémment les pays qui ont plus de 38 heures hebdomadaires de travail moyen ont une espérance de vie moyenne significativement inférieure en Europe."),
             html.Br(),
             
             html.H4(children="Fréquence de sentiment de bonheur et temps de travail hebdomadaire moyen par pays"),
@@ -49,6 +40,17 @@ class Tdmr():
             ]),
             html.P(""),
             html.Br(),
+            
+            html.H4(children="Proportion de symptomes dépressifs et temps de travail hebdomadaire moyen par pays"),
+            html.Div([ dcc.Graph(id='depression_graph'), ], style={'width':'100%', }),
+            html.P("Malheureusement ce graphique n'apporte pas de réelle preuve de relation entre le temps de travail moyen et les symptomes dépressifs recensés par pays, plusieurs approches via différentes lignes de tendance ne nous ont pas permi de fournir une représentation montrant quoi que ce soit."),
+            html.Br(),
+            
+            html.H4(children="Espérance de vie et temps de travail hebdomadaire moyen par pays"),
+            html.Div([ dcc.Graph(id='expectancy_graph'), ], style={'width':'100%', }),
+            html.P("On voit se dessiner grace à la trendline (LOWESS) que l'espérance de vie moyenne d'un pays semble impacter par le temps de travail moyen. Plus précisémment les pays qui ont plus de 38 heures hebdomadaires de travail moyen ont une espérance de vie moyenne significativement inférieure en Europe."),
+            html.Br(),
+        
             
             
             html.H4(children="Sources des données : "),
@@ -137,7 +139,18 @@ class Tdmr():
         )
         return fig
     
-    def show_hapiness(self, mean):    
+    def show_hapiness(self, mean):
+        
+        #w = self.hapiness_dataframe.groupby(['Temps de travail par semaine', 'Fréquence']).mean().reset_index()
+        #fig2 = px.histogram(
+        #    w,
+        #    x=w["Temps de travail par semaine"],
+        #    color=w["Fréquence"],
+        #    y=w["Fréquence du sentiment de bonheur (% de réponse)"],
+        #    nbins=25,
+        #)
+        #fig2.update_xaxes(type='category')
+          
         fig = px.scatter(    
             self.hapiness_dataframe,    
             x=self.hapiness_dataframe["Temps de travail par semaine"],    
@@ -147,6 +160,7 @@ class Tdmr():
             category_orders={"Fréquence": ["Toujours", "La plupart du temps", "Parfois", "Rarement", "Jamais"]}
         )
         return fig
+    
 
 if __name__ == '__main__':
     mpj = Tdmr()
