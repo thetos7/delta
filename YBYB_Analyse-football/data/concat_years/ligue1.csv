@@ -339,13 +339,3 @@ Unnamed: 0,Rk,Squad,MP,W,D,L,GF,GA,GD,Pts,Attendance,Top Team Scorer,Goalkeeper,
 17,18,FC Nantes,38,9,13,16,47,55,-8,40,,Ludovic Blas - 10,Alban Lafont,â†’ French 1/2 Relegation/Promotion Playoff,94.75,48.9,55.8,-6.9,-0.18,,2020-21
 18,19,Nîmes Olympique,38,9,8,21,40,71,-31,35,,Renaud Ripart - 11,Baptiste Reynet,Relegated,60.4,41.4,64.9,-23.5,-0.62,,2020-21
 19,20,Dijon FCO,38,4,9,25,25,73,-48,21,,Mama Samba BaldÃ© - 7,Anthony Racioppi,Relegated,65.63,31.5,75.3,-43.8,-1.15,,2020-21410256
-Name: age, dtype: float64, 2    23.780488
-Name: age, dtype: float64, 19    24.354839
-Name: age, dtype: float64, 13    25.169811
-Name: age, dtype: float64, 3    23.515152
-Name: age, dtype: float64, 15    25.026316
-Name: age, dtype: float64, 1    22.791667
-Name: age, dtype: float64, 14    24.85
-Name: age, dtype: float64, 8    24.0
-Name: age, dtype: float64, 16    23.724138
-Name: age, dtype: float64, 9    23.1
