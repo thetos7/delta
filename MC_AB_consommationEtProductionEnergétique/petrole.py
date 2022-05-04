@@ -13,14 +13,14 @@ import plotly.express as px
 import json
 import math
 
-from get_data import get_data
-from get_data import get_by_year
-from get_data import list_years
-from get_data import list_countries
-from get_data import country_code
+from MC_AB_consommationEtProductionEnergétique.get_data import get_data
+from MC_AB_consommationEtProductionEnergétique.get_data import get_by_year
+from MC_AB_consommationEtProductionEnergétique.get_data import list_years
+from MC_AB_consommationEtProductionEnergétique.get_data import list_countries
+from MC_AB_consommationEtProductionEnergétique.get_data import country_code
 
 
-class Independance_Petrole():
+class Petrole():
     def __init__(self, application=None):
 
         self.prod, self.cons, self.export, self.impor = get_data()
@@ -30,7 +30,7 @@ class Independance_Petrole():
         self.partners = [item for item in self.impor["partner"].unique() if item == item]
         self.countries = [item for item in self.impor["geo"].unique() if item == item]
 
-        with open("resources/europe.geo.json", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
+        with open("MC_AB_consommationEtProductionEnergétique/resources/europe.geo.json", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
             self.europe = json.load(f)
 
         for i in self.europe["features"]:
@@ -39,7 +39,7 @@ class Independance_Petrole():
         
         self.main_layout = html.Div(children=[
             html.H3(children='Petrole'),
-            dcc.Markdown("""Independance Européene face au Petrole comme energie fossile"""),
+            dcc.Markdown("""Independance Européene face au Pétrole comme energie fossile"""),
             html.Div([ html.Div('Année ref.'),
                           dcc.Slider(0, len(self.years) -1, 1,
                                id='year',
@@ -56,38 +56,41 @@ class Independance_Petrole():
                          ], style={'position': 'sticky', 'top': 0, 'zIndex': 1, 'backgroundColor': 'white', 'width': '100%', 'padding':'4em 0px 0px 0px'}), # bas D haut G
             html.Div([
                 html.Div([
-                    html.H2('Importations de petrole par pays:'),
-                    html.Div([ dcc.Graph(id='import-graph'), ], style={'width': '55em' })]),
+                    html.H2('Importations de pétrole par pays:'),
+                    html.Div([ dcc.Graph(id='import-graph'), ], style={'width': '50em' })]),
                 html.Div([
-                    html.H2('Exportations de petrole par pays:'),
-                    html.Div([ dcc.Graph(id='export-graph'), ], style={'width': '55em'})])
+                    html.H2('Exportations de pétrole par pays:'),
+                    html.Div([ dcc.Graph(id='export-graph'), ], style={'width': '50em'})])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
                 html.Div([
-                    html.H2('Consommation de petrole par pays:'),
-                    html.Div([ dcc.Graph(id='cons-graph'), ], style={'width': '55em' })]),
+                    html.H2('Consommation de pétrole par pays:'),
+                    html.Div([ dcc.Graph(id='cons-graph'), ], style={'width': '50em' })]),
                 html.Div([
-                    html.H2('Production de petrole par pays:'),
-                    html.Div([ dcc.Graph(id='prod-graph'), ], style={'width': '55em'})])
+                    html.H2('Production de pétrole par pays:'),
+                    html.Div([ dcc.Graph(id='prod-graph'), ], style={'width': '50em'})])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
                 html.Div([
-                    html.H2('Excedent de petrole par pays, calculé par Exc = production + importation - exportation - consommation :'),
-                    html.Div([ dcc.Graph(id='rel-graph'), ], style={'width': '110em' })])
+                    html.H2('Excedent de pétrole par pays, calculé par :'),
+                    html.H4('Exc = production + importation - exportation - consommation '),
+                    html.P('Ici nous pouvons voir la balance totale de pétrole de chaque pays européen à une certaine année.'),
+                    html.P('Si un pays est dans le rouge, il perd plus de pétrole qu\'il a et donc tourne sur ses réserves.'),
+                    html.Div([ dcc.Graph(id='rel-graph'), ], style={'width': '100em' })])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
                 html.Div([
-                    html.H2('Les plus gros importateurs de pétrole:'),
-                    html.Div([ dcc.Graph(id='big-import-graph'), ], style={'width': '110em' })])
+                    html.H2('Les plus gros exportateurs de pétrole:'),
+                    html.Div([ dcc.Graph(id='big-import-graph'), ], style={'width': '100em' })])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
                     html.Div([
-                        'Selectionner le pays dont on souhaite voir d\'ou viennent les importations',
+                        'Selectionner le pays dont on souhaite voir d\'où viennent les importations',
                         dcc.Dropdown(
                             id='specific-importation-of-country',
                             options=[{"label":country_code[i], "value": i} for i in self.countries]
                            ),
-                    html.Div([ dcc.Graph(id='specific-import-graph'), ], style={'width': '110em' })])
+                    html.Div([ dcc.Graph(id='specific-import-graph'), ], style={'width': '100em' })])
             ], style={'display': 'flex', 'justify-content': 'space-between'})
         ], style={
             'backgroundColor': 'white',
@@ -264,5 +267,5 @@ class Independance_Petrole():
 
 
 if __name__ == '__main__':
-    ind = Independance_Petrole()
+    ind = Petrole()
     ind.app.run_server(debug=True, port=8051)
