@@ -31,6 +31,16 @@ class EnergyMix():
         self.coal_use = self.coal_use[self.coal_use.year >= 1985]
         self.coal_use = self.coal_use[self.coal_use.iso_code != 0]
         self.coal_use = self.coal_use[self.coal_use.iso_code != 'OWID_WRL']
+        
+        self.growth = self.energymix[['iso_code', 'year', 'fossil_electricity', 'renewables_electricity', 'nuclear_electricity']]
+        self.growth = self.growth[self.growth.iso_code != 0]
+        self.growth = self.growth[self.growth.iso_code != 'OWID_WRL']
+        self.growth['total_electricity'] = self.growth['fossil_electricity'] + self.growth['renewables_electricity'] + self.growth['nuclear_electricity']
+        self.growth['total_change'] = self.growth['total_electricity'][self.growth.year == 2017] - self.growth['total_electricity'][self.growth.year == 1985]
+        self.growth['fossil_change'] = self.growth['fossil_electricity'][self.growth.year == 2017] - self.growth['fossil_electricity'][self.growth.year == 1985]
+        self.growth['renewables_change'] = self.growth['renewables_electricity'][self.growth.year == 2017] - self.growth['renewables_electricity'][self.growth.year == 1985]
+        self.growth = self.growth[self.growth.year == 2017]
+        self.growth = self.growth.rename(columns={'total_change': "Variation de la production d'électricité totale en TWh", 'renewables_change': "Variation de la production d'électricité verte en TWh", 'fossil_change': "Variation de la production d'électricité fossile en TWh"})
 
         self.main_layout = html.Div(children=[
             html.H1(children="Production d'électricité dans le monde : un enjeu climatique"),
@@ -99,7 +109,26 @@ class EnergyMix():
                     'flexDirection':'row',
                     'justifyContent':'flex-start',
                     }),
-            html.Br()
+            html.Br(),
+            html.Div([dcc.Graph(id='graph3'), ], style={'width': '100%'}),
+            html.Div([
+                html.Div([html.Div('Type de source', style={'width': '8em', 'display': 'inline-block'}),
+                            dcc.RadioItems(
+                               id='graph3_source',
+                               options=[{'label':'Totale', 'value':0}, 
+                                        {'label':'Renouvelable','value':1},
+                                        {'label':'Fossile','value':2}],
+                               value=0,
+                               labelStyle={'display':'block'},
+                           )], 
+                            style={'width': '30em', 'display': 'flex'}
+                            ),
+            ], style={
+                    'padding': '10px 50px', 
+                    'display':'flex',
+                    'flexDirection':'row',
+                    'justifyContent':'flex-start',
+                    }),
         ], style={
             'backgroundColor': 'white',
              'padding': '10px 50px 10px 50px',
@@ -120,12 +149,16 @@ class EnergyMix():
                     dash.dependencies.Output('graph2', 'figure'),
                     [ dash.dependencies.Input('graph2_year', 'value')])(self.update_graph2)
         
+        self.app.callback(
+                    dash.dependencies.Output('graph3', 'figure'),
+                    [ dash.dependencies.Input('graph3_source', 'value')])(self.update_graph3)
+        
     def update_graph1(self, country):
         fig = px.area(self.productions.loc[country], 'year', ['Fossile', 'Hydraulique', 'Solaire', 'Eolienne', 'Nucléaire'],
             title = None,
                 labels ={
                     "year": "Année",
-                    "value": "Quantité d'énergie générée en TWh",
+                    "value": "Quantité d'électricité générée en TWh",
                     "variable": "Type de source"
                 })
         return fig
@@ -136,6 +169,20 @@ class EnergyMix():
                 labels ={
                 })
         return fig
+    
+    def update_graph3(self, energy_type):
+        if energy_type == 0:
+            fig = px.choropleth(self.growth, locations='iso_code', color="Variation de la production d'électricité totale en TWh", color_continuous_scale=px.colors.sequential.thermal,
+                                title = "Variation des productions d'électricité entre 1985 et 2017")
+            return fig
+        if energy_type == 1:
+            fig = px.choropleth(self.growth, locations='iso_code', color="Variation de la production d'électricité verte en TWh", color_continuous_scale=px.colors.sequential.thermal,
+                                title = "Variation des productions d'électricité entre 1985 et 2017")
+            return fig
+        if energy_type == 2:
+            fig = px.choropleth(self.growth, locations='iso_code', color="Variation de la production d'électricité fossile en TWh", color_continuous_scale=px.colors.sequential.thermal,
+                                title = "Variation des productions d'électricité entre 1985 et 2017")
+            return fig
         
 if __name__ == '__main__':
     nrg = EnergyMix()
