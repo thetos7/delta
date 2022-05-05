@@ -38,19 +38,22 @@ class Naissance():
         self.dep_map = {d['properties']['code']: d['properties']['nom']
                         for d in self.dep['features']}
 
+        self.fign = self.fig_naissance()
+        self.figd = self.fig_deces()
+
         # main layout
         self.main_layout = html.Div(children=[
             html.H3(children='Naissance et décès en France en 2019'),
             html.Div([
                 html.Div([
                     dcc.Graph(id='map_france_naissance',
-                              figure=self.fig_naissance(),
+                              figure=self.fign,
                               style={'width': '100%',
                                      'display': 'inline-block'}, ),
                 ], style={'width': '50%'}, ),
                 html.Div([
                     dcc.Graph(id='map_france_deces',
-                              figure=self.fig_deces(),
+                              figure=self.figd,
                               style={'width': '100%',
                                      'display': 'inline-block',
                                      'padding-left': '0.5%'}, ),
@@ -223,6 +226,15 @@ class Naissance():
              dash.dependencies.Input('wps-hf-3', 'value'),
              ])(self.size_deces)
 
+        self.app.callback(
+            dash.dependencies.Output('map_france_deces', 'figure'),
+            [dash.dependencies.Input('map_france_naissance', 'relayoutData')
+             ])(self.layout_sync(self.figd))
+        self.app.callback(
+            dash.dependencies.Output('map_france_naissance', 'figure'),
+            [dash.dependencies.Input('map_france_deces', 'relayoutData')
+             ])(self.layout_sync(self.fign))
+
         # Department name
         self.app.callback(
             dash.dependencies.Output('list_department_naissance', 'children'),
@@ -232,6 +244,17 @@ class Naissance():
             dash.dependencies.Output('list_department_deces', 'children'),
             [dash.dependencies.Input('map_france_deces', 'selectedData'),
              ])(self.list_dep_d)
+
+    def layout_sync(self, fig_to_sync):
+        keys = ['mapbox.center', 'mapbox.zoom', 'mapbox.bearing', 'mapbox.pitch']
+
+        def sync(relayoutData):
+            if relayoutData:
+                filtered_layout = { k: relayoutData.get(k) for k in keys if k in relayoutData }
+                fig_to_sync.update_layout(filtered_layout)
+            return fig_to_sync
+        
+        return sync
 
     def list_dep_n(self, select):
         dep = self.get_department(select)
