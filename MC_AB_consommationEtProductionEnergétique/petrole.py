@@ -30,7 +30,7 @@ class Petrole():
         self.partners = [item for item in self.impor["partner"].unique() if item == item]
         self.countries = [item for item in self.impor["geo"].unique() if item == item]
 
-        with open("MC_AB_consommationEtProductionEnergétique/resources/europe.geo.json", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
+        with open("MC_AB_consommationEtProductionEnergétique/data/europe.geo.json", "r", encoding="utf-8") as f: # https://geojson-maps.ash.ms/
             self.europe = json.load(f)
 
         for i in self.europe["features"]:
@@ -48,7 +48,7 @@ class Petrole():
             Plus bas, il est possible de voir une carte qui montre l'excedent, positif ou négatif, de pétrole pour chaque pays d'Europe chaque année.
             Un excedent négatif signifie que le pays tourne sur ses réserves, positif qu'il stock des barils.
             
-            Enfin, il est possible de simuler à une certaine année un pays qui met fin à ses exportations de pétrole, et donc de voir si il passe dans le vert, et si il faire passer des autres dans le rouge.
+            Enfin, il est possible de simuler à une certaine année un pays qui met fin à ses exportations de pétrole, et donc de voir si il passe dans le vert, et si il fait passer des autres dans le rouge.
             
             Il est possible de s'aider des dernier graphes montrant qui sont les gros importateurs de pétrole en Europe, et pour chaque pays, d'où vient son approvisionnement."""),
             html.Div([ html.Div('Année ref.'),
