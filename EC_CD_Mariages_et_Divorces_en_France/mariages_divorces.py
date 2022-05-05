@@ -45,6 +45,10 @@ class Mariage():
         self.files = [mar_14, mar_15, mar_16, mar_17, mar_18, mar_19, mar_20]
         self.dep = '01'
         
+        deps = pd.read_excel('EC_CD_Mariages_et_Divorces_en_France/data/departements-francais.xls',
+                             usecols = {'NOM', 'NUMÉRO'}, skipfooter = 7)
+        deps.rename(columns={'NUMÉRO' : 'DEPARTEMENT'}, inplace = True)
+        
         df = pd.concat([mar_14, mar_15, mar_16, mar_17, mar_18, mar_19, mar_20])
        
         HH = df[(df['SEXE1'] == 'M') & (df['SEXE2'] == 'M')]
@@ -64,6 +68,10 @@ class Mariage():
             map_f.insert(c, idx,col.groupby('AMAR').size())
             c += 1
         map_f = map_f.transpose()
+        map_f.reset_index(drop = True, inplace = True)
+        map_f = pd.concat([map_f, deps], axis=1)
+        for i in range (0,10):
+            map_f.loc[map_f.DEPARTEMENT == i, "DEPARTEMENT"] = "0%i" % i
         
         df = mar_14
         df = df[df['DEPMAR'] == self.dep] 
@@ -86,7 +94,8 @@ class Mariage():
         self.departements = json.load(open('EC_CD_Mariages_et_Divorces_en_France/data/departements-version-simplifiee.geojson'))
         
         self.fig = px.line(self.df)
-        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.index,
+        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.DEPARTEMENT,
+                           hover_name = self.map_f.NOM,
                            featureidkey = 'properties.code', 
                            color=self.year, range_color=[200, 10000], color_continuous_scale="Viridis",
                            mapbox_style="carto-positron",
@@ -104,7 +113,7 @@ class Mariage():
     
         )
         self.fig_histo.update_layout(
-            title = 'Mariage et divorce dans le %s en %s' % (self.dep, self.year),
+            title = 'Mariage et divorce %s en %s' % (self.dep_name(), self.year),
             xaxis = dict(title = 'Mois du mariage'),
             yaxis = dict(title = 'Nombre de mariages'), 
             legend = dict(title = 'Type de mariage') 
@@ -201,7 +210,8 @@ class Mariage():
            return self.files[self.year - 2014].sort_values(by=['MMAR'])
         
     def update_map(self):
-        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.index,
+        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.DEPARTEMENT,
+                           hover_name = self.map_f.NOM,
                            featureidkey = 'properties.code', 
                            color=self.year, range_color=[200, 10000], color_continuous_scale="Viridis",
                            mapbox_style="carto-positron",
@@ -211,9 +221,11 @@ class Mariage():
                           )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     
+    
+    #TODO : mettre le nom département en titre Saloperie de Corse option de secours faire une fonction qui retourne ce qu'il faut
     def update_histo(self):
         df = self.get_file()
-        df = df[df['DEPMAR'] == self.dep] 
+        df = df[df['DEPMAR'] == self.dep]
       
         HH = df[(df['SEXE1'] == 'M') & (df['SEXE2'] == 'M')]
         graph = pd.DataFrame(HH.groupby('MMAR').size(), columns = ['HH'])
@@ -227,16 +239,16 @@ class Mariage():
         graph = graph.sort_values(by=['MMAR'])
         graph['MMAR'] =  graph['MMAR'].apply(self.update_month)
         
-        self.fig_histo = px.histogram(graph, x = 'MMAR', y = ['HH', 'FF', 'HF'],
-                                      title="Mariage et divorce dans le %s en %s" % (self.dep, self.year), barmode='group')
+        self.fig_histo = px.histogram(graph, x = 'MMAR', y = ['HH', 'FF', 'HF'], barmode='group')
+        
+        self.dep_name
         self.fig_histo.update_layout(
-            title = 'Mariage et divorce dans le %s en %s' % (self.dep, self.year),
+            title = 'Mariage et divorce %s en %s' % (self.dep_name(), self.year),
             xaxis = dict(title = 'Mois du mariage'),
             yaxis = dict(title = 'Nombre de mariages'), 
             legend = dict(title = 'Type de mariage') 
         )
         
-    #Note : self.update_histo probablement reset legende
     def update_graph(self, year, clickData):
         ctx = dash.callback_context
         button_id =""
@@ -247,7 +259,7 @@ class Mariage():
             self.year = year
             self.update_map()
         if button_id == 'mdf-map-graph':
-            self.dep = clickData['points'][0]['location']
+            self.dep = str(clickData['points'][0]['location'])
         self.update_histo()
         
         return self.fig_map, self.fig_histo
@@ -258,9 +270,7 @@ class Mariage():
         return s
         
     def update_month(self, s):
-        if s not in self.L:
-                return self.L[int(s) - 1]
-        return s
+        return self.L[int(s) - 1]
     
     def check_months(self, graph):
         col = graph['MMAR'].unique()
@@ -271,10 +281,16 @@ class Mariage():
                 s = "0" + str(i)
             else:
                 s = str(i)
-            if s not in col :
+            if i not in col :
                 graph.loc[idx] = (int(s), 0,0, 0.0001)
                 idx += 1
         return graph
+    
+    def dep_name(self):
+        if self.dep == "2A" or self.dep == "2B" or int(self.dep) < 10:
+            return self.map_f[self.map_f['DEPARTEMENT'] == self.dep].iloc[0,7]
+        else:
+            return self.map_f[self.map_f['DEPARTEMENT'] == int(self.dep)].iloc[0,7]
     
     def change_button(self, n_clicks, text):
         if text == self.START:
