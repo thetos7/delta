@@ -16,38 +16,95 @@ import datetime
 
 class TvSubject():
     def __init__(self, application=None):
-        df = pd.concat([pd.read_pickle(f) for f in glob.glob('data/morts_par_jour-*')])
-        df = df.groupby('deces').sum()
-        df.sort_index(inplace=True)
-        last_month = "02/2022"
-        now = np.datetime64(datetime.datetime.now()).astype('datetime64[M]')
-        df = df.loc['1973':now - np.timedelta64(2, 'M')]
 
-        # calcul de la moyenne journalière avec des fenêtres
-        # 2 passages pour retirer les valeurs qui dépassent l'écart type par rapport au sinus
-        width = 10
-        df2 = df.copy()
-        for _ in range(2):
-            prediction = pd.DataFrame({'x': np.zeros(len(df))}, index=df.index)
-            prediction_nb = pd.DataFrame({'x': np.zeros(len(df))}, index=df.index)
-            for step in range(1970, df.index[-1].year - width + 1):
-                dfp = df2.loc[f'{step}':f'{step + width}']
-                pente, v0 = np.polyfit(np.arange(len(dfp)), dfp.morts.values, 1)
-                y = fft.fft(dfp.morts)
-                y[y < 30 * len(dfp)] = 0
-                pred = fft.ifft(y)
-                pred -= dfp.morts.mean() - v0
-                pred += np.cumsum([pente, ] * len(dfp))
-                prediction.loc[f'{step}':f'{step + width}', 'x'] += pred
-                prediction_nb.loc[f'{step}':f'{step + width}', 'x'] += 1
-            prediction = np.array([p.real for p in prediction.x]) / prediction_nb.x
-            std = np.std(df.morts - prediction)
-            df2.morts[df2.morts > prediction + std] = prediction.astype('int') + int(std)
-            df2.morts[df2.morts < prediction - std] = prediction.astype('int') - int(std)
-        del df2
+        # # # # # # # # # # # # # # #
+        # Download data             #
+        # # # # # # # # # # # # # # #
+
+        column_names = ['MOIS', 'THEMATIQUES', 'TF1', 'France 2', 'France 3', 'Canal +', 'Arte', 'M6', 'TOTAUX']
+
+        data_watchtime = pd.read_csv('data/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-durees.csv', sep=";",
+                                     skipinitialspace=True,
+                                     quotechar="'", header=0, skiprows=1, names=column_names, encoding='latin-1',
+                                     parse_dates=[1])
+        data_count = pd.read_csv('data/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-nombre-de-sujets.csv', sep=";",
+                                 skipinitialspace=True,
+                                 quotechar="'", header=0, skiprows=1, names=column_names, encoding='iso8859_15',
+                                 parse_dates=[1])
+        # # # # # # # # # # # # # # #
+        # Data Cleaning             #
+        # # # # # # # # # # # # # # #
+
+        # # # # # # # # # # # # # # # #
+        # Change the date to datetime #
+        # # # # # # # # # # # # # # # #
+        def month_to_number(months):
+            if months == 'janvier':
+                return "01"
+            elif months[0] == 'f':
+                return "02"
+            elif months == 'mars':
+                return "03"
+            elif months == 'avril':
+                return "04"
+            elif months == 'mai':
+                return "05"
+            elif months == 'juin':
+                return "06"
+            elif months[0] == 'j':
+                return "07"
+            elif months[0] == 'a':
+                return "08"
+            elif months[0] == 's':
+                return "09"
+            elif months[0] == 'o':
+                return "10"
+            elif months[0] == 'n':
+                return "11"
+            elif months[0] == 'd':
+                return "12"
+            return "ERROR"
+
+        def string_to_date_time(date):
+            L = date.split("-")
+            L[1] = "20" + L[1]
+            L = L[1] + "-" + month_to_number(L[0])
+            return L
+
+        data_count["MOIS"] = data_count["MOIS"].apply(lambda date: string_to_date_time(date))
+        data_watchtime["MOIS"] = data_watchtime["MOIS"].apply(lambda date: string_to_date_time(date))
+
+        # # # # # # # # # # # # # # #
+        # CLean Data Accent         #
+        # # # # # # # # # # # # # # #
+
+        def clean_accent(string):
+            if (string.startswith("Sant")):
+                string = "Sante"
+            if (string.startswith("Soci")):
+                string = "Societe"
+            return string
+
+        data_watchtime["THEMATIQUES"] = data_watchtime["THEMATIQUES"].apply(lambda string: clean_accent(string))
+        data_count["THEMATIQUES"] = data_count["THEMATIQUES"].apply(lambda string: clean_accent(string))
+
+        # # # # # # # # # # # # # # #
+        # CLean Column type         #
+        # # # # # # # # # # # # # # #
+        # clean count df
+
+        data_count["MOIS"] = data_count["MOIS"].apply(pd.to_datetime)
+        data_count[["TF1", "France 2", "France 3", "Canal +", "Arte", "M6", "TOTAUX"]] = data_count[
+            ["TF1", "France 2", "France 3", "Canal +", "Arte", "M6", "TOTAUX"]].apply(pd.to_numeric)
+
+        # clean watchtime df
+        data_watchtime["MOIS"] = data_watchtime["MOIS"].apply(pd.to_datetime)
+        for col in data_watchtime.columns[2:]:
+            data_watchtime[col] = pd.to_timedelta(data_watchtime[col]) / pd.Timedelta('1s')
+            data_watchtime[col] = data_watchtime[col].apply(int)
+
 
         self.df = df
-        self.day_mean = prediction
 
         self.main_layout = html.Div(children=[
             html.H3(children='Nombre de décès par jour en France'),
@@ -71,8 +128,11 @@ class TvSubject():
 
             #### À propos
 
-            * Sources : https://www.data.gouv.fr/fr/datasets/fichier-des-personnes-decedees/
-            * (c) 2022 Olivier Ricou
+            * Sources : 
+                https://static.data.gouv.fr/resources/classement-thematique-des-sujets-de-journaux-televises-janvier-2005-septembre-2020/20201202-114045/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-nombre-de-sujets.csv
+                https://static.data.gouv.fr/resources/classement-thematique-des-sujets-de-journaux-televises-janvier-2005-septembre-2020/20201202-114231/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-durees.csv
+
+            * 2022 Romain Cazin, Nicolas Trabet
             """)
         ], style={
             'backgroundColor': 'white',
@@ -113,5 +173,5 @@ class TvSubject():
 
 
 if __name__ == '__main__':
-    mpj = Deces()
+    mpj = TvSubject()
     mpj.app.run_server(debug=True, port=8051)
