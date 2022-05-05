@@ -62,8 +62,10 @@ class CovidBasics():
         # 2021
         self.regions_2021 = self.df.reset_index()
         self.regions_2021['month'] = pd.to_datetime(self.regions_2021['date']).dt.month_name() 
+        self.regions_2021['month_order'] = pd.to_datetime(self.regions_2021['date']).dt.month
         self.regions_2021['year'] = pd.to_datetime(self.regions_2021['date']).dt.year     
         self.regions_2021 = self.regions_2021[self.regions_2021.year == 2021].groupby(['lib_reg', 'month']).mean().reset_index()
+        self.regions_2021 = self.regions_2021.sort_values('month_order')
 
         self.radio_options = [
           { 'label': reg, 'value': reg }
@@ -186,6 +188,7 @@ class CovidBasics():
           y=yaxis,
           color='lib_reg',
           title='Mean results for 2021'
+          #category_orders={'month': ['January','February','March','April','May','June','July','August','September','October','November','December']}
         )
       return fig
 
