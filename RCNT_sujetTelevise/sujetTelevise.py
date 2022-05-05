@@ -104,7 +104,8 @@ class TvSubject():
             data_watchtime[col] = data_watchtime[col].apply(int)
 
 
-        self.df = df
+        self.data_count = data_count
+        self.data_watchtime = data_watchtime
 
         self.main_layout = html.Div(children=[
             html.H3(children='Nombre de décès par jour en France'),
