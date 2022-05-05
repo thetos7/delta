@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from YBYB_Analyse_football import football
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+foot = football.Football(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -26,6 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
+                              dcc.Link(html.Button("Football Age, Classement, Valeur Marchande", style={'width':"100%"}), href='/football'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -66,9 +69,10 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/football':
+        return foot.main_layout
     else:
         return home_page
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)
