@@ -25,7 +25,7 @@ def draw_globe_graph(countries, lst: list, emission: bool):
         data = [
             dict(type='choropleth', locations=countries, z=lst, locationmode='country names', text=countries,
                  marker=dict(line=dict(color='rgb(0,0,0)', width=1)),
-                 colorbar=dict(autotick=True, tickprefix='', title='# Temperature \nDifferences,\n°C'))]
+                 colorbar=dict(autotick=True, tickprefix='', title='# Temperature\nDifferences,\n°C'))]
         layout = dict(title='Temperature differences in countries (1900 - 2013)',
                       geo=dict(showframe=False, showocean=True, oceancolor='rgb(0,255,255)',
                                projection=dict(type='orthographic', rotation=dict(lon=60, lat=10), ),
@@ -90,12 +90,31 @@ class GlobalWarming:
 
         self.countries = np.unique(clean_temp_df.Country)
         self.main_layout = html.Div(children=[
+            html.H3(children="Analysis of the state of global warming in each country in regard to its total CO2 "
+                             "emission from the industrial sectors"),
             html.Div(children=[html.Div([dcc.Graph(figure=fig_temp), ], style={'width': '100%', }),
                                html.Br(),
                                html.Div([dcc.Graph(figure=fig_emission), ], style={'width': '100%', }),
                                html.Br()], style={
                 'display': 'flex'
             }),
+            dcc.Markdown("""
+            * Commentary (Orthographic Graph):
+                * The globes are interactive, you can see the values in each country by 
+                hovering the mouse over the location of the country on the globe. This helps the user to have a bird's-eye
+                view over certain geographically regions and the effect of global warming on such regions.
+                * The two globes indicate the temperature differences from 1900 to 2013 and the total CO2 emission 
+                from 1990 to 2018 in each country. 
+                * For the temperature differences globe, we took the difference between the average temperature of the
+                year 1990 and the average temperature of the year 2013. As we can see from the globe, countries such as: 
+                China, the United States, India, Japan, Canada, Mexico... have the biggest temperature difference.
+                * For the total C02 emission globe, we used the mean value of the yearly total CO2 emission 
+                from 1990 to 2018. As we can see on this globe, the countries that have the highest total CO2 emission 
+                are: China, the United States, India, Japan...
+                * From the two globes, we can see that the countries that have highest total CO2 emission are also 
+                the ones that have the biggest temperature differences. Therefore, the CO2 emission affects 
+                on the warming in each countries.
+            """),
             html.Div([html.Div('Countries'),
                       dcc.Dropdown(
                           id='glb-which-countries',
@@ -104,7 +123,27 @@ class GlobalWarming:
                       ),
                       ], style={'width': '25%', 'padding': '2em 0px 0px 0px'}),
             html.Div([dcc.Graph(figure=fig_line_us, id='glb-line-graph'), ], style={'width': '100%', }),
-            html.Br(),
+            dcc.Markdown("""
+            * Commentary (Line Graph):
+                * The graph represents the trend between the difference in average temperature and in total emission of 
+                a country on a given period of time
+                * The default value of the filter is World
+                    * Provide a generalized view of the correlation between global warming and annual global total 
+                    emission
+                * The resulting trend can be monitor more closely with the filter being switched to a specific country.
+                For example, China has an exponential increase in total CO2 emission around the year 2000 when they 
+                went into industrialization. A decade later around the year 2012, a massive spike on their average temperature
+                was recorded by almost 1.5 degree Celsius compare to half a decade before. As the total CO2 emission 
+                increases over the years, the average temperature experiences the same trend.
+                * The similar trend in China can be seen in many other big industrial countries 
+                such as: the United States, India, Japan... and ultimately the world. We can see that over the years, 
+                the global average temperature increases as the total CO2 emission of the world rises.
+            ### Credits:
+            * Sources : 
+               * [Climate change:](https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data) Earth Surface Temperature Data
+               * [Climate Watch:](https://www.climatewatchdata.org/data-explorer/historical-emissions?historical-emissions-data-sources=cait&historical-emissions-gases=All%20Selected%2Cco2&historical-emissions-regions=All%20Selected&historical-emissions-sectors=All%20Selected&page=1) Historical Emission
+            * (c) 2022 Luu Hoang Long Vo, Phu Hien Le
+            """)
         ], style={
             'backgroundColor': 'white',
             'padding': '10px 50px 10px 50px',
@@ -129,10 +168,10 @@ class GlobalWarming:
         country_temp = self.clean_temp_df[self.clean_temp_df.Country == country]
         country_emission = self.clean_emission_df[self.clean_emission_df.Country == country]
 
-        fig.add_trace(go.Scatter(x=country_temp.Year, y=country_temp.AverageTemperature, name="Average Temperature"),
+        fig.add_trace(go.Scatter(x=country_temp.Year, y=country_temp.AverageTemperature, name="Average Temperature (°C)"),
                       secondary_y=False)
 
-        fig.add_trace(go.Scatter(x=country_emission.Year, y=country_emission.TotalEmission, name="Total Emission"),
+        fig.add_trace(go.Scatter(x=country_emission.Year, y=country_emission.TotalEmission, name="Total Emission (MtCO₂e)"),
                       secondary_y=True)
 
         fig.update_layout(title_text="Average Temperature and Total Emission of " + country)
