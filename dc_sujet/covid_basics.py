@@ -96,7 +96,7 @@ class CovidBasics():
                * On peut notamment voir les deux pics de cas, Octobre-Novembre '2020', amenant au 2nd confinement, et Janvier 2022.
             """),
           html.Div([
-                    html.Div([ dcc.Graph(id='cvd-slider_grpah'), ], style={'width':'90%', }),
+                    html.Div([ dcc.Graph(id='cvd-slider_graph'), ], style={'width':'90%', }),
                     html.Div([
                         html.Div('Y Axis'),
                         dcc.RadioItems(id='cvd-yaxis-slider', 
@@ -172,7 +172,7 @@ class CovidBasics():
                     dash.dependencies.Input('cvd-yaxis', 'value'))(self.update_graph)
 
         self.app.callback(
-                    dash.dependencies.Output('cvd-slider_grpah', 'figure'),
+                    dash.dependencies.Output('cvd-slider_graph', 'figure'),
                     dash.dependencies.Input('cvd-year-slider', 'value'),
                     dash.dependencies.Input('cvd-yaxis-slider', 'value'))(self.slider_graph)
 
