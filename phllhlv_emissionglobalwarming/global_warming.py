@@ -1,17 +1,11 @@
-import sys
 import dash
-import flask
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.graph_objs as go
 from dash import dcc
 from dash import html
-import pandas as pd
-import numpy as np
-import plotly.graph_objs as go
-import plotly.express as px
-import dateutil as du
-import plotly.offline as py
 from pandas import DataFrame
-
-import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
@@ -41,7 +35,6 @@ def draw_globe_graph(countries, lst: list, emission: bool):
 
 
 def get_temp_diff(df: DataFrame):
-    print(df.columns)
     countries = np.unique(df[df['Country'] != 'World']['Country'])
     temp_dif_lst = []
     for country in countries:
@@ -74,10 +67,11 @@ class GlobalWarming:
 
     def __init__(self, application=None):
         clean_temp_df = load_cleaned_dataframe_from_csv(
-            "data/clean/clean_global_land_temperature_by_country.csv", cols=4)
+            "phllhlv_emissionglobalwarming/data/clean/clean_global_land_temperature_by_country.csv", cols=4)
         clean_emission_df = load_cleaned_dataframe_from_csv(
-            "data/clean/clean_total_emission_by_country.csv", cols=4)
-        clean_mean_emission_df = load_cleaned_dataframe_from_csv("data/clean/clean_mean_emission_by_country.csv",
+            "phllhlv_emissionglobalwarming/data/clean/clean_total_emission_by_country.csv", cols=4)
+        clean_mean_emission_df = load_cleaned_dataframe_from_csv("phllhlv_emissionglobalwarming/data/clean"
+                                                                 "/clean_mean_emission_by_country.csv",
                                                                  cols=36)
         clean_temp_df.dropna(inplace=True)
         clean_emission_df.dropna(inplace=True)

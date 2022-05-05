@@ -10,32 +10,44 @@ def export_to_csv(df: DataFrame, path: str):
     df.to_csv(filepath)
 
 
-def clean_temperature_data():
-    temp_country = pd.read_csv('bad_global_land_temperatures_by_country.csv')
-    temp_world = pd.read_csv('bad_global_temperatures_world.csv')
+def clean_temperature_world(temp_world: DataFrame):
+    temp_world['dt'] = pd.to_datetime(temp_world['dt'])
+    start_date = pd.to_datetime('1900-1-1')
+    mask_world = temp_world['dt'] >= start_date
+    temp_world_1900 = temp_world.loc[mask_world]
+    temp_world_yearly = temp_world_1900.groupby([pd.Grouper(key='dt', freq='Y')])[
+        'LandAverageTemperature'].mean().reset_index(name='Year')
+    temp_world_yearly.rename(columns={'dt': 'Year', 'Year': 'AverageTemperature'}, inplace=True)
+    temp_world_yearly['Year'] = pd.DatetimeIndex(temp_world_yearly['Year']).year
+    temp_world_yearly['Country'] = 'World'
+    return temp_world_yearly
+
+
+def clean_temperature_country(temp_country: DataFrame):
     # Removing the duplicated countries and countries for which no information about the temperature
     temp_country_clean = DataFrame(temp_country[~temp_country['Country'].isin(
         ['Denmark', 'Antarctica', 'France', 'Europe', 'Netherlands', 'United Kingdom', 'Africa', 'South America'])])
     temp_country_clean.replace(
         ['Denmark (Europe)', 'France (Europe)', 'Netherlands (Europe)', 'United Kingdom (Europe)'],
         ['Denmark', 'France', 'Netherlands', 'United Kingdom'], inplace=True)
+
     temp_country_clean_copy = temp_country_clean.copy()
     temp_country_clean_copy['dt'] = pd.to_datetime(temp_country_clean['dt'])
-    temp_world['dt'] = pd.to_datetime(temp_world['dt'])
     start_date = pd.to_datetime('1900-1-1')
     mask = temp_country_clean_copy['dt'] >= start_date
-    mask_world = temp_world['dt'] >= start_date
-    temp_world_1900 = temp_world.loc[mask_world]
     temp_country_1900 = temp_country_clean_copy.loc[mask]
     temp_country_yearly = temp_country_1900.groupby([pd.Grouper(key='dt', freq='Y'), 'Country'])[
         'AverageTemperature'].mean().reset_index(name='Year')
-    temp_world_yearly = temp_world_1900.groupby([pd.Grouper(key='dt', freq='Y')])[
-        'LandAverageTemperature'].mean().reset_index(name='Year')
     temp_country_yearly.rename(columns={'dt': 'Year', 'Year': 'AverageTemperature'}, inplace=True)
     temp_country_yearly['Year'] = pd.DatetimeIndex(temp_country_yearly['Year']).year
-    temp_world_yearly.rename(columns={'dt': 'Year', 'Year': 'AverageTemperature'}, inplace=True)
-    temp_world_yearly['Year'] = pd.DatetimeIndex(temp_world_yearly['Year']).year
-    temp_world_yearly['Country'] = 'World'
+    return temp_country_yearly
+
+
+def clean_temperature_data():
+    temp_country = pd.read_csv('bad_global_land_temperatures_by_country.csv')
+    temp_world = pd.read_csv('bad_global_temperatures_world.csv')
+    temp_country_yearly = clean_temperature_country(temp_country)
+    temp_world_yearly = clean_temperature_world(temp_world)
     final_temp_df = pd.concat([temp_world_yearly, temp_country_yearly], sort=True)
     final_temp_df.sort_values(['Year', 'Country'], inplace=True)
     final_temp_df.reset_index(inplace=True, drop=True)
