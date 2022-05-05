@@ -67,20 +67,19 @@ def get_missing_values(dataset, all_countries):
                     print('ERROR ERROR I REPEAT ERROR')
                 new_row = pd.DataFrame({'Country': country, 'Year': year, 'Value': new_value}, index=[0])
                 dataset = pd.concat([new_row, dataset.loc[:]]).reset_index(drop=True)
-    # verify
-    """for country in list_countries:
-        print(country)
-        nbr_rows = len(dataset[dataset.Country == country])
-        print(nbr_rows)"""
 
     return dataset
 
 
+# Params: dataset - src dataset;
+#         countries_list - intersection of countries contained in all datasets
+# Return: dataset without useless rows (where the related county name won't be shown on the interface)
 def drop_rows_not_in_countries(dataset, countries_list):
     dataset = dataset[dataset['Country'].isin(countries_list)]
     return dataset
 
 
+# Make all datasets ready for future instructions
 def get_all_datasets():
     # real_happiness
     real_happiness_dataset = get_real_happiness_dataset()
@@ -119,12 +118,14 @@ def get_all_datasets():
                                                                         safety_countries), gdp_countries),
                                               social_security_contribution_countries), unemployment_countries)
 
+    # Add values if empty cells
     real_happiness_dataset = get_missing_values(real_happiness_dataset, all_countries)
     safety_dataset = get_missing_values(safety_dataset, all_countries)
     gdp_dataset = get_missing_values(gdp_dataset, all_countries)
     social_security_contribution_dataset = get_missing_values(social_security_contribution_dataset, all_countries)
     unemployment_dataset = get_missing_values(unemployment_dataset, all_countries)
 
+    # Get datasets ready for future instructions by renaming them properly
     safety_dataset.rename(columns={'Value': 'Safety Index'}, inplace=True)
     gdp_dataset.rename(columns={'Value': 'GDP Index'}, inplace=True)
     social_security_contribution_dataset.rename(columns={'Value': 'Social Security Employer Contribution Index'},

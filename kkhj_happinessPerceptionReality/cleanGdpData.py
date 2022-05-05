@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
+# extract data
 def get_dataframe():
     df = pd.read_csv("kkhj_happinessPerceptionReality/data/GDP_per_capita.csv")
     df.rename(columns={'Country Name': 'Country'}, inplace=True)

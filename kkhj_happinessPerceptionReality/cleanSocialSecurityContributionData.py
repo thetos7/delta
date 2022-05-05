@@ -1,13 +1,15 @@
 import pandas as pd
 
+
+# Extract data, make it ready for future instructions
 def get_security_contribution():
     df = pd.read_excel("kkhj_happinessPerceptionReality/data/socialSecurityContributions.xlsx")
     df = df.melt(['Country'], var_name='Year', value_name='Social Security Employer Contribution Index')
-    # TODO if don't want to keep empty cells => decomment line below
+    # Delete columns if there is any empty cells
     return df[(df != '-').all(1)]
 
-# print(get_security_contribution()['Year'])
 
+# Convert contribution rates to index (out of 10)
 def security_contribution_out_of_10():
     df = get_security_contribution()
     df.loc[:, df.columns == 'Social Security Employer Contribution Index'] = df.loc[:, df.columns == 'Social Security Employer Contribution Index'].div(10)

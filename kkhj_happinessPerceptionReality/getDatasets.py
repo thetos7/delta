@@ -3,8 +3,9 @@ from kkhj_happinessPerceptionReality.cleanEducationLevelData import *
 import pycountry_convert as pc
 
 
+# Merge all datasets into one
 def get_datasets():
-    # Extract datasets
+    # Extract datasets by completing missing values
     data = get_all_datasets()
     datasets = {'safety': data[1], 'unemployment': data[4],
                 'socialContribution': data[3], 'gdpPerCapita': data[2],
@@ -24,6 +25,7 @@ def get_datasets():
     return add_continents(df.set_index('Year'))
 
 
+# Associate continents to each country
 def add_continents(datasets):
     continents = {
         'NA': 'North America',
