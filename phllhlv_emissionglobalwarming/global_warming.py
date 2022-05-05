@@ -138,6 +138,8 @@ class GlobalWarming:
                 * The similar trend in China can be seen in many other big industrial countries 
                 such as: the United States, India, Japan... and ultimately the world. We can see that over the years, 
                 the global average temperature increases as the total CO2 emission of the world rises.
+                * Limited access to data is a draw back of this project since the availability of emission data only 
+                dates back from 1990
             ### Credits:
             * Sources : 
                * [Climate change:](https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data) Earth Surface Temperature Data
