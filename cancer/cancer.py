@@ -55,6 +55,8 @@ class Cancer():
         app = Dash(__name__)
         self.df =px.data.tips()
         self.df1 = px.data.tips()
+        self.df2 =px.data.tips()
+        self.df3 =px.data.tips()
         self.main_layout = html.Div(children=[
             html.H3(children='Répartition des Cancers entre les pays'),
             html.Div([dcc.Graph(id='cancer-main-graph'), 
@@ -178,14 +180,14 @@ class Cancer():
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
         sub_df = sub_df[sub_df['Sex'].isin(selected_sex)]
-        fig = px.histogram(self.df1, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Sex'],text_auto=True)
+        fig = px.histogram(self.df2, x=sub_df['Type of Cancer'],y=sub_df['Number of cases'],labels={'x':'Type of Cancer', 'y':'Number of cases'},color=sub_df['Sex'],text_auto=True)
         fig.update_layout(xaxis_title="Type of Cancer", yaxis_title="Number of cases")
         return fig
     
     def update_graph_country(self,continent_id,column_x):
         sub_df= self.World[self.World['Continent'].isin(continent_id)]
         sub_df = sub_df[sub_df['Type of Cancer'].isin(column_x)]
-        fig = px.histogram(self.df1, x=sub_df['Country'],y=sub_df['Number of cases'],labels={'x':'Country', 'y':'Number of cases'},color=sub_df['Type of Cancer'],text_auto=True)
+        fig = px.histogram(self.df3, x=sub_df['Country'],y=sub_df['Number of cases'],labels={'x':'Country', 'y':'Number of cases'},color=sub_df['Type of Cancer'],text_auto=True)
         fig.update_layout(xaxis_title="Country", yaxis_title="Number of cases")
         return fig
     # def update_graph(self, current_df, column_x, column_y, marginal_option):
