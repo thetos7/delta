@@ -1,14 +1,9 @@
-import sys
-import dash
-import flask
-from dash import dcc
-from dash import html, Dash, Output, Input, dash_table
 # import dash_design_kit as ddk
 import pandas as pd
-import numpy as np
-import plotly.graph_objs as go
 import plotly.express as px
-import dateutil as du
+import plotly.graph_objs as go
+from dash import dcc
+from dash import html, Dash, Output, Input, dash_table
 
 pd.options.plotting.backend = "plotly"
 
@@ -49,15 +44,6 @@ class Top100BillboardUSA:
         self.app = Dash(__name__) if application is None else application
         self.app.layout = self.main_layout
 
-        """self.app.layout = ddk.App([
-            ddk.Header([
-                ddk.Menu(dcc.Link(page['name'], href=page['path']))
-                for page in dash.page_registry
-            ]),
-
-            dash.page_container
-        ])"""
-
         # Adding callbacks
         self.callbacks()
 
@@ -67,8 +53,7 @@ class Top100BillboardUSA:
         Returns the default layout for the Dash application.
         :return: html.Div
         """
-        graph_year = [dcc.Graph(id='weeks-on-board-year-{}'.format(i), figure=self.get_weeks_on_board_fig_year(i)) for i
-                      in range(1989, 1996)]
+
         layout = html.Div([
             html.H1('Top 100 Billboard USA'),
 
@@ -80,7 +65,6 @@ class Top100BillboardUSA:
             
             
             '''),
-            dcc.Graph(id='new_artist_on_board_fig', figure=self.get_new_artist_on_board_fig()),
             dcc.Graph(id='weeks-on-board-plot', figure=self.get_weeks_on_board_fig()),
             dcc.Markdown('''
             Un large pic est visible à la 20e semaine.   
@@ -91,8 +75,9 @@ class Top100BillboardUSA:
             stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si elles se classent en dessous de la 50e place.   
             De même pour les chansons au classement depuis 1 an, si elles se trouvent en dessous de la 25e position.   
             '''),
-            html.Div([graph_year[0], graph_year[1], graph_year[2], graph_year[3], graph_year[4], graph_year[5],
-                      graph_year[6]]),
+            dcc.Graph(id='weeks-on-board-fig-year', figure=self.get_weeks_on_board_fig_year()),
+            dcc.Graph(id='new_artist_on_board_fig', figure=self.get_new_artist_on_board_fig()),
+
             html.H3('Graphs by artist'),
             dcc.Dropdown(id="artist-dropdown", options=self.df.artist.unique().tolist(), value='Michael Jackson'),
             html.Div(id='artist-dropdown-output'),
@@ -123,23 +108,23 @@ class Top100BillboardUSA:
             Input('artist-dropdown', 'value')
         )
         def update_artist_dropdown(input_value):
-            # self.generate_artist_gaph(self.df[self.df['artist'] == input_value])
             return generate_dash_table(self.df[self.df['artist'] == input_value])
-
-        # # Example callback
-        # @self.app.callback(Output("foo", "children"), Input('my-input', 'value'))
-        # def update_graph(input_value):
-        #     return html.Div([
-        #         html.H2(input_value),
-        #         self.generate_table(self.df),
-        #     ])
 
     @staticmethod
     def load_billboard_dataframe() -> pd.DataFrame:
         df = pd.read_csv('data/top_100_billboard_usa.csv')
         df["date"] = pd.to_datetime(df["date"])
-
         return df
+
+    def get_max_weeks_on_board_count(self, df=None) -> pd.Series:
+        """
+        Returns the distribution of weeks on board
+        :return: pd.Series
+        """
+        if df is None:
+            df = self.df
+        max_weeks_on_board_count = df.groupby(by=["artist", "song"])["weeks-on-board"].max().value_counts()
+        return max_weeks_on_board_count
 
     def get_weeks_on_board_fig(self):
         """
@@ -147,30 +132,44 @@ class Top100BillboardUSA:
         :return: plotly.graph_objs.Figure
         """
         # Creating the figure
-        max_weeks_on_board = self.df.groupby(by=["artist", "song"]).max("weeks-on-board").value_counts("weeks-on-board")
-        fig = max_weeks_on_board.reindex(list(range(1, max_weeks_on_board.index.max() + 1)), fill_value=0).plot.bar()
-        name = "Count"
+        max_weeks_on_board_count = self.get_max_weeks_on_board_count()
+        fig = max_weeks_on_board_count.reindex(
+            list(range(1, max_weeks_on_board_count.index.max() + 1)),
+            fill_value=0
+        ).plot.bar()
+
         fig.update_layout(showlegend=False)
 
-        fig.update_layout(title="Nombre de semaines consécutives qu'une musique reste au Billboard, de 1958 à 2021")
-        fig.update_layout(xaxis_title="Nombre de semaines consécutives", yaxis_title="Nombre de musiques")
+        fig.update_layout(title="Distribution du nombre de semaines des musiques au Billboard, de 1958 à 2021")
+        fig.update_layout(xaxis_title="Nombre de semaines", yaxis_title="Nombre de musiques")
         return fig
 
-    def get_weeks_on_board_fig_year(self, year):
-        """
-        Returns a plotly figure of the number of weeks on the billboard for a specific year.
-        :return: plotly.graph_objs.Figure
-        """
-        # 7 years
-        df_tmp = self.df[self.df["date"].dt.year == year]
-        # Creating the figure
-        max_weeks_on_board = df_tmp.groupby(by=["artist", "song"]).max("weeks-on-board").value_counts("weeks-on-board")
+    def get_weeks_on_board_fig_year(self):
 
-        # We take weeks-on-board up to 45 since there are no relevant data afterwards
-        fig = max_weeks_on_board.reindex(list(range(1, 45)), fill_value=0).plot.bar()
-        fig.update_layout(showlegend=False)
-        fig.update_layout(title="{}".format(year))
-        fig.update_layout(xaxis_title="Nombre de semaines consécutives", yaxis_title="Nombre de musiques")
+        tmp_year_list = []
+        for year in sorted(self.df.date.dt.year.unique(), reverse=False):
+            df_tmp = self.df[self.df["date"].dt.year == year]
+
+            max_weeks_on_board_count = self.get_max_weeks_on_board_count(df_tmp)
+
+            max_weeks_on_board_count = max_weeks_on_board_count.reindex(
+                range(1, max_weeks_on_board_count.index.max() + 1), fill_value=0)
+            for week, count in max_weeks_on_board_count.items():
+                tmp_year_list.append((year, week, count))
+
+        weeks_on_board_year = pd.DataFrame(data=tmp_year_list, columns=["year", "week", "count"])
+        weeks_on_board_year = weeks_on_board_year.sort_values(["year", "week"], ascending=True)
+        fig = px.bar(weeks_on_board_year, x="week", y="count", animation_frame="year")
+
+        # Setting titles
+        fig.update_layout(xaxis_title="Nombre de semaines", yaxis_title="Nombre de musiques")
+        fig.layout.sliders[0].currentvalue = {'prefix': 'Année: '} # Update slider label
+
+        # Setting plot parameters
+        fig.update_xaxes(range=[0, 52]), fig.update_yaxes(range=[0, 250])  # Set the range of all axis
+        fig.update_layout(height=800)
+        fig.layout.updatemenus[0].buttons[0].args[1]['frame']['duration'] = 250  # Update animation speed
+
         return fig
 
     def get_new_artist_on_board_fig(self) -> go.Figure:
@@ -191,10 +190,12 @@ class Top100BillboardUSA:
                        labels={'x': 'Années', 'y': 'Nombre de nouvels artistes'})
 
     @property
-    def artist_count(self): return len(self.df["artist"].unique())
+    def artist_count(self):
+        return len(self.df["artist"].unique())
 
     @property
-    def song_count(self): return len(self.df["song"].unique())
+    def song_count(self):
+        return len(self.df["song"].unique())
 
 
 if __name__ == '__main__':

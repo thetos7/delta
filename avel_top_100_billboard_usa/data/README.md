@@ -8,7 +8,8 @@ Elles ne sont pas téléchargées par le script puisqu'il est nécessaire de pas
 Bien que les données soient en libre accès, il est nécessaire de posséder un token d'identification
 et donc, d'un compte gratuit pour pouvoir télécharger les données.
 
-Le module Python `kaggle` est disponible [sur pypi (pip)](https://pypi.org/project/kaggle/) mais n'est pas utilisable dans le
+Le module Python `kaggle` est disponible [sur pypi (pip)](https://pypi.org/project/kaggle/) mais n'est pas utilisable
+dans le
 projet puisqu'il n'est pas autorisé de rajouter des dépendances.
 
 Si cela était possible, l'import se ferait de la manière suivante (en bash ou dans un script iPython avec un `!` devant
