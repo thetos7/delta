@@ -208,10 +208,10 @@ sources = {
     },
 }
 
+df = pd.DataFrame()
+
 for year, src in sources.items():
     print(f"Collecting data for {year}")
-    os.makedirs(year, exist_ok=True)
-
     print("Reading user data...")
     usagers = pd.read_csv(src['usagers']['url'], **src['usagers']['opts'])
     print("Reading accident caracteristics data...")
@@ -222,13 +222,18 @@ for year, src in sources.items():
 
     if 'process' in src['caracteristiques']:
         caracs = src['caracteristiques']['process'](caracs)
+    
+    acc_grav = usagers[['Num_Acc','grav']].groupby('Num_Acc').agg('max')
+    acc_caracs_grav = pd.merge(caracs, acc_grav, how='inner', on='Num_Acc')
+    acc_caracs_grav['year'] = year
 
-    # TODO process data, cleanup, join...
-    # ...
+    # print("Writing file(s)...")
+    # usagers.to_csv(f"{year}/usagers.csv", index=False)
+    # caracs.to_csv(f"{year}/caracteristiques.csv", index=False)
+    df = pd.concat([df, acc_caracs_grav])
 
-    print("Writing file(s)...")
-    usagers.to_csv(f"{year}/usagers.csv", index=False)
-    caracs.to_csv(f"{year}/caracteristiques.csv", index=False)
+df = df.drop(columns=['hrmn', 'gps', 'adr', 'com', 'atm', 'int'])
+df.to_pickle(f"acc_caracs_grav.pkl")
 
 print()
 print("Done.")

@@ -3,12 +3,19 @@ import dash
 from dash import html
 import dash_core_components as dcc
 import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.express as px
+%matplotlib inline
 
 # TODO create layout
 class Accidents:
+    START = 'Start'
+    STOP  = 'Stop'
+
     def __init__(self, application = None):
         file_dir = os.path.dirname(os.path.realpath(__file__))
-        map_filepath = f'{file_dir}/map.html' 
+        map_filepath = f'{file_dir}/map.html'
         map_html: Union[str, None] = None
         try:
             with open(map_filepath, 'r') as map_file:
@@ -26,7 +33,7 @@ class Accidents:
                     'align-self': 'center'
                 }
             ) if map_html is not None else dcc.Markdown(f"""
-            Map HTML file `{map_filepath}` is missing.  
+            Map HTML file `{map_filepath}` is missing.
             It may not have generated correctly.
             """),
             dcc.Markdown("""
@@ -52,10 +59,10 @@ class Accidents:
         else:
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
-            
+
     def run(self, debug=False, port=8050):
         self.app.run_server(host="0.0.0.0", debug=debug, port=port)
-            
+
 if __name__ == '__main__':
     acc = Accidents()
     acc.run(port=8065)
