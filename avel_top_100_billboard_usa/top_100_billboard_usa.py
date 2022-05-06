@@ -67,7 +67,8 @@ class Top100BillboardUSA:
         Returns the default layout for the Dash application.
         :return: html.Div
         """
-        graph_year = [dcc.Graph(id='weeks-on-board-year-{}'.format(i), figure=self.get_weeks_on_board_fig_year(i)) for i in range(1989, 1996)]
+        graph_year = [dcc.Graph(id='weeks-on-board-year-{}'.format(i), figure=self.get_weeks_on_board_fig_year(i)) for i
+                      in range(1989, 1996)]
         layout = html.Div([
             html.H1('Top 100 Billboard USA'),
 
@@ -90,7 +91,8 @@ class Top100BillboardUSA:
             stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si elles se classent en dessous de la 50e place.   
             De même pour les chansons au classement depuis 1 an, si elles se trouvent en dessous de la 25e position.   
             '''),
-            html.Div([graph_year[0], graph_year[1], graph_year[2], graph_year[3], graph_year[4], graph_year[5], graph_year[6]]),
+            html.Div([graph_year[0], graph_year[1], graph_year[2], graph_year[3], graph_year[4], graph_year[5],
+                      graph_year[6]]),
             html.H3('Graphs by artist'),
             dcc.Dropdown(id="artist-dropdown", options=self.df.artist.unique().tolist(), value='Michael Jackson'),
             html.Div(id='artist-dropdown-output'),
@@ -139,6 +141,20 @@ class Top100BillboardUSA:
 
         return df
 
+    def get_weeks_on_board_fig(self):
+        """
+        Returns a plotly figure of the number of weeks on the billboard.
+        :return: plotly.graph_objs.Figure
+        """
+        # Creating the figure
+        max_weeks_on_board = self.df.groupby(by=["artist", "song"]).max("weeks-on-board").value_counts("weeks-on-board")
+        fig = max_weeks_on_board.reindex(range(1, len(max_weeks_on_board))).plot.bar()
+        name = "Count"
+        fig.update_layout(showlegend=False)
+
+        fig.update_layout(title="Nombre de semaines consécutives qu'une musique reste au Billboard, de 1958 à 2021")
+        fig.update_layout(xaxis_title="Nombre de semaines consécutives", yaxis_title="Nombre de musiques")
+        return fig
 
     def get_weeks_on_board_fig_year(self, year):
         """
@@ -153,7 +169,6 @@ class Top100BillboardUSA:
         fig.update_layout(showlegend=False)
         fig.update_layout(title="{}".format(year))
         fig.update_layout(xaxis_title="Nombre de semaines consécutives", yaxis_title="Nombre de musiques")
-
         return fig
 
     def get_new_artist_on_board_fig(self) -> go.Figure:
