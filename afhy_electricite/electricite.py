@@ -9,9 +9,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+'''
+Authors: Arthur Fan; Hao Ye
+Create on 06/05/2022
+'''
 
 class Eletricite():
     def __init__(self, application = None):
+        # Retrieve pre-processed data 
         df_full_selected = pd.read_pickle("afhy_electricite/data/preprocessed_maingraphdata.pkl")
         df_by_year = df_full_selected.groupby(by=df_full_selected.index.year).sum()
         df_animated = pd.read_pickle("afhy_electricite/data/preprocessed_barplotdata.pkl")
@@ -28,9 +33,11 @@ class Eletricite():
 
             html.H1(children='Evolution de la production d\'électricité dans les différents secteurs et du prix de l\'électricité en France de 2012 à 2020'),
             html.H2(children='Graphique Intéractif'),
+            # Main graph 
             html.Div([dcc.Graph(id='main_graph')]),
             html.Div([
                 html.Div([
+                    # Dropdown to select electricity's souscription
                     html.Div('Souscription'),
                     dcc.Dropdown(
                         [3, 6, 9, 12, 15],
@@ -39,6 +46,7 @@ class Eletricite():
                     )
                 ], style={'width': '90px', 'display': 'inline-block'}),
                 html.Div([html.Div('PART'),
+                    # Dropdown to select electricity price part
                     dcc.Dropdown(
                         ['PART_FIXE_HT','PART_FIXE_TTC','PART_VARIABLE_HT','PART_VARIABLE_TTC'],
                         'PART_VARIABLE_TTC',
@@ -46,6 +54,7 @@ class Eletricite():
                     )
                 ], style={'width': '220px', 'display': 'inline-block', 'margin':"0px 10px 0px 10px"}),
                 html.Div([html.Div('Affichage'),
+                    # Dropdown to select the period
                     dcc.Dropdown(
                         [
                             {'label': 'Jour', 'value': 'D'},
@@ -56,6 +65,7 @@ class Eletricite():
                     )
                 ], style={'width': '90px', 'display': 'inline-block', 'margin':"0px 10px 0px 10px"}),
                 html.Div([html.Div('Échelle de la production'),
+                    # To switch the type of 1st y axis
                     dcc.RadioItems(
                         ['Linear', 'Log'],
                         'Linear',
@@ -64,6 +74,7 @@ class Eletricite():
                     )
                 ], style={'width': '200px', 'display': 'inline-block'}),
                 html.Div([html.Div('Échelle des prix'),
+                    # To switch the type of 2nd y axis
                     dcc.RadioItems(
                         ['Linear', 'Log'],
                         'Linear',
@@ -96,6 +107,7 @@ class Eletricite():
                 html.Div([
                     html.Div([
                         html.Div('Année'),
+                        # Dropdown to select year
                         dcc.Dropdown(
                             list(df_by_year.index),
                             "2012",
@@ -123,6 +135,7 @@ class Eletricite():
                 html.Div([dcc.Graph(id='production_bar')]),
                 html.Div([
                     html.Div([
+                        # Select the start date D/M/Y
                         html.Div('Date de début'),
                         html.Div([
                             html.Div('Jour'),
@@ -150,6 +163,7 @@ class Eletricite():
                         ], style={'width': '90px', 'display': 'inline-block', 'margin':"0px 10px 0px 10px"})
                     ]),
                     html.Div([
+                        # Select the end date D/M/Y
                         html.Div('Date de Fin'),
                         html.Div([
                             html.Div('Jour'),
@@ -197,6 +211,7 @@ class Eletricite():
             html.H2(children='Diagramme en bâtons animé de la production d\'électricité de 2012 à 2020'),
             html.Div([
                 html.Div([html.Div('Échelle'),
+                    # To switch the type of axis
                     dcc.RadioItems(
                         ['Linear', 'Log'],
                         'Linear',
@@ -224,9 +239,9 @@ class Eletricite():
                 * Le nucléaire représente la filière de production principale d'électricité en France, devant l'hydraulique  
                 \n
 
-                Comme nous avons pu le constater, le prix de l'électricité n'est pas lié à la production d'électricité. Cela est dû au fait 
-                que le prix de l'électricité est établie par le gouvernement Français. Néanmoins nous pouvons remarqué qu'en France, 
-                l'électricité est essentiellement produit avec du nucléaire.
+                Comme nous avons pu le constater, le prix de l'électricité n'est pas fortement lié à la production d'électricité. Cela est dû au fait 
+                que le prix de l'électricité est établie par le gouvernement Français. L'état français régule le prix en cas de besoin. 
+                Néanmoins nous pouvons remarqué qu'en France, l'électricité est essentiellement produit avec du nucléaire ce qui peut expliquer la faible prix d'électricité en France comparer aux autres pays européens.
 
                 #### À propos
 
@@ -250,6 +265,7 @@ class Eletricite():
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
         
+        # Main graph's callback function 
         self.app.callback(
                     Output('main_graph', 'figure'),
                     Input('souscription_selection', 'value'),
@@ -258,10 +274,12 @@ class Eletricite():
                     Input('period_selection', 'value'),
                     Input('type_selection', 'value'))(self.update_main_graph)
 
+        # Pie chart's callback function
         self.app.callback(
                     Output('pie_chart', 'figure'),
                     Input('year_selection', 'value'))(self.update_pie_graph)
 
+        # Barplot's callback function
         self.app.callback(
                     Output('production_bar', 'figure'),
                     Input('day_start_bar', 'value'),
@@ -271,18 +289,23 @@ class Eletricite():
                     Input('month_end_bar', 'value'),
                     Input('year_end_bar', 'value'))(self.update_bar_graph)
 
+        # Animate barplot's callback function
         self.app.callback(
             Output("animated_bargraph", "figure"),
             Input("animated_type_xaxis", "value"))(self.display_animated_graph)
 
     def update_main_graph(self, souscription_selection, yaxis2_type, yaxis1_type, period_selection, type_selection):
     
-        #souscription = int(souscription_selection)
+        # Group by the selected period 
         dff_full_selected = self.df_full_selected.copy().groupby(pd.Grouper(freq=period_selection)).sum()
+        # Get the corresponded column
         dff_prix = self.df_prix[self.df_prix['P_SOUSCRITE'] == souscription_selection]
         
+        # Plot a main graph 
         subfig = make_subplots(specs=[[{"secondary_y": True}]])
+        # 1st yaxis
         fig_1 = px.line(dff_full_selected, render_mode="webgl")
+        # 2nd yaxis
         fig_2 = px.line(dff_prix[type_selection], render_mode="webgl")
         fig_2.update_traces(yaxis="y2")
         
@@ -291,16 +314,19 @@ class Eletricite():
         subfig.layout.xaxis.title="Date"
         subfig.layout.yaxis.title="MW"
         
+        # Define the type of 1st y axis
         if yaxis1_type == 'Linear':
             subfig.layout.yaxis.type="linear"
         else:
             subfig.layout.yaxis.type="log"
         
+        # Define the type of 2nd y axis
         if yaxis2_type == 'Linear':
             subfig.layout.yaxis2.type="linear"
         else:
             subfig.layout.yaxis2.type='log'
         
+        # Add title
         subfig.layout.yaxis2.title="prix par MW en euros"
         subfig.for_each_trace(lambda t: t.update(line=dict(color=t.marker.color)))
         
@@ -308,6 +334,7 @@ class Eletricite():
     
     def update_pie_graph(self, year_selection):
 
+        # Get data by selected year
         dff = self.df_full_selected.groupby(by=self.df_full_selected.index.year).sum().copy()
         i = int(year_selection) - 2012
         
@@ -329,7 +356,9 @@ class Eletricite():
 
     def update_bar_graph(self, day_start_bar, month_start_bar, year_start_bar, day_end_bar, month_end_bar, year_end_bar):
         df = self.df_full_selected.copy()
+        # Define the start date
         date_start = str(year_start_bar) + '-' + str(month_start_bar) + '-' + str(day_start_bar)
+        # Define the end date
         date_end = str(year_end_bar) + '-' + str(month_end_bar) + '-' + str(day_end_bar)
         fig = px.bar(df.loc[date_start: date_end].sum(), color=df.columns, text_auto='.2s')
         fig.update_traces(textfont_size=14, textangle=0, textposition="outside", cliponaxis=False)
@@ -345,12 +374,13 @@ class Eletricite():
         fig = px.bar(
             df, x='Type', y="Value", color="Type",
             title="",
+            # Make animation
             animation_group="Type", animation_frame='Date')
         fig.update_layout(
             xaxis = dict(title="Filière de production"),
             yaxis= dict(title="Production en MW")
         )
-        
+
         fig.update_yaxes(type="linear" if animated_type_xaxis == "Linear" else "log")
         
         return fig
