@@ -16,12 +16,15 @@ class TBGT:
 
     def _get_relations_radio(self) -> dcc.RadioItems:
         relations = [self.RELATION_DEFAULT] + list(self.train_df.groups.keys())
-        return dcc.RadioItems(
-            relations,
-            value=self.RELATION_DEFAULT,
-            id="relations",
-            style={"font-size": "10px"}
-        )
+        return html.Div([
+            "Grandes lignes SNCF:",
+            dcc.RadioItems(
+                relations,
+                value=self.RELATION_DEFAULT,
+                id="relations",
+                style={"font-size": "10px", "margin": "10px"}
+            )
+        ], style={"display": "inline-block", "width": "20%"})
 
     def _get_coords(self, src: str, dst: str) -> Tuple[Coords, Coords]:
         return (
@@ -73,8 +76,12 @@ class TBGT:
                 "Évolution de la population des villes françaises "
                 "vis-à-vis du développement des grandes lignes SNCF"
             ),
-            dcc.Graph(id="map", figure=self._get_map()),
-            self._get_relations_radio(),
+            html.Div([
+                self._get_relations_radio(),
+                dcc.Graph(id="map", figure=self._get_map(),
+                          style={"display": "inline-block", "width": "75%",
+                                 "position": "relative", "vertical-align": "top"}),
+            ])
         ], style={
             "backgroundColor": "white",
             "padding": "10px 50px 10px 50px",
