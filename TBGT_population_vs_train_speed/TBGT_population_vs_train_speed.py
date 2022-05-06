@@ -48,6 +48,7 @@ class TBGT:
         ))
 
         fig.update_layout(
+            title=f"Ligne: {relation}",
             hovermode="closest",
             mapbox=dict(
                 accesstoken=mapbox_access_token,
