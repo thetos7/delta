@@ -22,7 +22,7 @@ def _clean_train(train_df: pd.DataFrame) -> None:
     train_df.loc[train_df["Relations"] == "PARIS - CLERMONT FERRAND", "Relations"] = "PARIS - CLERMONT-FERRAND"
     train_df.loc[train_df["Relations"] == "PARIS - ST ETIENNE", "Relations"] = "PARIS - SAINT-ETIENNE"
 
-def get_train_data() -> pd.DataFrame:
+def get_train_data() -> pd.core.groupby.DataFrameGroupBy:
     train_df = pd.read_csv(TRAIN_PATH, sep=";")
     train_df.sort_values("Année", inplace=True)
     _clean_train(train_df)
