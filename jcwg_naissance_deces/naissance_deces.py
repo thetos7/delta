@@ -183,13 +183,13 @@ class Naissance():
             En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la carte, réinitialiser avec un double clic et utiliser le lasso pour sélectionner plusieurs départements.
 
             #### Informations intéressantes :
-               * On remarque que les grosses villes ont un important nombre de naissance et un plus faible nombre de décès.
+               * On remarque que les grosses villes ont un important nombre de naissances et un plus faible nombre de décès.
                 Avec l'âge les gens finissent leur vie en régions plutôt que dans les grandes villes.
-               * Cela se confirme en étudiant les départements unitairement, les zones à forte population ont plus de naissance que de décès.
+               * Cela se confirme en étudiant les départements unitairement, les zones à forte population ont plus de naissances que de décès.
                 On observe le phénomène inverse dans les départements moins peuplés.
-               * On observe une croissance démographique en France, il y a plus de naissance que de décès.
+               * On observe une croissance démographique en France, il y a plus de naissances que de décès.
                * On repère les hivers avec un nombre plus important de mort durant ces périodes.
-               * On observe moins de naissance de février à avril, pour un pic de naissance en juillet.
+               * On observe moins de naissances de février à avril, pour un pic de naissances en juillet.
                * Les hommes ont en moyenne des enfants plus tard que les femmes.
                * Les femmes vivent plus longtemps que les hommes.
 
@@ -368,22 +368,22 @@ class Naissance():
                 what += [(d, self.agen, 'SIZEPEREN', 'Homme ' +
                           self.dep_map[d]) for d in dep]
             if 'Somme' in type:
-                what += [(d, self.agen, 'SIZEMEREPEREN', 'H/F somme ' +
+                what += [(d, self.agen, 'SIZEMEREPEREN', 'Somme H/F ' +
                           self.dep_map[d]) for d in dep]
             if 'Moyenne' in type:
-                what += [(d, self.agen, 'MGMEREPEREN', 'H/F moyenne ' +
+                what += [(d, self.agen, 'MGMEREPEREN', 'Moyenne H/F ' +
                           self.dep_map[d]) for d in dep]
 
         else:
             data = self.agen.loc[dep].reset_index().groupby(['level_1']).sum()
             if 'Femme' in type:
-                what += [(None, data, 'SIZEMEREN', 'Femme cumulée')]
+                what += [(None, data, 'SIZEMEREN', 'Total femmes')]
             if 'Homme' in type:
-                what += [(None, data, 'SIZEPEREN', 'Homme cumulée')]
+                what += [(None, data, 'SIZEPEREN', 'Total hommes')]
             if 'Somme' in type:
-                what += [(None, data, 'SIZEMEREPEREN', 'H/F cumulée')]
+                what += [(None, data, 'SIZEMEREPEREN', 'Total H/F')]
             if 'Moyenne' in type:
-                what += [(None, data, 'MGMEREPEREN', 'H/F moyenne')]
+                what += [(None, data, 'MGMEREPEREN', 'Moyenne H/F')]
 
         return self.cts(self.age_naissances_axis, what,
                         "Nombre de naissance en fonction de l'age")
@@ -400,21 +400,21 @@ class Naissance():
                 what += [(d, self.aged, 'SIZEPERED', 'Homme ' +
                           self.dep_map[d]) for d in dep]
             if 'Somme' in type:
-                what += [(d, self.aged, 'SIZEMEREPERED', 'H/F somme ' +
+                what += [(d, self.aged, 'SIZEMEREPERED', 'Somme H/F ' +
                           self.dep_map[d]) for d in dep]
             if 'Moyenne' in type:
-                what += [(d, self.aged, 'MGMEREPERED', 'H/F moyenne ' +
+                what += [(d, self.aged, 'MGMEREPERED', 'Moyenne H/F ' +
                           self.dep_map[d]) for d in dep]
         else:
             data = self.aged.loc[dep].reset_index().groupby(['AGE']).sum()
             if 'Femme' in type:
-                what += [(None, data, 'SIZEMERED', 'Femme cumulée')]
+                what += [(None, data, 'SIZEMERED', 'Total femmes')]
             if 'Homme' in type:
-                what += [(None, data, 'SIZEPERED', 'Homme cumulée')]
+                what += [(None, data, 'SIZEPERED', 'Total hommes')]
             if 'Somme' in type:
-                what += [(None, data, 'SIZEMEREPERED', 'H/F cumulée')]
+                what += [(None, data, 'SIZEMEREPERED', 'Total H/F')]
             if 'Moyenne' in type:
-                what += [(None, data, 'MGMEREPERED', 'H/F moyenne')]
+                what += [(None, data, 'MGMEREPERED', 'Moyenne H/F')]
 
         return self.cts(self.age_deces_axis, what,
                         "Nombre de décès en fonction de l'age")
