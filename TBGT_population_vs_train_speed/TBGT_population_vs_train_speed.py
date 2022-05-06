@@ -29,7 +29,7 @@ class TBGT:
                 id="relations",
                 style={"font-size": "10px", "margin": "10px"}
             )
-        ], style={"margin": "10px", "display": "inline-block", "width": "20%"})
+        ], style={"margin": "10px", "display": "inline-block", "width": "15%"})
 
     def _get_coords(self, src: str, dst: str) -> Tuple[Coords, Coords]:
         return (
@@ -56,6 +56,7 @@ class TBGT:
         ))
 
         fig.update_layout(
+            margin=dict(l=30, r=30, t=100, b=100),
             title=f"Ligne: {relation}",
             hovermode="closest",
             mapbox=dict(
@@ -66,7 +67,7 @@ class TBGT:
                     lon=self.FRANCE_CENTER[1]
                 ),
                 pitch=0,
-                zoom=3.5
+                zoom=4.5
             )
         )
 
@@ -126,11 +127,10 @@ class TBGT:
 
     def _get_statistics_graph(self) -> html.Div:
         return html.Div([
-            dcc.Graph(id="line_speed_fig", figure=self._get_line_speed_fig(),
-                      style={"display": "inline-block", "width": "50%"}),
-            dcc.Graph(id="pop_fig", figure=self._get_pop_fig(),
-                      style={"display": "inline-block", "width": "50%"}),
-        ])
+            dcc.Graph(id="line_speed_fig", figure=self._get_line_speed_fig()),
+            dcc.Graph(id="pop_fig", figure=self._get_pop_fig())
+        ], style={"display": "inline-block", "width": "40%",
+                  "position": "relative", "vertical-align": "top"})
 
     def __init__(self, application = None):
         self.train_df = get_train_data()
@@ -144,12 +144,11 @@ class TBGT:
             ),
             html.Div([
                 self._get_relations_radio(),
-                html.Div([
-                    dcc.Graph(id="map_fig", figure=self._get_map_fig()),
-                    self._get_statistics_graph()
-                ], style={"display": "inline-block", "width": "75%",
-                          "position": "relative", "vertical-align": "top"})
-
+                dcc.Graph(id="map_fig", figure=self._get_map_fig(),
+                          style={"display": "inline-block", "width": "40%",
+                                 "position": "relative", "vertical-align": "top",
+                                 "height": "900px"}),
+                self._get_statistics_graph()
             ])
         ], style={
             "backgroundColor": "white",
