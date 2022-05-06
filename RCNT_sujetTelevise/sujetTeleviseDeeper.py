@@ -130,7 +130,7 @@ class TvSubjectDeeper():
         self.data_watchtime_tot = data_watchtime_tot
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Quelques statistiques plus poussées sur les sujets télévisées francais entre 2005 et 2020'),
+            html.H3(children='Quelques statistiques plus poussées sur les sujets télévisés francais entre 2005 et 2020'),
             html.Div([dcc.Graph(id='sujetp-main-graph'), ], style={'width': '100%', }),
             html.Div([dcc.RadioItems(id='sujetp-mean',
                                      options=[{'label': 'Graphique à barres en fonction des chaines TV', 'value': 0},

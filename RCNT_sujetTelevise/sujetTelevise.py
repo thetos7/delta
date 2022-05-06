@@ -127,21 +127,43 @@ class TvSubject():
 
         self.data_count = data_count
         self.data_watchtime = data_watchtime
-
+        self.thematiques_name = thematiques_names = ["Catastrophes", "Culture-loisirs", "Economie", "Education", "Environnement",
+                             "Faits divers", "Histoire-hommages", "International", "Justice", "Politique France",
+                             "Sante", "Sciences et techniques", "Societe", "Sport"]
         self.data_count_tot = data_count_tot
         self.data_watchtime_tot = data_watchtime_tot
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Quelques statistiques sur les sujets télévisées francais entre 2005 et 2020'),
+            html.H3(children='Quelques statistiques sur les sujets télévisés francais entre 2005 et 2020'),
             html.Div([dcc.Graph(id='sujet-main-graph'), ], style={'width': '100%', }),
-            html.Div([dcc.RadioItems(id='sujet-mean',
-                                     options=[{'label': 'Courbes du total des sujets', 'value': 1},
-                                              {'label': 'Courbes détaillées pour chaque sujet', 'value': 0},
-                                              {'label': "Temps moyen d'un programme TV en fonction de la chaine", 'value': 2},
-                                              {'label': "Temps moyen d'un programme TV en fonction du thème", 'value': 3}],
-                                     value=0,
-                                     labelStyle={'display': 'block'}),
-                      ]),
+            html.Div([
+                html.Div([dcc.RadioItems(id='sujet-mean',
+                                         options=[{'label': 'Courbes du total des sujets', 'value': 1},
+                                                  {'label': 'Courbes détaillées pour chaque sujet (choisi ton sujet ->)', 'value': 0},
+                                                  {'label': "Temps moyen d'un programme TV en fonction de la chaine",
+                                                   'value': 2},
+                                                  {'label': "Temps moyen d'un programme TV en fonction du thème",
+                                                   'value': 3}],
+                                         value=1,
+                                         labelStyle={'display': 'block'})], style={'width': '40em'}),
+                html.Div(style={'width': '2em'}),
+                html.Div(style={'width': '2em'}),
+                html.Div(style={'width': '2em'}),
+                html.Div(style={'width': '2em'}),
+                html.Div([html.Div('Theme'),
+                          dcc.Dropdown(
+                              id='sujet-theme',
+                              options=[{'label': i, 'value': i} for i in self.thematiques_name],
+                              value=2000,
+                              disabled=True,)
+                          ], style={'width': '10em', 'padding': '0em 10px 0px 0px'}),
+            ], style={
+                'padding': '10px 50px',
+                'display': 'flex',
+                'flexDirection': 'row',
+                'justifyContent': 'flex-start',
+            }),
+
             html.Br(),
             dcc.Markdown("""
             Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
@@ -173,14 +195,21 @@ class TvSubject():
 
         self.app.callback(
             dash.dependencies.Output('sujet-main-graph', 'figure'),
-            dash.dependencies.Input('sujet-mean', 'value'))(self.update_graph)
+            [dash.dependencies.Input('sujet-mean', 'value'),
+            dash.dependencies.Input('sujet-theme', 'value')])(self.update_graph)
 
-    def update_graph(self, mean = 1):
+        self.app.callback(
+            dash.dependencies.Output('sujet-theme', 'disabled'),
+            dash.dependencies.Input('sujet-mean', 'value'))(self.disable_theme)
+
+    def update_graph(self, mean, theme_choose):
         themes = self.data_watchtime.groupby('THEMATIQUES').sum() / 3600  # en heure
         if mean == 0:
-            fig = px.line(self.data_watchtime[self.data_watchtime["THEMATIQUES"] == "Education"].drop(["THEMATIQUES"] , axis=1)/ 3600)
+            if not theme_choose in self.thematiques_name:
+                theme_choose = "Education"
+            fig = px.line(self.data_watchtime[self.data_watchtime["THEMATIQUES"] == theme_choose].drop(["THEMATIQUES"] , axis=1)/ 3600)
             fig.update_layout(
-                title='Graphiques du temps télévisé pour les différents sujets',
+                title='Graphiques du temps télévisé pour les différents sujets: ici ' + theme_choose ,
                 yaxis=dict(title='Total en heure')
             )
 
@@ -216,6 +245,11 @@ class TvSubject():
 
         return fig
 
+    def disable_theme(self, option):
+        if option == 0:
+            return False
+        else:
+            return True
 
 if __name__ == '__main__':
     sujet = TvSubject()
