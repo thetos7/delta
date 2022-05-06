@@ -144,6 +144,13 @@ class EnergyMix():
                           une faible croissance de la production à partir d'énergies fossiles en Australie ce qui indique 
                           que cette production a stagnée et que des efforts sont faits.
                           """),
+            html.Br(),
+            html.Br(),
+            dcc.Markdown("""
+                        #### À propos
+                        * [Source de la base de donnée](https://www.kaggle.com/datasets/pralabhpoudel/world-energy-consumption)
+                        * Auteurs : Yorick Madelain, Jordan Failloux
+                        """),
         ], style={
             'backgroundColor': 'white',
              'padding': '10px 50px 10px 50px',
