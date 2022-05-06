@@ -30,7 +30,7 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/music'),
                               html.Br(),
                               html.Br(),
-                              html.Center(html.A('Source Code', href='https://github.com/Stratcher/delta')),
+                              html.Center(html.A('Source Code', href='https://github.com/oricou/delta')),
                           ]),
                  html.Div(id='page_content', className="ten columns"),
             ]),
