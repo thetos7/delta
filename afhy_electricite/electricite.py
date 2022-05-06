@@ -349,7 +349,7 @@ class Eletricite():
                     title  = 'Production totale: ' + str(int(np.sum(dff.iloc[i,:]))) + " MW en " + str(dff.index[i]),
                     autosize = False)
 
-
+        # Plot the pie graph
         fig = go.Figure(data = traces, layout = layout)
 
         return fig
@@ -358,8 +358,11 @@ class Eletricite():
         df = self.df_full_selected.copy()
         # Define the start date
         date_start = str(year_start_bar) + '-' + str(month_start_bar) + '-' + str(day_start_bar)
+
         # Define the end date
         date_end = str(year_end_bar) + '-' + str(month_end_bar) + '-' + str(day_end_bar)
+
+        # Plot the bar graph
         fig = px.bar(df.loc[date_start: date_end].sum(), color=df.columns, text_auto='.2s')
         fig.update_traces(textfont_size=14, textangle=0, textposition="outside", cliponaxis=False)
         fig.update_layout(
@@ -371,6 +374,7 @@ class Eletricite():
 
     def display_animated_graph(self, animated_type_xaxis):
         df = self.df_animated.copy()
+        # Plot the animated graph
         fig = px.bar(
             df, x='Type', y="Value", color="Type",
             title="",
