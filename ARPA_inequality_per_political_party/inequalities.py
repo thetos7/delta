@@ -21,7 +21,7 @@ class Inequalities():
         self.main_layout = html.Div(children=[
             html.H3(children='Répartition des inégalités par parti politique en Europe depuis les années 2000', style={'font-weight': 'bold'}),
 
-            html.Div("L'indice (ou coefficient) de Gini est un indicateur synthétique permettant de rendre compte du niveau d'inégalité pour une variable et sur une population donnée"),
+            html.Div("L'indice (ou coefficient) de Gini est un indicateur synthétique permettant de rendre compte du niveau d'inégalité pour une variable et sur une population donnée."),
             html.Div("Il varie entre 0 (égalité parfaite) et 1 (inégalité extrême). Entre 0 et 1, l'inégalité est d'autant plus forte que l'indice de Gini est élevé."),
             html.Br(),
 
@@ -30,51 +30,73 @@ class Inequalities():
 
             html.Div([
                     html.Div([
+                        # Properly display the main graph title
                         html.H6('Evolution du coefficient de Gini et des partis politiques en Europe',
-                                style={'font-weight': 'bold', 'display':'flex', 'justifyContent':'center', 'font-size':'22px'}),
+                                style={
+                                    'font-weight': 'bold',
+                                    'display':'flex',
+                                    'justifyContent':'center',
+                                    'font-size':'22px'
+                                }
+                        ),
+
+                        # Display the main graph
                         dcc.Graph(id='ine-main-graph'),
+
+                        # Set the year slider
                         html.Div(
                             dcc.Slider(
                                     id='ine-crossfilter-year-slider',
+                                    step = 1,
                                     min=self.years[0],
                                     max=self.years[-1],
-                                    step = 1,
                                     value=self.years[0],
                                     marks={str(year): str(year) for year in self.years[::3]},
                             ), style={'width': '100%'}),
-                        dcc.Interval( # fire a callback periodically
+
+                        # fire a callback periodically
+                        dcc.Interval( 
                             id='ine-auto-stepper',
-                            interval=750,       # in milliseconds
-                            max_intervals = -1, # start running
+                            interval=750,
+                            max_intervals = -1,
                             n_intervals = 0
                         ),
                     ]),
                     
                     html.Div([
+                        # Manage spacing
                         html.Br(),
                         html.Br(),
                         html.Br(),
                         html.Br(),
+
+                        # Display the checklist element
                         html.Div('Orientations Politiques', style={'font-weight': 'bold'}),
                         dcc.Checklist(
                             id='ine-crossfilter-which-party',
                             options=[{'label': ' ' + i, 'value': i} for i in sorted(self.color.keys())],
                             value=sorted(self.color.keys()),
                         ),
+
+                        # Manage spacing
                         html.Br(),
                         html.Br(),
                         html.Br(),
                         html.Br(),
                         html.Br(),
+
+                        # Display dropdown element
                         html.Div('Paramètre Politique', style={'font-weight': 'bold'}),
                         dcc.Dropdown(
                             id='ine-which-parameter',
-                            options=[{'label': 'Gouvernement', 'value': 'Government'},
-                                     {'label': 'Parlement', 'value': 'Parliament'}],
-                            value='Government',
+                            value='gouvernement',
                             clearable=False,
-                            style={'width': '102%'}
+                            options=[{'label': 'gouvernement', 'value': 'gouvernement'},
+                                     {'label': 'parlement', 'value': 'parlement'}],
+                            style={'width': '102%'},
                         ),
+
+                        # Manage spacing
                         html.Br(),
                         html.Br(),
                         html.Br(),
@@ -82,18 +104,20 @@ class Inequalities():
                         html.Br(),
                         html.Br(),
                         html.Br(),
-                        html.Div(html.Button(
-                            self.START,
-                            id='ine-button-start-stop'
-                        ))
+
+                        # Display the stop button for the year slider
+                        html.Div(html.Button(self.START, id='ine-button-start-stop'))
                     ], style={'margin-left':'90px'}), 
 
                     html.Div([
+                        # Manage spacing
                         html.Br(),
                         html.Br(),
                         html.Br(),
                         html.Br(),
                         html.Br(),
+
+                        # Display the political orientation legend for the main graph
                         html.Span(style={'height': '19px', 'width': '19px', 'border-radius': '50%', 'display': 'inline-block', "background-color": self.color['Centre']}),
                         html.Br(),
                         html.Span(style={'height': '19px', 'width': '19px', 'border-radius': '50%', 'display': 'inline-block', "background-color": self.color['Droite']}),
@@ -106,19 +130,36 @@ class Inequalities():
                     'borderTop': 'thin lightgrey solid',
                 }),
 
+            # Display the selected country
             html.Br(),
             html.Div(id='ine-div-country', style={'font-size': '20px', 'borderBottom': 'thin lightgrey solid'}),
             html.Br(),
 
+            # Display the two linked subgraphs
             html.Div([
                     dcc.Graph(id='ine-gini-evolution', style={'width':'50%', 'display':'inline-block'}),
                     dcc.Graph(id='ine-mean-gini-per-party', style={'width':'50%', 'display':'inline-block'}),
                 ], style={ 'display':'flex', 
                            'borderBottom': 'thin lightgrey solid',
                            'align-content':'center' }),
-            
+
+            dcc.Markdown('''
+            ### Analyse:
+            Notre projet essaye de mettre en relation l'orientation politique et l'inégalité en utilisant le coefficient de gini. Cependant, ce coefficient connait quelques biais qui peuvent empêcher une analyse statistique fine. En effet, comme la moyenne, un même coefficient peut venir de plusieurs répartitions différentes.
+
+            ###### Résultats:
+              * Tout d'abord, il est bon de noter que le parlement et le gouvernement sont dans la majorité des cas de la même orientation politique.
+              * On peut aussi remarquer que la crise économique a beaucoup influencé la valeur du coefficient de gini. Ce dernier baissant en Europe car la répartition des richesses est devenu plus égalitaire bien que la majorité population ait perdu de l'argent.
+              * Il ne semble pas avoir de corrélation entre l'orientation politique et la baisse du coefficient de gini.
+
+            ###### Critiques:
+              * Le data-set détaillant l'orientation politique, bien que très utile n'a pas énormément de sens en lui-même. En effet, deux partis de gauche sont différents, ne se correspondent pas vraiment entre pays et change en fonction du temps. Pour réduire cela nous avons décidé de travailler que depuis 2000.
+              * Les conséquences (positives ou négatives) d'un parti ne peuvent se mesurer qu'avec un certains décalage, le temps que les lois entre en vigueur et aient un effet sur le coefficient de gini.
+            ''', style={'borderBottom': 'thin lightgrey solid', 'borderTop': 'thin lightgrey solid'}),
+
+            # Display the "A propos" section
             dcc.Markdown("""
-            ##### À propos
+            ### À propos
 
                 * Dans le cadre d'un projet de Python pour le Big Data (PYBD), encadré par Olivier Ricou à l'EPITA
                 * [Version Plotly](https://plotly.com/python/v3/gapminder-example/)
@@ -127,23 +168,28 @@ class Inequalities():
                 * (c) 2022 Philippe Aymard, Alexandre Rulleau
             """),
         ], style={'padding': '10px 50px 10px 50px'})
-        
+
+        # application should have its own layout and use self.main_layout as a page or in a component
         if application:
             self.app = application
-            # application should have its own layout and use self.main_layout as a page or in a component
         else:
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
         
+        # Main graph callback
         self.app.callback(
             dash.dependencies.Output('ine-main-graph', 'figure'),
             [dash.dependencies.Input('ine-crossfilter-which-party', 'value'),
             dash.dependencies.Input('ine-crossfilter-year-slider', 'value'),
             dash.dependencies.Input('ine-which-parameter', 'value')])(self.update_graph)
+
+        # Stop button callback
         self.app.callback(
             dash.dependencies.Output('ine-button-start-stop', 'children'),
             dash.dependencies.Input('ine-button-start-stop', 'n_clicks'),
             dash.dependencies.State('ine-button-start-stop', 'children'))(self.button_on_click)
+
+        # Year slider callback
         # this one is triggered by the previous one because we cannot have 2 outputs for the same callback
         self.app.callback(
             dash.dependencies.Output('ine-auto-stepper', 'max_interval'),
@@ -154,9 +200,13 @@ class Inequalities():
             dash.dependencies.Input('ine-auto-stepper', 'n_intervals'),
             [dash.dependencies.State('ine-crossfilter-year-slider', 'value'),
              dash.dependencies.State('ine-button-start-stop', 'children')])(self.on_interval)
+
+        # Callback to handle the selected callback
         self.app.callback(
             dash.dependencies.Output('ine-div-country', 'children'),
             dash.dependencies.Input('ine-main-graph', 'hoverData'))(self.get_country)
+
+        # Callback for the two subgraphs
         self.app.callback(
             dash.dependencies.Output('ine-gini-evolution', 'figure'),
             [dash.dependencies.Input('ine-main-graph', 'hoverData'),
@@ -167,15 +217,20 @@ class Inequalities():
             dash.dependencies.Input('ine-which-parameter', 'value')])(self.update_mean_gini_per_party)
 
     def update_graph(self, parties, year, parameter):
+        # Use input parameters
         dfg = self.df[self.df.year == year]
-        dfg = dfg[dfg[f'Main {parameter} Party'].isin(parties)]
+        dfg = dfg[dfg[f'Orientation politique du {parameter}'].isin(parties)]
 
+        # Handle the case were no political orientation is selected
         if dfg.empty:
             fig = go.Figure(go.Scattergeo())
         else:
-            fig = px.scatter_geo(dfg, locations="iso", hover_name="country", hover_data=['gini'],
-                                 size="gini_display", color=f'Main {parameter} Party',
+            fig = px.scatter_geo(dfg, locations="iso", hover_name="country",
+                                 hover_data={'gini': True, 'gini_display': False, 'iso': False},
+                                 size="gini_display", color=f'Orientation politique du {parameter}',
                                  color_discrete_map=self.color, opacity=0.95)
+
+        # Update graph display
         fig.update_geos(
             resolution=50,
             showcoastlines=True, coastlinecolor="RebeccaPurple",
@@ -183,59 +238,69 @@ class Inequalities():
             showocean=True, oceancolor="LightSkyBlue",
             scope='europe', projection_type='natural earth',
         )
+
         fig.update_layout(height=500, margin={"r":0,"t":0,"l":0,"b":0}, showlegend=False)
         return fig
 
     def update_gini_evolution(self, hover_data, parameter):
+        # Use input parameters
         country = self.get_country(hover_data)
         dfg = self.df[self.df.country == country]
 
+        # Create the figure
         fig = go.Figure()
         for index, row in dfg.reset_index().iterrows():
             previous_gini = dfg.iloc[[0]].gini if index == 0 else dfg.iloc[[index - 1]].gini
             previous_year = 2000 if index == 0 else dfg.iloc[[index - 1]].year
-            party = row[f'Main {parameter} Party']
+            party = row[f'Orientation politique du {parameter}']
 
             fig.add_trace(go.Scatter(x=[int(previous_year), row.year],
                                      y=[float(previous_gini), row.gini],
                                      fill='tozeroy', fillcolor=self.color[party],
                                      line_color=self.color[party], text=party))
 
-        fig.update_layout(margin={"r":110,"t":60,"l":30,"b":80},
-                          showlegend=False,
-                          hovermode='closest',
-                          yaxis_range=[dfg['gini'].min() - self.offset,
-                                       dfg['gini'].max() + self.offset],
-                          xaxis_title=dict(text="Années"),
-                          yaxis_title=dict(text="Coefficient de Gini"),
-                          title="<b>Courbe d'évolution du coefficient de Gini selon l'année coloré en fonction des partis",
-                          title_x=0.0,
+        # Update graph display
+        fig.update_layout(
+            title="<b>Courbe d'évolution du coefficient de Gini selon l'année, coloré en fonction des partis",
+            title_x=0.0,
+            margin={"r":110,"t":60,"l":30,"b":80},
+            hovermode='closest',
+            showlegend=False,
+            xaxis_title=dict(text="Années"),
+            yaxis_title=dict(text="Coefficient de Gini"),
+            yaxis_range=[dfg['gini'].min() - self.offset,
+                         dfg['gini'].max() + self.offset],
         )
         
         return fig
     
     def update_mean_gini_per_party(self, hover_data, parameter):
+        # Use inputs parameter
         country = self.get_country(hover_data)
         dfg = self.df[self.df.country == country]
-        dfg = dfg.groupby(f'Main {parameter} Party')['gini'].mean().to_frame(name='mean').reset_index()
+        dfg = dfg.groupby(f'Orientation politique du {parameter}')['gini'].mean().to_frame(name='moyenne').reset_index()
         
-        fig = px.bar(dfg, x=f'Main {parameter} Party', y='mean',
-                     color=f'Main {parameter} Party', color_discrete_map=self.color)
-        
-        fig.update_layout(showlegend=True,
-                          hovermode='closest',
-                          yaxis_range=[dfg['mean'].min() - self.offset,
-                                       dfg['mean'].max() + self.offset],
-                          xaxis_title=dict(text="Orientations politiques"),
-                          yaxis_title=dict(text="Coefficient de Gini (en moyenne)"),
-                          legend={'title': 'Orientations Politiques'},
-                          title='<b>Coefficient de Gini moyen par orientation politique',
-                          title_x=0.5,
+        # Create the figure
+        fig = px.bar(dfg, x=f'Orientation politique du {parameter}', y='moyenne',
+                     color=f'Orientation politique du {parameter}', color_discrete_map=self.color)
+
+        # Update graph display
+        fig.update_layout(
+            title='<b>Coefficient de Gini moyen par orientation politique',
+            title_x=0.5,
+            hovermode='closest',
+            showlegend=True,
+            legend={'title': 'Orientations Politiques'},
+            xaxis_title=dict(text="Orientations politiques"),
+            yaxis_title=dict(text="Coefficient de Gini (en moyenne)"),
+            yaxis_range=[dfg['moyenne'].min() - self.offset,
+                         dfg['moyenne'].max() + self.offset],
         )
         return fig
 
+    # Get the selected country
     def get_country(self, hover_data):
-        if hover_data == None:  # init value
+        if hover_data == None: # init value
             return self.df['country'].iloc[np.random.randint(len(self.df))]
         return hover_data['points'][0]['hovertext']
 
@@ -248,7 +313,7 @@ class Inequalities():
     # this one is triggered by the previous one because we cannot have 2 outputs
     # in the same callback
     def run_movie(self, text):
-        if text == self.START:    # then it means we are stopped
+        if text == self.START:
             return 0 
         return -1
 
