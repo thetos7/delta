@@ -46,6 +46,7 @@ def _clean_pop_index(pop_df: pd.DataFrame) -> None:
     pop_df.columns = [[int(s) for s in name.split() if s.isdigit()][0] for name in pop_df.columns]
     pop_df.index = pop_df.index.str.upper()
     pop_df.index = pop_df.index.str.replace(u"É","E")
+    pop_df = pop_df.loc[:, ~pop_df.columns.duplicated()]
 
     # Compute Paris as a single city
     paris = pop_df.loc["Paris 1er Arrondissement":"Paris 20e Arrondissement"].sum()
