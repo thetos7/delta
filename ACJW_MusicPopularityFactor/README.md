@@ -9,7 +9,7 @@ Voir requirement.txt
 ## Le projet
 - Pour extraire les données, lancer le ficher get_data.py
 - Pour lancer le projet juste lancer le fichier music.py
-    python3 music.py ou python3 delta.py
+     _python3 music.py_ ou _python3 delta.py_
 
 
 
