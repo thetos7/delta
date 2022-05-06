@@ -46,15 +46,13 @@ class Parrainage():
             html.Div([ dcc.Graph(id='par-main-map') ], style={'width':'80%', }),
             html.Div([dcc.RadioItems(id='par-candidat-map')]),       
             dcc.Markdown("""
-            #### À propos
-
-            * Inspiration initiale : [conférence de Hans Rosling](https://www.ted.com/talks/hans_rosling_new_insights_on_poverty)
-            * [Version Plotly](https://plotly.com/python/v3/gapminder-example/)
-            * Données : [Banque mondiale](https://databank.worldbank.org/source/world-development-indicators)
-            * (c) 2022 Olivier Ricou
+                # Sources
+                    * [Jeu de données parrainage des candidats pour l'élection présidentielle 2022](https://www.data.gouv.fr/fr/datasets/parrainages-des-candidats-a-lelection-presidentielle-francaise-de-2022/)
+                    * [GeoJSON France (délimitations géographiques des départements)](https://france-geojson.gregoiredavid.fr/)
+                # Auteurs
+                    * Nathan Cabasso (<nathan.cabasso@epita.fr>)
+                    * Ferdinand Mom (<ferdinand.mom@epita.fr>)
             """),
-           
-
         ], style={
                 #'backgroundColor': 'rgb(240, 240, 240)',
                  'padding': '10px 50px 10px 50px',
