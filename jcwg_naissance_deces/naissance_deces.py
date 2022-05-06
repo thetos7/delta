@@ -49,7 +49,7 @@ class Naissance():
         self.fig.update_layout(
             clickmode='event+select',
             hovermode='closest',
-            margin=dict(l=0, r=0, t=20, b=0),
+            margin=dict(l=0, r=0, t=30, b=0),
         )
 
         self.fig.add_trace(self.fig_naissance(), row=1, col=1)
@@ -120,7 +120,6 @@ class Naissance():
                 ], style={'width': '10%', 'display': 'inline-block'}),
             ], style={'display': 'flex',
                       'borderTop': 'thin lightgrey solid',
-                      'borderBottom': 'thin lightgrey solid',
                       'justifyContent': 'center', }),
             html.Br(),
             html.Div([
@@ -433,11 +432,11 @@ class Naissance():
             'data': scatters,
             'layout': {
                 'height': 300,
-                'margin': {'l': 50, 'b': 50, 'r': 10, 't': 20},
-                'yaxis': {'title': title,
-                          'type': 'linear',
+                'margin': {'l': 50, 'b': 30, 'r': 10, 't': 70},
+                'yaxis': {'type': 'linear',
                           'font': {'size': 15}},
-                'title': {'font': {'size': 15}},
+                'title': {'text': title,
+                          'font': {'size': 15}},
                 'legend': {
                     'title': {'font': {'size': 5}},
                     'font': {'size': 11}},
