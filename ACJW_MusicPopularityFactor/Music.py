@@ -61,16 +61,18 @@ class Song:
             Le graphique est interactif. En passant la souris sur des parties du graphe des infobulles sur le genre et la critique apparaissent.
             Les differentes notations, années et nombres de genres affichés peuvent être modifier avec les  menus deroulants ci-dessus.
             - AOTY: Album of the year, album de l'année
-            - Certains ont peu de notes et peuvent être asser extremes
+            - MetaCritic : Site Américain qui collecte des notes de divers sujets de la Pop culture
             """
                 ),
                 html.H3(children="POPULARITE DES ARTISTES"),
                 html.Div([dcc.Graph(id="corrplot", figure=self.createcorrplot())]),
                 dcc.Markdown(
                     """
-            Ce graphique est interactif, en passant la souris sur des points des infobulles apparaisent pour afficher le genre et l'artiste.
-            cliquer sur des points de la legende peut retirer des genres du graphique
-            - On peut remarquer une relation entre le nombre de follower et le facteur de popularité des artistes
+             Ce graphique présente la corrélation entre la popularité d'une musique avec le nombre de personnes suivant son interprète sur Spotify.\n
+            Le graphique est interactif, en passant la souris sur des points, des infobulles apparaisent pour afficher le genre , l'artiste et le Titre de son album.\n
+            Cliquez sur des points de la légende pour retirer des genres
+            
+            On peut remarquer une relation entre le nombre de followers et la popularité de son album.
             """
                 ),
                 html.Div(
@@ -83,16 +85,23 @@ class Song:
                                     figure=self.createMap(),
                                     style={"padding": "100px"},
                                 ),
+                                dcc.Markdown(
+                                    """
+                                    Cette carte présente le genre le plus populaire par pays.\n
+                                    Elle est intéractive, en passant la souris sur un pays, une infobulle apparait montrant le titre le plus populaire dans ce pays.\n
+                                    La sélection d'un pays sur cette carte modifie le graphe ci-dessous
+                                    """
+                                ),
                                 dcc.Graph(id="pieChart"),
+                                dcc.Markdown(
+                                    """
+                                    Ce graphique représente les genre les plus populaires du pays selectionné sur la carte précedente.\n
+                                    Il est possible de retirer des genres en cliquant sur la légende
+                                    """
+                                ),
                             ]
                         ),
                     ]
-                ),
-                dcc.Markdown(
-                    """
-                    Ces deux graphiques sont interactifs, il est possible de selectionné un ou plusieurs pays sur le premier et le deuxième affiche la popularité des genres pour le pays selectionné.
-                    Les genres peuvent être desactivé en appuyant sur la legende
-                """
                 ),
                 dcc.Markdown(
                     """
@@ -155,6 +164,7 @@ class Song:
             y="followers",
             color="Genre",
             hover_name="artists",
+            hover_data=["Title", "Label"],
         )
 
     def createMap(self):
@@ -177,9 +187,8 @@ class Song:
         fig.update_coloraxes(showscale=False)
         return fig
 
-    def createPie(self, country):
-        country = self.songpopularity[self.songpopularity["Country"] == country]
-
+    def createPie(self, choice_country):
+        country = self.songpopularity[self.songpopularity["Country"] == choice_country]
         # piechart
         l = []
         for c in list(country.genres):
@@ -194,8 +203,12 @@ class Song:
             names=piedata.index,
             hover_name=piedata.index,
             color_discrete_sequence=px.colors.sequential.Plasma,
+            title=f"Best genres in {choice_country}",
+            height=700,
+            width=900,
         )
         fig.update_traces(textinfo="percent+label")
+        fig.update_layout(title={'font': {'size': 35}})
         return fig
 
     def getCountry(self, clickData):
