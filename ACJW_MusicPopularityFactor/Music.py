@@ -37,7 +37,10 @@ class Song():
                 dcc.Dropdown([5, 10, 20, 50 ], 10, id = "barplot_n")]),
             
             dcc.Markdown('''
-            Ajouter des commentaires ICI
+            Le graphique est interactif. En passant la souris sur des parties du graphe des infobulles sur le genre et la critique apparaissent.
+            Les differentes notations, années et nombres de genres affichés peuvent être modifier avec les  menus deroulants ci-dessus.
+            - AOTY: Album of the year, album de l'année
+            - Certains ont peu de notes et peuvent être asser extremes
             '''),
             html.H3(children='POPULARITE DES ARTISTES'),
             html.Div([
@@ -45,7 +48,9 @@ class Song():
             ]),
             
             dcc.Markdown('''
-            Ajouter des commentaires ici
+            Ce graphique est interactif, en passant la souris sur des points des infobulles apparaisent pour afficher le genre et l'artiste.
+            cliquer sur des points de la legende peut retirer des genres du graphique
+            - On peut remarquer une relation entre le nombre de follower et le facteur de popularité des artistes
             ''')
         ]), html.Div(children=[
                 html.H3(children='POPULARITE PAR PAYS'),
@@ -56,7 +61,8 @@ class Song():
                 ]),
             
                 dcc.Markdown('''
-                    Ce graphique est interractif...
+                    Ces deux graphiques sont interactifs, il est possible de selectionné un ou plusieurs pays sur le premier et le deuxième affiche la popularité des genres pour le pays selectionné.
+                    Les genres peuvent être desactivé en appuyant sur la legende
                 '''),
                 dcc.Markdown('''
                    #### À propos
