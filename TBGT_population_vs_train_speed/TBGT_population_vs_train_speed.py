@@ -87,9 +87,25 @@ class TBGT:
 
         return fig
 
+    def _get_global_pop_fig(self) -> go.Figure:
+        category = {'0':'Province', 'PARIS': 'Paris'}
+        global_pop_df = pd.concat([self.pop_df.loc[:, self.pop_df.columns != "PARIS"].mean(axis=1), self.pop_df["PARIS"]], axis=1)
+
+        fig = global_pop_df.plot()
+        fig.update_xaxes(title_text="Années", range=[1920, 2019])
+        fig.update_yaxes(title_text="Croissance en %")
+        fig.update_layout(title="Croissance moyenne de la population parisienne et provinciale")
+        fig.for_each_trace(
+            lambda t: t.update(name = category[t.name],
+                               legendgroup = category[t.name],
+                               hovertemplate = t.hovertemplate.replace(t.name, category[t.name]))
+        )
+
+        return fig
+
     def _get_pop_fig(self, relation: str = RELATION_DEFAULT) -> go.Figure:
         if (relation == self.RELATION_DEFAULT):
-            return go.Figure() # FIXME: global figure
+            return self._get_global_pop_fig()
 
         fig = self.pop_df[relation.split(" - ")].plot()
         fig.update_xaxes(title_text="Années")
