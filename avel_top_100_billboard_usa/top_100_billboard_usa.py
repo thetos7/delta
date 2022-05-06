@@ -26,16 +26,28 @@ def to_decade(year):
     return year // 10 * 10
 
 
+def generate_dash_table(dataframe: pd.DataFrame, max_rows: int = 10):
+    """
+    Generates a dash table from a dataframe.
+    :param dataframe: the dataframe to generate the table from
+    :param max_rows: the number of rows to display
+    :return: html.Table
+    """
+    return dash_table.DataTable(
+        dataframe.to_dict('records'),
+        columns=[{'id': c, 'name': c} for c in dataframe.columns],
+        page_size=max_rows
+    )
+
+
 class Top100BillboardUSA:
     def __init__(self, application: Dash = None):
         # Importing the data
-        self.df = pd.read_csv('data/top_100_billboard_usa.csv')
-        self.df["date"] = pd.to_datetime(self.df["date"])
+        self.df = self.load_billboard_dataframe()
 
         # Creating the Dash application
         self.app = Dash(__name__) if application is None else application
         self.app.layout = self.main_layout
-        app = dash.Dash(__name__)
 
         """self.app.layout = ddk.App([
             ddk.Header([
@@ -110,7 +122,7 @@ class Top100BillboardUSA:
         )
         def update_artist_dropdown(input_value):
             # self.generate_artist_gaph(self.df[self.df['artist'] == input_value])
-            return self.generate_table(self.df[self.df['artist'] == input_value])
+            return generate_dash_table(self.df[self.df['artist'] == input_value])
 
         # # Example callback
         # @self.app.callback(Output("foo", "children"), Input('my-input', 'value'))
@@ -121,74 +133,13 @@ class Top100BillboardUSA:
         #     ])
 
     @staticmethod
-    def generate_table(dataframe: pd.DataFrame, max_rows: int = 10):
-        """
-        Generates a dash table from a dataframe.
-        :param dataframe: the dataframe to generate the table from
-        :param max_rows: the number of rows to display
-        :return: html.Table
-        """
-        return dash_table.DataTable(
-            dataframe.to_dict('records'),
-            columns=[{'id': c, 'name': c} for c in dataframe.columns],
-            page_size=max_rows
-        )
-        #
-        # return html.Table([
-        #     html.Thead(
-        #         html.Tr([html.Th(col) for col in dataframe.columns])
-        #     ),
-        #     html.Tbody([
-        #         html.Tr([
-        #             html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
-        #         ]) for i in range(min(len(dataframe), max_rows))
-        #     ])
-        # ])
-    
-#    def generate_artist_gaph(df: pd.DataFrame):
-#        """
-#        Generates songs graph for an artist.
-#        :return: plotly.graph_objs.Figure
-#        """
-#        y_filter="rank"
-#        for song in df["song"].unique():
-#            filtered_song_df = df[df["song"] == song].copy()
-#            filtered_song_df[["date"][y_filter]].update_layout()
-#            #plt.plot_date(x = filtered_song_df["date"], y = filtered_song_df[y_filter], fmt="o-", label=song)
-#        """plt.legend()
-#        plt.title(f"Songs ranking by {artist}")
-#        plt.show()"""
+    def load_billboard_dataframe() -> pd.DataFrame:
+        df = pd.read_csv('data/top_100_billboard_usa.csv')
+        df["date"] = pd.to_datetime(df["date"])
 
-    def get_weeks_on_board_fig(self):
-        """
-        Returns a plotly figure of the number of weeks on the billboard.
-        :return: plotly.graph_objs.Figure
-        """
-        # Creating the figure
-        max_weeks_on_board = self.df.groupby(by=["artist", "song"]).max("weeks-on-board").value_counts("weeks-on-board")
-        fig = max_weeks_on_board.reindex(range(1, len(max_weeks_on_board))).plot.bar()
-        name = "Count"
-        fig.update_layout(showlegend=False)
+        return df
 
-        fig.update_layout(title="Nombre de semaines consécutives qu'une musique reste au Billboard, de 1958 à 2021")
-        fig.update_layout(xaxis_title="Nombre de semaines consécutives", yaxis_title="Nombre de musiques")
-        fig.update_layout()
-        return fig
-        # # Adding the data
-        # fig.add_trace(go.Scatter(x=self.df.date, y=self.df.weeks_on_chart, name='Weeks on Chart'))
-        #
-        # # Adding the layout
-        # fig.update_layout(
-        #     title='Weeks on Chart',
-        #     xaxis_title='Date',
-        #     yaxis_title='Weeks on Chart',
-        #     xaxis_tickformat='%Y-%m-%d',
-        #     xaxis_tickangle=-45,
-        #     showlegend=True
-        # )
-        #
-        # return fig
-    
+
     def get_weeks_on_board_fig_year(self, year):
         """
         Returns a plotly figure of the number of weeks on the billboard for a specific year.
@@ -202,7 +153,7 @@ class Top100BillboardUSA:
         fig.update_layout(showlegend=False)
         fig.update_layout(title="{}".format(year))
         fig.update_layout(xaxis_title="Nombre de semaines consécutives", yaxis_title="Nombre de musiques")
-        fig.update_layout()
+
         return fig
 
     def get_new_artist_on_board_fig(self) -> go.Figure:
@@ -219,28 +170,15 @@ class Top100BillboardUSA:
             x.append(year), y.append(artistes_distincts_decade)
 
         # Creating the figure
-        return px.line(title="Nombre de nouvels artistes chaque année", x=x, y=y, labels={'x': 'Années', 'y': 'Nombre de nouvels artistes'})
-
-
-        # # Adding the data
-        # fig.add_trace(go.Scatter(x=self.df.date, y=self.df.weeks_on_chart, name='Weeks on Chart'))
-        #
-        # # Adding the layout
-        # fig.update_layout(
-        #     title='Weeks on Chart',
-        #     xaxis_title='Date',
-        #     yaxis_title='Weeks on Chart',
-        #     xaxis_tickformat='%Y-%m-%d',
-        #     xaxis_tickangle=-45,
-        #     showlegend=True
-        # )
-        #
-        # return fig
+        return px.line(title="Nombre de nouvels artistes chaque année", x=x, y=y,
+                       labels={'x': 'Années', 'y': 'Nombre de nouvels artistes'})
 
     @property
     def artist_count(self): return len(self.df["artist"].unique())
+
     @property
     def song_count(self): return len(self.df["song"].unique())
+
 
 if __name__ == '__main__':
     nrg = Top100BillboardUSA()
