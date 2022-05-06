@@ -1,4 +1,3 @@
-import glob
 import json
 
 import dash
@@ -16,14 +15,14 @@ class Naissance():
             self.dep = json.load(f)
 
         # Load pkl
-        self.daten = pd.read_pickle('data/date_naissance.pkl')
-        self.dated = pd.read_pickle('data/date_deces.pkl')
+        self.daten = pd.read_pickle('data/jcwg_date_naissance.pkl')
+        self.dated = pd.read_pickle('data/jcwg_date_deces.pkl')
 
-        self.depn = pd.read_pickle('data/department_naissance.pkl')
-        self.depd = pd.read_pickle('data/department_deces.pkl')
+        self.depn = pd.read_pickle('data/jcwg_department_naissance.pkl')
+        self.depd = pd.read_pickle('data/jcwg_department_deces.pkl')
 
-        self.agen = pd.read_pickle('data/age_naissance.pkl')
-        self.aged = pd.read_pickle('data/age_deces.pkl')
+        self.agen = pd.read_pickle('data/jcwg_age_naissance.pkl')
+        self.aged = pd.read_pickle('data/jcwg_age_deces.pkl')
 
         self.zmax = max(self.depn['SIZE'].max(), self.depd['SIZE'].max())
         self.zmin = min(self.depn['SIZE'].min(), self.depd['SIZE'].min())
@@ -179,7 +178,7 @@ class Naissance():
                       'justifyContent': 'center', }),
             html.Br(),
             dcc.Markdown("""
-            Les cartes sont interactifs. En passant la souris sur les départements vous avez une infobulle.
+            Les cartes sont interactives. En passant la souris sur les départements vous avez une infobulle.
             De plus, en séléctionnant plusieurs départements (shift et click), on peut avoir plus d'info sur ceux-ci à l'aide des graphiques.
             En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la carte, réinitialiser avec d'un double click et utiliser le lasso pour sélectionner plusieurs départements.
 
@@ -214,22 +213,22 @@ class Naissance():
         # Subgraph of the map
         self.app.callback(
             dash.dependencies.Output('size_france', 'figure'),
-            [dash.dependencies.Input('map', 'selectedData'),
-             dash.dependencies.Input('wps-naissance-deces-1', 'value'),
-             dash.dependencies.Input('wps-uni-mg-1', 'value'),
-             ])(self.size_france)
+            dash.dependencies.Input('map', 'selectedData'),
+            dash.dependencies.Input('wps-naissance-deces-1', 'value'),
+            dash.dependencies.Input('wps-uni-mg-1', 'value'),
+            )(self.size_france)
         self.app.callback(
             dash.dependencies.Output('size_naissance', 'figure'),
-            [dash.dependencies.Input('map', 'selectedData'),
-             dash.dependencies.Input('wps-uni-mg-2', 'value'),
-             dash.dependencies.Input('wps-hf-2', 'value'),
-             ])(self.size_naissance)
+            dash.dependencies.Input('map', 'selectedData'),
+            dash.dependencies.Input('wps-uni-mg-2', 'value'),
+            dash.dependencies.Input('wps-hf-2', 'value'),
+            )(self.size_naissance)
         self.app.callback(
             dash.dependencies.Output('size_deces', 'figure'),
-            [dash.dependencies.Input('map', 'selectedData'),
-             dash.dependencies.Input('wps-uni-mg-3', 'value'),
-             dash.dependencies.Input('wps-hf-3', 'value'),
-             ])(self.size_deces)
+            dash.dependencies.Input('map', 'selectedData'),
+            dash.dependencies.Input('wps-uni-mg-3', 'value'),
+            dash.dependencies.Input('wps-hf-3', 'value'),
+            )(self.size_deces)
 
         # Department names
         self.app.callback(

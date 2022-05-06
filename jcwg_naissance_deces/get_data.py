@@ -82,14 +82,14 @@ def save_data_as_pkl(urlsn, urlsd):
 
     # Save to csv
 
-    daten.fillna(0).to_pickle('data/date_naissance.pkl')
-    dated.fillna(0).to_pickle('data/date_deces.pkl')
+    daten.fillna(0).to_pickle('data/jcwg_date_naissance.pkl')
+    dated.fillna(0).to_pickle('data/jcwg_date_deces.pkl')
 
-    depn.fillna(0).to_pickle('data/department_naissance.pkl')
-    depd.fillna(0).to_pickle('data/department_deces.pkl')
+    depn.fillna(0).to_pickle('data/jcwg_department_naissance.pkl')
+    depd.fillna(0).to_pickle('data/jcwg_department_deces.pkl')
 
-    agen.fillna(0).to_pickle('data/age_naissance.pkl')
-    aged.fillna(0).to_pickle('data/age_deces.pkl')
+    agen.fillna(0).to_pickle('data/jcwg_age_naissance.pkl')
+    aged.fillna(0).to_pickle('data/jcwg_age_deces.pkl')
 
 
 def convert_date(y, m):
