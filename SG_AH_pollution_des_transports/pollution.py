@@ -35,7 +35,6 @@ class Pollution():
             "Islande",
             "Italie",
             "Lettonie",
-            "Liechtenstein",
             "Lituanie",
             "Luxembourg",
             "Malte",
@@ -48,9 +47,7 @@ class Pollution():
             "République Tchèque",
             "Slovaquie",
             "Slovénie",
-            "Suisse",
             "Suède",
-            "Turquie",
         ]
 
         self.main_layout = html.Div(
@@ -136,13 +133,13 @@ class Pollution():
                     Cette carte nous permet d'observer les différents niveaux de
                     pollution par pays entre 1990 et 2020. Ces pourcentages étant calculés
                     par rapport aux données de l'année 2000, cela nous permet de savoir si
-                    les émissions des différents gaz polluants (tels que l'Oxyde d'azote,
-                    les composés organiques volatils autres que le méthane et les particules
-                    ayant une taille inférieure à 10 nanomètres) sont considérablement
-                    différentes par rapport à l'année observée. On peut par exemple observer
-                    que la Lettonie rejette énormément d'Oxyde d'azote et de composés
-                    organiques volatils autre que le méthane. Dans l'ensemble l'Europe, on
-                    voit qu'à partir de 2006 la pollution en particules augmente beaucoup.
+                    les émissions des différents gaz polluants, à une année choisie, sont
+                    considérablement différentes par rapport à l'année de référence. On 
+                    peut par exemple observer que la Lettonie rejette énormément d'oxyde
+                    d'azote et de composés organiques volatils autre que le méthane. Dans
+                    l'Europe de l'Est, on voit qu'à partir de 2006 la pollution en
+                    particules augmente beaucoup. En revanche la pollution en composés 
+                    organiques autre que le méthane a beaucoup diminué sur toute la temporalité
                     """, style={'text-align': 'justify'}
                 ),
                 dcc.Markdown(
@@ -218,7 +215,8 @@ class Pollution():
                     ensuite réduit pour faire parti des pays les moins polluant d'Europes.
                     Les Pays-Bas reste majoritèrement ceux qui sont les moins pollueurs
                     parmis tout les pays d'Europe. La France quant à elle reste toujours
-                    très en dessous de la moyenne européene et plutôt stable dans le temps.
+                    très en dessous de la moyenne européene et est plutôt stable dans le
+                    temps.
                     Mais comparer aux Pays-Bas sur les dernières années la France reste
                     plus pollueuse.
                     """, style={'text-align': 'justify'}
@@ -308,21 +306,17 @@ class Pollution():
                     """
                     Le graphique représente la moyenne des émissions des véhicules
                     circulant en France selon les informations données par les
-                    constructeurs.
-                    """, style={'text-align': 'justify'}
-                ),
-                dcc.Markdown(
-                    """
-                    Le graphe permet de trier en fonction des différentes émissions
-                    des véhicules ainsi que de leur types ou de leur marques.
+                    constructeurs. Sur celui-ci, il est posssible de trier les données
+                    en fonction des différentes émissions des véhicules ainsi que de
+                    leur types ou de leur marques.
                     """, style={'text-align': 'justify'}
                 ),
                 dcc.Markdown(
                     """
                     Pour certaines émissions, il manque des valeurs leurs donnant la
                     moyenne de 0. Cela peut aussi venir de leur non émission avec les
-                    voitures électriques par example. Ces valeurs sont donc mis tout
-                    à la fin pour informer le lecteur d'un potentielle problème.
+                    voitures électriques par example. Ces valeurs sont donc mise tout
+                    à la fin pour informer le lecteur d'un potentiel problème.
                     """, style={'text-align': 'justify'}
                 ),
                 html.Br(),
@@ -392,16 +386,16 @@ class Pollution():
 
                 dcc.Markdown(
                     """
-                    Le graphe prend comme valeur centrale l'objectif de qualité donné par l'OMS
-                    ce qui explique pourquoi certaines échelle vont en dessous de 0 lorsque
-                    les valeurs maximales deviennent trop élevés.
+                    Cette représentation prend comme valeur centrale l'objectif de qualité donné par l'OMS
+                    ce qui explique pourquoi certaines échelles vont en dessous de 0 lorsque
+                    les valeurs maximales deviennent trop élevées.
                     """, style={'text-align': 'justify'}
                 ),
                 dcc.Markdown(
                     """
                     On observe que la pollution est très élevée dans beaucoup des écoles et crèches
                     près du centre de Paris. On peut aussi noter que l'objectif de qualité de l'air
-                    n'est pas atteint pour beaucoup d'établissement surtout pour les particules de moins
+                    n'est pas atteint pour beaucoup d'établissements surtout pour les particules de moins
                     de 2.5 nanomètres.
                     """, style={'text-align': 'justify'}
                 ),
@@ -493,7 +487,8 @@ class Pollution():
             ],
             dash.dependencies.Input("pol-all-europe-choice", "value"),
         )(self.disable_choice_country)
-        # Callbacks for cars graph in France
+
+        # Callbacks for vehicules graph in France
         self.app.callback(
             dash.dependencies.Output("pol-main-graph", "figure"),
             [
@@ -557,8 +552,8 @@ class Pollution():
             .sort_values(by=[col, axis])
             # .replace(np.NaN,0)
         )
-        
-        title= f"par {axis.lower()}" if axis != 'Hybride' else f"{axis.lower()}"
+
+        title = f"par {axis.lower()}" if axis != 'Hybride' else f"{axis.lower()}"
         fig = px.bar(
             agg,
             y=col,
@@ -573,7 +568,7 @@ class Pollution():
 
     # Update function for the European map of pollution
     def update_graph_poll_eu(self, name="NMVOC", year=1990):
-        dfg = self.pollution_eu[1]
+        dfg = self.pollution_eu
         dfg = dfg.loc[dfg["Type de pollution"] == name]
         dfg = dfg.loc[dfg["Année"] == year]
 
@@ -654,6 +649,7 @@ class Pollution():
     # Enables of disables the poll for countries
     def disable_choice_country(self, info):
         return (info != "mean",)
+
 
 if __name__ == "__main__":
     pol = Pollution()

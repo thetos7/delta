@@ -64,9 +64,6 @@ def transform_countries_names(df, col):
     return df
 
 
-import os
-
-
 def get_transport_pollution_eu():
     df = pd.read_csv(
         "SG_AH_pollution_des_transports/data/emission_de_polluant_des_transports_1990-2020.csv"
@@ -85,13 +82,12 @@ def get_transport_pollution_eu():
         }
     )
 
-    # Seperate data for all EUROPE
-    df_all_eu = df.loc[df["Pays"] == "EU27_2020"]
+    # Remove data for all EUROPE
     df = df[df["Pays"] != "EU27_2020"]
 
     # Rename geo columns with right names
     df = transform_countries_names(df, "Pays")
-    return (df_all_eu, df)
+    return df
 
 
 def get_pollution_per_vehicules_eu():
@@ -139,8 +135,10 @@ def get_air_pollution_schools():
 
     # remove useless columns
     df = df.drop(["ID", "ville", "CP", "type"], axis=1)
-    df["lon"] = df["geometry"].map(lambda x: float(re.match("POINT\((.*) ", x)[1]))
-    df["lat"] = df["geometry"].map(lambda x: float(re.match(".* (.*)\)", x)[1]))
+    df["lon"] = df["geometry"].map(
+        lambda x: float(re.match("POINT\((.*) ", x)[1]))
+    df["lat"] = df["geometry"].map(
+        lambda x: float(re.match(".* (.*)\)", x)[1]))
     return df.drop(["geometry"], axis=1)
 
 
@@ -176,10 +174,9 @@ def get_pollution_per_vehicules_in_france():
         "Hybride",
         "Carburant",
     ]
-    # Seperate data for all EUROPE
-    # df_all_eu = df.loc[(df['geo'] == 'EU27_2020')]
-    # df = df[(df['geo'] != 'EU27_2020') & (df['geo'] != 'EU27_2007') & (df['geo'] != 'EU28')]
+
     # Rename geo columns with right names
     df = transform_energ_names(df, "Carburant")
-    df["Hybride"].replace({"non ": "non Hybride", "oui ": "Hybride"}, inplace=True)
+    df["Hybride"].replace(
+        {"non ": "non Hybride", "oui ": "Hybride"}, inplace=True)
     return df

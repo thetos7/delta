@@ -28,7 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
-                              dcc.Link(html.Button('Emission de CO2', style={'width':"100%"}), href='/pollution'),
+                              dcc.Link(html.Button('Pollution des transports', style={'width':"100%"}), href='/pollution'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
