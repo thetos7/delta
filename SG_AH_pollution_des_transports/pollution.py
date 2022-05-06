@@ -1,42 +1,23 @@
-from statistics import mean
 import dash
 import pandas as pd
 import plotly.express as px
 from dash import dcc, html
 from .get_data import *
-from urllib.request import urlopen
 import json
 
-axisX = html.Div(
-    [
-        html.Div("Catégorie"),
-        dcc.RadioItems(
-            id="pol-choice",
-            options=[
-                {"label": "Marque", "value": "Marque"},
-                {
-                    "label": "Hybride",
-                    "value": "Hybride",
-                },
-                {"label": "Carburant", "value": "Carburant"},
-            ],
-            value="Marque",
-            labelStyle={"display": "block"},
-        ),
-    ],
-    style={"width": "9em", "padding": "0px 0px 0px 10em"},
-)
 
-
-class Pollution:
+class Pollution():
     def __init__(self, application=None):
+        # Retrieving the date needed
         self.pollution_eu = get_transport_pollution_eu()
         self.pollution_vehicules_eu = get_pollution_per_vehicules_eu()
         self.pollution_vehicules_france = get_pollution_per_vehicules_in_france()
         self.pollution_schools_idf = get_air_pollution_schools()
+
+        # complementary data needed for the graphs
         self.years_school = [x for x in range(2012, 2018)]
         self.years = [x for x in range(1990, 2020)]
-        self.pays = [
+        self.countries = [
             "Allemagne",
             "Autriche",
             "Belgique",
@@ -74,14 +55,12 @@ class Pollution:
 
         self.main_layout = html.Div(
             children=[
-                html.H1(children="Pollution des Transports à différentes échelles"),
-                html.Br(),
-                html.H2(children="Étude de la pollution de l'air en Europe"),
-                dcc.Markdown(
-                    """Tout d'abord nous allons étudier quelques chiffres sur la pollution des transports en Europe.
-            """
-                ),
-                html.H3(children="Pollution des Transports en Europe de 1990 à 2020"),
+                html.H1(children="Pollution des Transports à différentes échelles", style={
+                        "color": "darkred", "text-decoration": "underline"}),
+                html.H2(
+                    children="1. Étude de la pollution des transports en Europe"),
+                html.H4(
+                    children="Pollution des Transports en Europe de 1990 à 2020"),
                 html.Div(
                     [
                         dcc.Graph(id="pol-main-europe-graph"),
@@ -92,7 +71,8 @@ class Pollution:
                     [
                         html.Div(
                             [
-                                html.Div("Type de Pollution"),
+                                html.Div("Type de Pollution", style={
+                                         "font-weight": "bold"}),
                                 dcc.RadioItems(
                                     id="pol-europe-type",
                                     options=[
@@ -145,27 +125,36 @@ class Pollution:
                     style={"padding": "0px 50px", "width": "100%"},
                 ),
                 dcc.Markdown(
-                    """Cette carte est intéractive. Pour visualiser la pollution d'une certaine temporalité
-            appuyez sur le button stop et glissez le curseur le long de l'axe pour changer l'année observée.
-"""
-                ),
-                dcc.Markdown(
-                    """Cette carte nous permet d'observer les différents niveaux de pollution par pays entre 1990 et 2020. 
-            Ces pourcentages étant calculés par rapport aux données de l'année 2000, cela nous permet de savoir si les émissions
-             des différents gaz polluants (tels que l'Oxyde d'azote, les composés organiques volatils autres que le méthane et 
-             les particules ayant une taille inférieure à 10 nanomètres) sont considérablement différentes par rapport à l'année observée.
-            On peut observer la Lettonie rejette énormément d'Oxyde d'azote et de composés organiques volatils autre que le méthane.
-            Dans l'ensemble l'Europe, on voit qu'à partir de 2006 la pollution en particules augmente beaucoup.
-            """
+                    """
+                    Cette carte est intéractive. Pour visualiser la pollution d'une
+                    certaine temporalité appuyez sur le button stop et glissez le curseur
+                    le long de l'axe pour changer l'année observée.
+                    """, style={'text-align': 'justify'}
                 ),
                 dcc.Markdown(
                     """
-            Maintenant qu'on a observé la pollution des transports en général et autre que le C02, nous allons nous concentrer sur les véhicules
-            neufs afin d'estimer quel pays contribue le plus à la pollution en CO2 en Europe.
-            """
+                    Cette carte nous permet d'observer les différents niveaux de
+                    pollution par pays entre 1990 et 2020. Ces pourcentages étant calculés
+                    par rapport aux données de l'année 2000, cela nous permet de savoir si
+                    les émissions des différents gaz polluants (tels que l'Oxyde d'azote,
+                    les composés organiques volatils autres que le méthane et les particules
+                    ayant une taille inférieure à 10 nanomètres) sont considérablement
+                    différentes par rapport à l'année observée. On peut par exemple observer
+                    que la Lettonie rejette énormément d'Oxyde d'azote et de composés
+                    organiques volatils autre que le méthane. Dans l'ensemble l'Europe, on
+                    voit qu'à partir de 2006 la pollution en particules augmente beaucoup.
+                    """, style={'text-align': 'justify'}
+                ),
+                dcc.Markdown(
+                    """
+                    Maintenant qu'on a observé la pollution des transports en général et
+                    autre que le C02, nous allons nous concentrer sur les véhicules neufs
+                    afin d'estimer quel pays contribue le plus à la pollution en CO2 en
+                    Europe.
+                    """, style={'text-align': 'justify'}
                 ),
                 html.Br(),
-                html.H3(
+                html.H4(
                     children="Émission de CO2 des véhicules neufs entre 2000 et 2020 en Europe"
                 ),
                 html.Div([dcc.Graph(id="pol-europe-cars-graph")]),
@@ -173,7 +162,8 @@ class Pollution:
                     [
                         html.Div(
                             [
-                                html.Div("Choix de visualisation"),
+                                html.Div("Choix de visualisation",
+                                         style={"font-weight": "bold"}),
                                 dcc.RadioItems(
                                     id="pol-all-europe-choice",
                                     options=[
@@ -194,17 +184,19 @@ class Pollution:
                         ),
                         html.Div(
                             [
-                                html.Div("Pays:"),
+                                html.Div("Pays", style={
+                                         "font-weight": "bold"}),
                                 dcc.Dropdown(
                                     id="pol-which-country",
                                     options=[
-                                        {"label": i, "value": i} for i in self.pays
+                                        {"label": i, "value": i} for i in self.countries
                                     ],
                                     value="France",
                                     disabled=True,
                                 ),
                             ],
-                            style={"width": "15em", "padding": "2em 0px 0px 0px"},
+                            style={"width": "15em",
+                                   "padding": "2em 0px 0px 0px"},
                         ),
                         html.Div(style={"width": "2em"}),
                     ],
@@ -216,28 +208,33 @@ class Pollution:
                     },
                 ),
                 dcc.Markdown(
-                    """Avec cette représentation il est possible de comparer un seul pays 
-            avec la moyenne de la consommation de toute l'Europe en choisissant le pays souhaité avec le menu
-            déroulant.
-            """
+                    """Avec cette représentation il est possible de comparer un seul pays
+                    avec la moyenne de la consommation de toute l'Europe en choisissant
+                    le pays souhaité avec le menu déroulant.
+                    """, style={'text-align': 'justify'}
                 ),
                 dcc.Markdown(
-                    """La Suède émettait énormément de CO2 dans les années 2000 et s'est 
-            ensuite réduit pour faire parti des pays les moins polluant d'Europes. Les Pays-Bas reste majoritèrement
-            ceux qui sont les moins pollueurs parmis tout les pays d'Europe. La France quant à elle reste toujours 
-            très en dessous de la moyenne européene et plutôt stable dans le temps. Mais comparer aux Pays-Bas sur les dernières années
-            la France reste plus pollueuse.
-            """
+                    """La Suède émettait énormément de CO2 dans les années 2000 et s'est
+                    ensuite réduit pour faire parti des pays les moins polluant d'Europes.
+                    Les Pays-Bas reste majoritèrement ceux qui sont les moins pollueurs
+                    parmis tout les pays d'Europe. La France quant à elle reste toujours
+                    très en dessous de la moyenne européene et plutôt stable dans le temps.
+                    Mais comparer aux Pays-Bas sur les dernières années la France reste
+                    plus pollueuse.
+                    """, style={'text-align': 'justify'}
                 ),
                 dcc.Markdown(
-                    """Dans la suite nous allons nous concentrer sur la France pour voir comment elle
-             contribue à la pollution européenne, et après voir quel impact cela a sur la vie des français et plus particulièrement
-             sur les écoles et crèches de l'Île-de-France.
-            """
+                    """
+                    Dans la suite nous allons nous concentrer sur la France pour voir
+                    comment elle contribue à la pollution européenne, et après voir quel
+                    impact cela a sur la vie des français et plus particulièrement sur
+                    les écoles et crèches de l'Île-de-France.                    
+                    """, style={'text-align': 'justify'}
                 ),
                 html.Br(),
-                html.H2(children="Étude de la pollution des transports en France"),
-                html.H3(
+                html.H2(
+                    children="2. Étude de la pollution des transports en France"),
+                html.H4(
                     children="Éjection de différents gaz en fonction de la marque en France en 2015"
                 ),
                 html.Div(
@@ -252,7 +249,8 @@ class Pollution:
                     [
                         html.Div(
                             [
-                                html.Div("Type de gaz"),
+                                html.Div("Type de gaz", style={
+                                         "font-weight": "bold"}),
                                 dcc.RadioItems(
                                     id="pol-type-gaz",
                                     options=[
@@ -274,9 +272,30 @@ class Pollution:
                                     #'Hybride', 'Carburant',
                                 ),
                             ],
-                            style={"width": "9em"},
+                            style={"width": "16em"},
                         ),
-                        axisX,
+                        html.Div(
+                            [
+                                html.Div("Catégorie", style={
+                                         "font-weight": "bold"}),
+                                dcc.RadioItems(
+                                    id="pol-choice",
+                                    options=[
+                                        {"label": "Marque", "value": "Marque"},
+                                        {
+                                            "label": "Hybride",
+                                            "value": "Hybride",
+                                        },
+                                        {"label": "Carburant",
+                                            "value": "Carburant"},
+                                    ],
+                                    value="Marque",
+                                    labelStyle={"display": "block"},
+                                ),
+                            ],
+                            style={"width": "9em",
+                                   "padding": "0px 0px 0px 10em"},
+                        ),
                     ],
                     style={
                         "padding": "10px 50px",
@@ -287,25 +306,27 @@ class Pollution:
                 ),
                 dcc.Markdown(
                     """
-                    Le graphique représente la moyenne des émissions des véhicules circulant en France
-                    selon les informations données par les constructeurs.
-                    """
+                    Le graphique représente la moyenne des émissions des véhicules
+                    circulant en France selon les informations données par les
+                    constructeurs.
+                    """, style={'text-align': 'justify'}
                 ),
                 dcc.Markdown(
                     """
-                    Le graphe permet de trier en fonction des différentes émissions des véhicules
-                    ainsi que de leur types ou de leur marques.
-                    """
+                    Le graphe permet de trier en fonction des différentes émissions
+                    des véhicules ainsi que de leur types ou de leur marques.
+                    """, style={'text-align': 'justify'}
                 ),
                 dcc.Markdown(
                     """
-                    Pour certaines émissions, il manque des valeurs leurs donnant la moyenne de 0
-                    Cela peut aussi venir de leur non émission avec les voitures électriques par example.
-                    Ces valeurs sont donc mis tout à la fin pour informer le lecteur d'un potentielle problème.
-                    """
+                    Pour certaines émissions, il manque des valeurs leurs donnant la
+                    moyenne de 0. Cela peut aussi venir de leur non émission avec les
+                    voitures électriques par example. Ces valeurs sont donc mis tout
+                    à la fin pour informer le lecteur d'un potentielle problème.
+                    """, style={'text-align': 'justify'}
                 ),
                 html.Br(),
-                html.H3(
+                html.H4(
                     children="Pollution aérienne des écoles et crêches en Île de France entre 2012 et 2017"
                 ),
                 html.Div([dcc.Graph(id="pol-school-graph")]),
@@ -313,13 +334,16 @@ class Pollution:
                     [
                         html.Div(
                             [
-                                html.Div("Type de Pollution"),
+                                html.Div("Type de Pollution", style={
+                                         "font-weight": "bold"}),
                                 dcc.RadioItems(
                                     id="pol-idf-type",
                                     options=[
-                                        {"label": "PM10", "value": "PM10"},
-                                        {"label": "PM2,5", "value": "PM25"},
-                                        {"label": "NO2", "value": "NO2"},
+                                        {"label": "Particules < 10 nanomètres",
+                                            "value": "PM10"},
+                                        {"label": "Particules < 2.5 nanomètres",
+                                            "value": "PM25"},
+                                        {"label": "Dioxyde d'azote", "value": "NO2"},
                                     ],
                                     value="NO2",
                                     labelStyle={"display": "block"},
@@ -361,20 +385,25 @@ class Pollution:
                 ),
                 dcc.Markdown(
                     """
-                    La carte permet de visualiser la pollution aérienne au abords de chaque école.
-                    """
+                    La carte permet de visualiser la pollution aérienne au abords de chaque école. Il 
+                    est possible de choisir le type de pollution et de suivre son évolution au fil des ans.
+                    """, style={'text-align': 'justify'}
                 ),
+
                 dcc.Markdown(
                     """
-                    Il est possible de choisir le type de pollution et de suivre son évolution au fil des ans.
-                    """
-                ),
-                dcc.Markdown(
-                    """
-                    Le graph prend comme valeur centrale l'objectif de qualité donné par l'OMS
+                    Le graphe prend comme valeur centrale l'objectif de qualité donné par l'OMS
                     ce qui explique pourquoi certaines échelle vont en dessous de 0 lorsque
                     les valeurs maximales deviennent trop élevés.
+                    """, style={'text-align': 'justify'}
+                ),
+                dcc.Markdown(
                     """
+                    On observe que la pollution est très élevée dans beaucoup des écoles et crèches
+                    près du centre de Paris. On peut aussi noter que l'objectif de qualité de l'air
+                    n'est pas atteint pour beaucoup d'établissement surtout pour les particules de moins
+                    de 2.5 nanomètres.
+                    """, style={'text-align': 'justify'}
                 ),
                 html.Br(),
                 html.H2(children="À propos"),
@@ -389,7 +418,6 @@ class Pollution:
                     * (c) 2022 Sarah Gutierez et Adrien Houpert
                         """
                 ),
-                html.H3(children=""),
             ],
             style={
                 "backgroundColor": "white",
@@ -445,7 +473,8 @@ class Pollution:
             dash.dependencies.Input("pol-idf-auto-stepper", "n_intervals"),
             [
                 dash.dependencies.State("pol-idf-year-slider", "value"),
-                dash.dependencies.State("pol-idf-button-start-stop", "children"),
+                dash.dependencies.State(
+                    "pol-idf-button-start-stop", "children"),
             ],
         )(self.on_interval_idf)
 
@@ -456,7 +485,7 @@ class Pollution:
                 dash.dependencies.Input("pol-all-europe-choice", "value"),
                 dash.dependencies.Input("pol-which-country", "value"),
             ],
-        )(self.update_graph_europe_cars)
+        )(self.update_graph_europe_vehicules)
 
         self.app.callback(
             [
@@ -471,7 +500,7 @@ class Pollution:
                 dash.dependencies.Input("pol-type-gaz", "value"),
                 dash.dependencies.Input("pol-choice", "value"),
             ],
-        )(self.update_graph_cars)
+        )(self.update_graph_vehicules)
 
         # Callbacks for schools graph of France
         self.app.callback(
@@ -482,7 +511,8 @@ class Pollution:
             ],
         )(self.update_graph_schools)
 
-    def update_graph_europe_cars(self, all_europe="all_countries", country="France"):
+    # Update function for the study of Europe vehicules
+    def update_graph_europe_vehicules(self, all_europe="all_countries", country="France"):
         df, mean_eu = self.pollution_vehicules_eu
 
         if all_europe == "mean":
@@ -516,7 +546,8 @@ class Pollution:
             labels={"Taux de pollution": f"Taux de Pollution en g/km"},
         )
 
-    def update_graph_cars(self, name, axis):
+    # Update function for the study of France vehicules
+    def update_graph_vehicules(self, name, axis):
         col = f"Emission {name}"
         agg = (
             self.pollution_vehicules_france.copy()[[axis, col]]
@@ -526,12 +557,13 @@ class Pollution:
             .sort_values(by=[col, axis])
             # .replace(np.NaN,0)
         )
-
+        
+        title= f"par {axis.lower()}" if axis != 'Hybride' else f"{axis.lower()}"
         fig = px.bar(
             agg,
             y=col,
             x=axis,
-            title=f"Moyenne d'{col} pour les modèles par {axis}",
+            title=f"Moyenne d'{col} pour les modèles {title}",
             color_discrete_sequence=["purple"] * len(agg),
         )
         fig.update_traces(
@@ -623,27 +655,6 @@ class Pollution:
     def disable_choice_country(self, info):
         return (info != "mean",)
 
-
-def transform_energ_names(df, col):
-    energ_name = {
-        "ES ": "Essence",
-        "GO ": "Gazole",
-        "ES/GP ": "Essence ou Gaz de Pétrole Liquéfié",
-        "GP/ES ": "Essence ou Gaz de Pétrole Liquéfié",
-        "EE ": "Essence Hybride rechargeable",
-        "EL ": "Electricité",
-        "EH ": "Essence Hybride non rechargeable",
-        "GH ": "Gazole Hybride non rechargeable",
-        "ES/GN ": "Essence ou Gaz Naturel",
-        "GN/ES ": "Essence ou Gaz Naturel",
-        "FE ": "Superéthanol",
-        "GN ": "Gaz Naturel",
-        "GL ": "Gazole Hybride rechargeable",
-    }
-    df[col].replace(energ_name, inplace=True)
-    return df
-
-
 if __name__ == "__main__":
-    pol = Energies()
+    pol = Pollution()
     pol.app.run_server(debug=True, port=8051)
