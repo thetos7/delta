@@ -179,12 +179,12 @@ class Naissance():
             html.Br(),
             dcc.Markdown("""
             Les cartes sont interactives. En passant la souris sur les départements vous avez une infobulle.
-            De plus, en séléctionnant plusieurs départements (shift et click), on peut avoir plus d'info sur ceux-ci à l'aide des graphiques.
-            En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la carte, réinitialiser avec d'un double click et utiliser le lasso pour sélectionner plusieurs départements.
+            De plus, en sélectionnant plusieurs départements (shift et clic), on peut avoir plus d'info sur ceux-ci à l'aide des graphiques.
+            En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la carte, réinitialiser avec un double clic et utiliser le lasso pour sélectionner plusieurs départements.
 
             #### Informations intéressantes :
                * On remarque que les grosses villes ont un important nombre de naissance et un plus faible nombre de décès.
-                Avec l'age les gens finnissent leur vie en régions plutôt que dans les grandes villes.
+                Avec l'âge les gens finissent leur vie en régions plutôt que dans les grandes villes.
                * Cela se confirme en étudiant les départements unitairement, les zones à forte population ont plus de naissance que de décès.
                 On observe le phénomène inverse dans les départements moins peuplés.
                * On observe une croissance démographique en France, il y a plus de naissance que de décès.
