@@ -80,6 +80,7 @@ class Energies():
                                labelStyle={'display':'block'},
                            )
                          ], style={'width': '9em'} ),
+
                 html.Div([ html.Div('Mois ref.'),
                            dcc.Dropdown(
                                id='nrg-which-month',
@@ -88,6 +89,8 @@ class Energies():
                                disabled=True,
                            ),
                          ], style={'width': '6em', 'padding':'2em 0px 0px 0px'}), # bas D haut G
+
+
                 html.Div([ html.Div('Annee ref.'),
                            dcc.Dropdown(
                                id='nrg-which-year',
@@ -96,7 +99,10 @@ class Energies():
                                disabled=True,
                            ),
                          ], style={'width': '6em', 'padding':'2em 0px 0px 0px'} ),
+
+
                 html.Div(style={'width':'2em'}),
+
                 html.Div([ html.Div('Échelle en y'),
                            dcc.RadioItems(
                                id='nrg-xaxis-type',
