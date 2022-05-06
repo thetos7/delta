@@ -10,15 +10,15 @@ import json
 class Song():
     
     def __init__(self, application = None):
-        self.songs = pd.read_pickle("efm_sujet/data/songs.pkl")
-        self.df = pd.read_pickle("efm_sujet/data/df.pkl")
-        self.artists = pd.read_pickle("efm_sujet/data/artists.pkl")
-        self.Tracks = pd.read_pickle("efm_sujet/data/Tracks.pkl")
-        self.songs_pays = pd.read_pickle("efm_sujet/data/songs_pays.pkl")
-        self.head_country = pd.read_pickle("efm_sujet/data/head_country.pkl")
-        self.songpopularity = pd.read_pickle("efm_sujet/data/songpopularity.pkl")
+        self.songs = pd.read_pickle("ACJW_MusicPopularityFactor/data/songs.pkl")
+        self.df = pd.read_pickle("ACJW_MusicPopularityFactor/data/df.pkl")
+        self.artists = pd.read_pickle("ACJW_MusicPopularityFactor/data/artists.pkl")
+        self.Tracks = pd.read_pickle("ACJW_MusicPopularityFactor/data/Tracks.pkl")
+        self.songs_pays = pd.read_pickle("ACJW_MusicPopularityFactor/data/songs_pays.pkl")
+        self.head_country = pd.read_pickle("ACJW_MusicPopularityFactor/data/head_country.pkl")
+        self.songpopularity = pd.read_pickle("ACJW_MusicPopularityFactor/data/songpopularity.pkl")
         
-        self.mymap = json.load(open('efm_sujet/custom.geo_1.json'))
+        self.mymap = json.load(open('ACJW_MusicPopularityFactor/custom.geo_1.json'))
         
         
         self.main_layout = html.Div(children=[
