@@ -1,26 +1,28 @@
-from itertools import dropwhile
-import sys
 import dash
-import flask
 from dash import dcc
 from dash import html
 import pandas as pd
-import numpy as np
-import plotly.graph_objs as go
 import plotly.express as px
-import dateutil as du
 
 class EnergyMix():
 
     def make_dataframe(self):
-        energymix = pd.read_csv("./data/World_Energy_Consumption.csv", sep=",", skiprows=[], header=0)
+        energymix = 0
+        try:
+            energymix = pd.read_csv("./data/World_Energy_Consumption.csv", sep=",", skiprows=[], header=0)
+        except:
+            print('Couldn\'t fin dataset for energymix. Did you run get_data.py ?')
+            raise FileNotFoundError
         energymix = energymix.fillna(0.0)
         self.countries = energymix.country.unique()
         energymix = energymix.set_index('country')
         return energymix
     
     def __init__(self, application=None):
-        self.energymix = self.make_dataframe()
+        try:
+            self.energymix = self.make_dataframe()
+        except:
+            return
         
         self.productions = self.energymix[['year', 'fossil_electricity', 'hydro_electricity', 'solar_electricity', 'wind_electricity', 'nuclear_electricity']]
         self.productions = self.productions.rename(columns={'fossil_electricity' : 'Fossile', 'hydro_electricity' : 'Hydraulique', 'solar_electricity' : 'Solaire', 'wind_electricity' : 'Eolienne', 'nuclear_electricity' : 'Nucléaire'})
