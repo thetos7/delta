@@ -88,19 +88,17 @@ class Impact():
             html.Br(),
             html.Br(),
             dcc.Markdown("""
-            #TODO préciser différence pollution particules fines
-            Il est possible d'intervertir le graphe avec une carte qui montre le ratio entre l'espérance de vie et le taux de pollution d'un côté, et le ratio entre l'espérance de vie et le taux de particules fines de l'autre.
+            Il est possible d'intervertir le graphe avec une carte qui montre le ratio entre le taux de pollution et l'espérance de vie d'un côté, et le ratio entre le taux de particules fines et l'espérance de vie de l'autre.
 
             Même si les résultats semblent similaires tant dans les graphes que sur les cartes, nous pouvons ressortir quelques pistes de lecture :
-            * Sur le graphe, plus la courbe d'un pays se trouve sur des abscisses élevées, plus son exposition à la pollution ou au taux de particules fines est importante.
-            * L'échelle des cartes est plus grande pour le ratio du taux de pollution. Cela signifie que que le taux de particules fines est globalement plus élevée que le taux de pollution en Europe. 
+            * Sur le graphe, plus la courbe d'un pays se trouve sur des abscisses élevées, plus son exposition à la pollution ou aux particules fines est importante.
+            * De manière générale, on peut voir sur les cartes que les taux de pollution et de particules fines influent proportionnellement l'un par rapport à l'autre sur l'espérance de vie. On voit cependant que c'est faux pour certains pays (Croatie, Islande...)
             """),
             html.Br(),
             html.Br(),
             dcc.Graph(id='imp-ratio-graph', figure=self.set_ratio_graph(), style={'width':'100%', 'display':'inline-block'}),
             dcc.Markdown("""
-            Ce graphe montre le ratio entre les 2 ratios calculés pour les cartes.
-            # TODO
+            Ce graphe montre que l'exposition aux particules fines à un impact plus important que l'exposition à la pollution sur l'espérance de vie.
             """)
         ], style={
             'backgroundColor': 'white',
@@ -147,7 +145,7 @@ class Impact():
         xtitle = "Taux de " + name
         ytitle = "Espérance de vie"
         fig.update_layout(
-            title = 'Evolution de l\'espérance de vie en fonction du taux de ' + name + ' en Europe',
+            title = 'Evolution de l\'espérance de vie en fonction du taux de ' + name + ' (2008-2019)',
             xaxis = dict( title = xtitle,
                           type= 'linear',),
             yaxis = dict( title = ytitle,
@@ -165,7 +163,7 @@ class Impact():
             if country in self.countries:
                 dataframe_values = dataframe.loc[dataframe['country'] == country].reset_index(drop=True)
                 lifespan_values = self.lifespan.loc[self.lifespan['country'] == country].reset_index(drop=True)
-                ratios = lifespan_values.value.astype(float) / dataframe_values.value.astype(float)
+                ratios = dataframe_values.value.astype(float) / lifespan_values.value.astype(float)
                 ratio_mean = ratios.mean()
                 values.append(float("{:.3f}".format(ratio_mean)))
                 text.append("")
@@ -197,7 +195,7 @@ class Impact():
         )
 
         fig.update_layout(
-            title = "Ratio entre l'espérance de vie et le taux de " + name + " en Europe",
+            title = "Moyenne des ratios entre le taux de " + name + " et l'espérance de vie (2008-2019)",
             margin = dict(l=140, r=140, t=50, b=50),
         )
 
@@ -206,27 +204,44 @@ class Impact():
     def set_ratio_graph(self):
         fig = px.line(template='plotly_white')
 
+        pollution_dict = dict((elt, []) for elt in self.lifespan.sort_values('value')['value'])
+        particles_dict = dict((elt, []) for elt in self.lifespan.sort_values('value')['value'])
+
         for country in self.countries:
             pollution_values = self.pollution.loc[self.pollution['country'] == country].reset_index(drop=True)
             particles_values = self.fine_particles.loc[self.fine_particles['country'] == country].reset_index(drop=True)
             lifespan_values = self.lifespan.loc[self.lifespan['country'] == country].reset_index(drop=True)
+
+            for index, row in lifespan_values.iterrows():
+                pollution_row = pollution_values[pollution_values['year'] == row['year']]
+                if not pollution_row.empty:
+                    pollution = pollution_row['value'].astype(float).item()
+                    pollution_dict[row['value']].append(pollution)
+                
+                particles_row = particles_values[particles_values['year'] == row['year']]
+                if not particles_row.empty:
+                    particles = particles_row['value'].astype(float).item()
+                    particles_dict[row['value']].append(particles)
             
-            pollution_ratios = lifespan_values.value.astype(float) / pollution_values.value.astype(float)
-            particles_ratios = lifespan_values.value.astype(float) / particles_values.value.astype(float)
+        pollution_dict = {k:v for k, v in pollution_dict.items() if v != []}
+        particles_dict = {k:v for k, v in particles_dict.items() if v != []}
 
-            fig.add_scatter(x = lifespan_values.year, y=pollution_ratios / particles_ratios, mode='lines', name=country, text=country, hoverinfo='x+y+text')
+        pollution_means = [np.mean(val) for val in list(pollution_dict.values())]
+        particles_means = [np.mean(val) for val in list(particles_dict.values())]
 
-        xtitle = "Années"
-        ytitle = "(taux pollution / espérance) / (taux particules fines / espérance)"
+        fig.add_scatter(x = list(pollution_dict.keys()), y=pollution_means, mode='lines', name="Pollution", text="", hoverinfo='x+y+text')
+        fig.add_scatter(x = list(particles_dict.keys()), y=particles_means, mode='lines', name="Particules fines", text="", hoverinfo='x+y+text')
+
+        xtitle = "Espérance de vie"
+        ytitle = "Moyenne des taux par espérance de vie"
         fig.update_layout(
-            title = 'Evolution du facteur entre l\'influence de la pollution et des particules fines sur l\'espérance de vie',
+            title = 'Evolution du taux de pollution et du taux de particules fines en fonction de l\'espérance de vie',
             xaxis = dict( title = xtitle,
                           type= 'linear',),
             yaxis = dict( title = ytitle,
                           type= 'linear',),
             height=450,
             hovermode='closest',
-            legend = {'title': 'Pays'},
         )
         return fig
 if __name__ == '__main__':
