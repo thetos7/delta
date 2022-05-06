@@ -27,7 +27,7 @@ def get_train_data() -> pd.core.groupby.DataFrameGroupBy:
     train_df.sort_values("Année", inplace=True)
     _clean_train(train_df)
 
-    return train_df.groupby("Relations")
+    return train_df
 
 def get_cities() -> dict[str, Coords]:
     with open(CITIE_PATH, "r") as f:

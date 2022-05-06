@@ -4,6 +4,7 @@ from typing import Tuple
 
 import dash
 from dash import dcc, html, Input, Output
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -19,7 +20,7 @@ class TBGT:
     RELATION_DEFAULT = "TOUTES LES LIGNES"
 
     def _get_relations_radio(self) -> dcc.RadioItems:
-        relations = [self.RELATION_DEFAULT] + list(self.train_df.groups.keys())
+        relations = np.insert(pd.unique(self.train_df["Relations"]), 0, self.RELATION_DEFAULT)
         return html.Div([
             "Grandes lignes SNCF:",
             dcc.RadioItems(
@@ -71,11 +72,20 @@ class TBGT:
 
         return fig
 
+    def _get_global_line_speed_fig(self) -> go.Figure:
+        fig = self.train_df.groupby("Année").mean().interpolate(method='linear').plot()
+        fig.update_xaxes(title_text="Années")
+        fig.update_yaxes(title_text="Minutes")
+        fig.update_layout(title="Evolution du temps de trajet moyen des grandes lignes en Frances")
+
+        return fig
+
     def _get_line_speed_fig(self, relation: str = RELATION_DEFAULT) -> go.Figure:
         if (relation == self.RELATION_DEFAULT):
-            return go.Figure() # FIXME: global figure
+            return self._get_global_line_speed_fig()
 
-        relation_df = self.train_df.get_group(relation)
+        relations_groups = self.train_df.groupby("Relations")
+        relation_df = relations_groups.get_group(relation)
         relation_df = relation_df.set_index("Année")
         relation_df = relation_df.drop(columns="Relations").dropna()
         relation_df = relation_df.interpolate(method='spline', order = 3)
