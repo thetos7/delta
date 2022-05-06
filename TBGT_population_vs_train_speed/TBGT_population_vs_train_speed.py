@@ -104,7 +104,7 @@ class TBGT:
         fig = global_pop_df.plot()
         fig.update_xaxes(title_text="Années", range=[1920, 2019])
         fig.update_yaxes(title_text="Croissance en %")
-        fig.update_layout(title="Croissance moyenne de la population parisienne et provinciale")
+        fig.update_layout(title="Croissance de la population parisienne et provinciale")
         fig.for_each_trace(
             lambda t: t.update(name = category[t.name],
                                legendgroup = category[t.name],
