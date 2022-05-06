@@ -35,7 +35,7 @@ def get_cities() -> dict[str, Coords]:
 
     return cities
 
-def _clean_pop_index(pop_df: pd.DataFrame) -> None:
+def _clean_pop_index(pop_df: pd.DataFrame) -> pd.DataFrame:
     # Remove useless columns/ rows
     pop_df = pop_df.drop(index=[0,1,2]).drop(columns=pop_df.columns[0:3])
     pop_df.columns = pop_df.iloc[0]
@@ -48,13 +48,17 @@ def _clean_pop_index(pop_df: pd.DataFrame) -> None:
     pop_df.index = pop_df.index.str.replace(u"É","E")
 
     # Compute Paris as a single city
-    paris = pop_df.loc["Paris 1er Arrondissement":"Paris 20e Arrondissement"].sum()
-    paris.name = "Paris"
+    paris = pop_df.loc["PARIS 1ER ARRONDISSEMENT":"PARIS 20E ARRONDISSEMENT"].sum()
+    paris.name = "PARIS"
     pop_df = pop_df.append(paris.transpose())
 
     # Sort on years
     pop_df = pop_df.transpose()
     pop_df = pop_df.sort_index()
+
+    # Filter out unused cities
+    cities = get_cities().keys()
+    pop_df = pop_df[cities]
 
     # Remove duplicate cities
     pop_df = pop_df.loc[:, ~pop_df.columns.duplicated()]
@@ -63,10 +67,10 @@ def _clean_pop_index(pop_df: pd.DataFrame) -> None:
     pop_df = pop_df.reindex(list(range(pop_df.index.min(),pop_df.index.max()+1)))
     pop_df = pop_df.infer_objects()
     pop_df = pop_df.interpolate()
-    growth = pop_df.pct_change().mul(100)
-
-def get_population() -> pd.DataFrame:
-    pop_df = pd.read_excel("TBGT_population_vs_train_speed/data/base-pop-historiques-1876-2019.xlsx")
-    _clean_pop_index(pop_df)
+    pop_df = pop_df.pct_change().mul(100)
 
     return pop_df
+
+def get_population_data() -> pd.DataFrame:
+    pop_df = pd.read_excel("TBGT_population_vs_train_speed/data/base-pop-historiques-1876-2019.xlsx")
+    return _clean_pop_index(pop_df)

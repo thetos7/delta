@@ -4,10 +4,14 @@ from typing import Tuple
 
 import dash
 from dash import dcc, html, Input, Output
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from .get_data import get_train_data, get_cities, Coords
+from .get_data import get_train_data, get_population_data, get_cities, Coords
+
+
+pd.options.plotting.backend = "plotly"
 
 
 class TBGT:
@@ -24,7 +28,7 @@ class TBGT:
                 id="relations",
                 style={"font-size": "10px", "margin": "10px"}
             )
-        ], style={"display": "inline-block", "width": "20%"})
+        ], style={"margin": "10px", "display": "inline-block", "width": "20%"})
 
     def _get_coords(self, src: str, dst: str) -> Tuple[Coords, Coords]:
         return (
@@ -32,7 +36,7 @@ class TBGT:
             (self.cities[src][1], self.cities[dst][1])
         )
 
-    def _get_map(self, relation: str = RELATION_DEFAULT) -> go.Figure:
+    def _get_map_fig(self, relation: str = RELATION_DEFAULT) -> go.Figure:
         lat_coords, lon_coords = [], []
         cities_name = []
         if (relation != self.RELATION_DEFAULT):
@@ -67,8 +71,44 @@ class TBGT:
 
         return fig
 
+    def _get_line_speed_fig(self, relation: str = RELATION_DEFAULT) -> go.Figure:
+        if (relation == self.RELATION_DEFAULT):
+            return go.Figure() # FIXME: global figure
+
+        relation_df = self.train_df.get_group(relation)
+        relation_df = relation_df.set_index("Année")
+        relation_df = relation_df.drop(columns="Relations").dropna()
+        relation_df = relation_df.interpolate(method='spline', order = 3)
+
+        fig = relation_df.plot()
+        fig.update_xaxes(title_text="Années")
+        fig.update_yaxes(title_text="Minutes")
+        fig.update_layout(title=f"Evolution du temps de trajet sur la ligne {relation}")
+
+        return fig
+
+    def _get_pop_fig(self, relation: str = RELATION_DEFAULT) -> go.Figure:
+        if (relation == self.RELATION_DEFAULT):
+            return go.Figure() # FIXME: global figure
+
+        fig = self.pop_df[relation.split(" - ")].plot()
+        fig.update_xaxes(title_text="Années")
+        fig.update_yaxes(title_text="Croissance en %")
+        fig.update_layout(title="Croissance de la population des deux villes")
+
+        return fig
+
+    def _get_statistics_graph(self) -> html.Div:
+        return html.Div([
+            dcc.Graph(id="line_speed_fig", figure=self._get_line_speed_fig(),
+                      style={"display": "inline-block", "width": "50%"}),
+            dcc.Graph(id="pop_fig", figure=self._get_pop_fig(),
+                      style={"display": "inline-block", "width": "50%"}),
+        ])
+
     def __init__(self, application = None):
         self.train_df = get_train_data()
+        self.pop_df = get_population_data()
         self.cities = get_cities()
 
         self.main_layout = html.Div(children=[
@@ -78,9 +118,12 @@ class TBGT:
             ),
             html.Div([
                 self._get_relations_radio(),
-                dcc.Graph(id="map", figure=self._get_map(),
-                          style={"display": "inline-block", "width": "75%",
-                                 "position": "relative", "vertical-align": "top"}),
+                html.Div([
+                    dcc.Graph(id="map_fig", figure=self._get_map_fig()),
+                    self._get_statistics_graph()
+                ], style={"display": "inline-block", "width": "75%",
+                          "position": "relative", "vertical-align": "top"})
+
             ])
         ], style={
             "backgroundColor": "white",
@@ -96,6 +139,16 @@ class TBGT:
 
         ### CALLBACKS ###
         self.app.callback(
-            Output("map", "figure"),
+            Output("map_fig", "figure"),
             Input("relations", "value")
-        )(self._get_map)
+        )(self._get_map_fig)
+
+        self.app.callback(
+            Output("pop_fig", "figure"),
+            Input("relations", "value")
+        )(self._get_pop_fig)
+
+        self.app.callback(
+            Output("line_speed_fig", "figure"),
+            Input("relations", "value")
+        )(self._get_line_speed_fig)
