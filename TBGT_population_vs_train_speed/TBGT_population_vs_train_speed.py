@@ -73,11 +73,18 @@ class TBGT:
 
         return fig
 
+    def _set_legend(self, fig: go.Figure) -> None:
+        fig.update_layout(legend=dict(
+            yanchor="top",
+            xanchor="right",
+        ))
+
     def _get_global_line_speed_fig(self) -> go.Figure:
         fig = self.train_df.groupby("Année").mean().interpolate(method='linear').plot()
         fig.update_xaxes(title_text="Années")
         fig.update_yaxes(title_text="Minutes")
         fig.update_layout(title="Evolution du temps de trajet moyen des grandes lignes en Frances")
+        self._set_legend(fig)
 
         return fig
 
@@ -95,6 +102,7 @@ class TBGT:
         fig.update_xaxes(title_text="Années")
         fig.update_yaxes(title_text="Minutes")
         fig.update_layout(title=f"Evolution du temps de trajet sur la ligne {relation}")
+        self._set_legend(fig)
 
         return fig
 
@@ -111,6 +119,7 @@ class TBGT:
                                legendgroup = category[t.name],
                                hovertemplate = t.hovertemplate.replace(t.name, category[t.name]))
         )
+        self._set_legend(fig)
 
         return fig
 
@@ -122,6 +131,7 @@ class TBGT:
         fig.update_xaxes(title_text="Années")
         fig.update_yaxes(title_text="Croissance en %")
         fig.update_layout(title="Croissance de la population des deux villes")
+        self._set_legend(fig)
 
         return fig
 
