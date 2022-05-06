@@ -4,8 +4,8 @@ import json
 import dash
 import numpy as np
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
+import plotly.subplots as sp
 from dash import dcc
 from dash import html
 
@@ -38,26 +38,39 @@ class Naissance():
         self.dep_map = {d['properties']['code']: d['properties']['nom']
                         for d in self.dep['features']}
 
-        self.fign = self.fig_naissance()
-        self.figd = self.fig_deces()
+        self.dep_idx_map = { d: i for i, d in enumerate(sorted(self.dep_map)) }
+
+        self.fig = sp.make_subplots(
+            rows=1,
+            cols=2,
+            subplot_titles=('Naissances', 'Décès'),
+            specs=[[{"type": "mapbox"}, {"type": "mapbox"}]],
+        )
+
+        self.fig.update_layout(
+            clickmode='event+select',
+            hovermode='closest',
+            margin=dict(l=0, r=0, t=20, b=0),
+        )
+
+        self.fig.add_trace(self.fig_naissance(), row=1, col=1)
+        self.fig.add_trace(self.fig_deces(), row=1, col=2)
+
+        self.fig.update_mapboxes(
+            style='carto-positron',
+            center={"lat": 47.0353, "lon": 2.2928 },
+            zoom=4.42,
+        )
 
         # main layout
         self.main_layout = html.Div(children=[
             html.H3(children='Naissance et décès en France en 2019'),
             html.Div([
-                html.Div([
-                    dcc.Graph(id='map_france_naissance',
-                              figure=self.fign,
-                              style={'width': '100%',
-                                     'display': 'inline-block'}, ),
-                ], style={'width': '50%'}, ),
-                html.Div([
-                    dcc.Graph(id='map_france_deces',
-                              figure=self.figd,
-                              style={'width': '100%',
-                                     'display': 'inline-block',
-                                     'padding-left': '0.5%'}, ),
-                ], style={'width': '50%'}, ),
+                dcc.Graph(
+                    id='map',
+                    figure=self.fig,
+                    style={'width': '100%', 'display': 'inline-block'},
+                )
             ],
                 style={
                     'display': 'flex',
@@ -66,14 +79,7 @@ class Naissance():
             ),
 
             html.Div([
-                html.Plaintext(id='list_department_naissance',
-                               style={
-                                   'width': '50%',
-                                   'whiteSpace': 'normal',
-                                   'height': 'auto',
-                                   'overflow-wrap': 'break-word',
-                               }),
-                html.Plaintext(id='list_department_deces',
+                html.Plaintext(id='list_department',
                                style={
                                    'width': '50%',
                                    'whiteSpace': 'normal',
@@ -208,77 +214,78 @@ class Naissance():
         # Subgraph of the map
         self.app.callback(
             dash.dependencies.Output('size_france', 'figure'),
-            [dash.dependencies.Input('map_france_naissance', 'selectedData'),
-             dash.dependencies.Input('map_france_deces', 'selectedData'),
+            [dash.dependencies.Input('map', 'selectedData'),
              dash.dependencies.Input('wps-naissance-deces-1', 'value'),
              dash.dependencies.Input('wps-uni-mg-1', 'value'),
              ])(self.size_france)
         self.app.callback(
             dash.dependencies.Output('size_naissance', 'figure'),
-            [dash.dependencies.Input('map_france_naissance', 'selectedData'),
+            [dash.dependencies.Input('map', 'selectedData'),
              dash.dependencies.Input('wps-uni-mg-2', 'value'),
              dash.dependencies.Input('wps-hf-2', 'value'),
              ])(self.size_naissance)
         self.app.callback(
             dash.dependencies.Output('size_deces', 'figure'),
-            [dash.dependencies.Input('map_france_deces', 'selectedData'),
+            [dash.dependencies.Input('map', 'selectedData'),
              dash.dependencies.Input('wps-uni-mg-3', 'value'),
              dash.dependencies.Input('wps-hf-3', 'value'),
              ])(self.size_deces)
 
+        # Department names
         self.app.callback(
-            dash.dependencies.Output('map_france_deces', 'figure'),
-            [dash.dependencies.Input('map_france_naissance', 'relayoutData')
-             ])(self.layout_sync(self.figd))
+            dash.dependencies.Output('list_department', 'children'),
+            dash.dependencies.Input('map', 'selectedData'),
+            )(self.list_dep)
+
+        # Map layout sync
         self.app.callback(
-            dash.dependencies.Output('map_france_naissance', 'figure'),
-            [dash.dependencies.Input('map_france_deces', 'relayoutData')
-             ])(self.layout_sync(self.fign))
+            dash.dependencies.Output('map', 'figure'),
+            dash.dependencies.Input('map', 'relayoutData'),
+            dash.dependencies.Input('map', 'selectedData'),
+            )(self.map_sync)
 
-        # Department name
-        self.app.callback(
-            dash.dependencies.Output('list_department_naissance', 'children'),
-            [dash.dependencies.Input('map_france_naissance', 'selectedData'),
-             ])(self.list_dep_n)
-        self.app.callback(
-            dash.dependencies.Output('list_department_deces', 'children'),
-            [dash.dependencies.Input('map_france_deces', 'selectedData'),
-             ])(self.list_dep_d)
+    def get_layout_params(self, relayout_data):
 
-    def layout_sync(self, fig_to_sync):
-        keys = ['mapbox.center', 'mapbox.zoom', 'mapbox.bearing', 'mapbox.pitch']
+        key_gen = [lambda i: f'mapbox{i}.center', lambda i: f'mapbox{i}.zoom', lambda i: f'mapbox{i}.bearing', lambda i: f'mapbox{i}.pitch']
 
-        def sync(relayoutData):
-            if relayoutData:
-                filtered_layout = { k: relayoutData.get(k) for k in keys if k in relayoutData }
-                fig_to_sync.update_layout(filtered_layout)
-            return fig_to_sync
-        
-        return sync
+        params = { k(''): relayout_data.get(k('')) for k in key_gen if k('') in relayout_data }
+        params.update({ k(''): relayout_data.get(k(2)) for k in key_gen if k(2) in relayout_data })
 
-    def list_dep_n(self, select):
-        dep = self.get_department(select)
-        if len(dep) == 96:
+        return params
+
+    def map_sync(self, relayout_data, selected_data):
+
+        deps = self.get_department(selected_data)
+
+        # upate selected elements to reflect on both maps
+        self.fig.update_traces(selectedpoints=[self.dep_idx_map[d] for d in deps])
+
+        mapbox_params = self.get_layout_params(relayout_data)
+        params = { k.removeprefix('mapbox.'): v for k, v in mapbox_params.items() }
+
+        # update layout to reflect on both maps
+        self.fig.update_mapboxes(params)
+
+        return self.fig
+
+    def list_dep(self, select_data):
+        deps = self.get_department(select_data)
+
+        if len(deps) == 96:
             return 'Toute la France'
         else:
-            return ','.join([self.dep_map[d] for d in dep])
-
-    def list_dep_d(self, select):
-        dep = self.get_department(select)
-        if len(dep) == 96:
-            return 'Toute la France'
-        else:
-            return ','.join([self.dep_map[d] for d in dep])
+            return ', '.join([self.dep_map[d] for d in deps])
 
     def fig_naissance(self):
-        fign = go.Figure(go.Choroplethmapbox(
+        return go.Choroplethmapbox(
             geojson=self.dep,
             name='',
             colorscale='Inferno',
             colorbar=dict(
-                title="Naissance",
                 tickvals=[np.log10(i) for i in self.tickval],
-                ticktext=self.tickval
+                ticktext=self.tickval,
+                thickness=20,
+                x=0.46,
             ),
             locations=self.depn.index,
             customdata=np.stack((self.depn['NAME'], self.depn.index,
@@ -291,26 +298,18 @@ class Naissance():
             z=np.log10(self.depn['SIZE']),
             zmin=np.log10(self.zmin),
             zmax=np.log10(self.zmax),
-        ))
-
-        fign.update_layout(mapbox_style="carto-positron",
-                           mapbox_zoom=4.42,
-                           mapbox_center={"lat": 47.0353, "lon": 2.2928},
-                           margin={"r": 0, "t": 0, "l": 0, "b": 0},
-                           clickmode='event+select',
-                           hovermode='closest',
-                           )
-        return fign
+        )
 
     def fig_deces(self):
-        figd = go.Figure(go.Choroplethmapbox(
+        return go.Choroplethmapbox(
             geojson=self.dep,
             name='',
             colorscale='Inferno',
             colorbar=dict(
-                title="Décès",
                 tickvals=[np.log10(i) for i in self.tickval],
-                ticktext=self.tickval
+                ticktext=self.tickval,
+                thickness=20,
+                x=0.46,
             ),
             locations=self.depd.index,
             customdata=np.stack((self.depd['NAME'], self.depd.index,
@@ -323,44 +322,34 @@ class Naissance():
             z=np.log10(self.depd['SIZE']),
             zmin=np.log10(self.zmin),
             zmax=np.log10(self.zmax),
-        ))
-
-        figd.update_layout(mapbox_style="carto-positron",
-                           mapbox_zoom=4.42,
-                           mapbox_center={"lat": 47.0353, "lon": 2.2928},
-                           margin={"r": 0, "t": 0, "l": 0, "b": 0},
-                           clickmode='event+select',
-                           hovermode='closest',
-                           )
-        return figd
+        )
 
     def get_department(self, hoverData):
         if hoverData is None or hoverData['points'] == []:
             return list(self.dep_map.keys())
         return [p['location'] for p in hoverData['points']]
 
-    def size_france(self, clickDataNaissance, clickDataDeces, nd_val, unmg_val):
-        depnid = self.get_department(clickDataNaissance)
-        depdid = self.get_department(clickDataDeces)
+    def size_france(self, selected_data, nd_val, unmg_val):
+        deps = self.get_department(selected_data)
 
         what = []
         if unmg_val == 'Unitaire':
             if 'Naissance' in nd_val:
                 what += [(d, self.daten, 'SIZE', 'Naissance ' +
                           self.dep_map[d])
-                         for d in depnid]
+                         for d in deps]
 
             if 'Décès' in nd_val:
                 what += [(d, self.dated, 'SIZE',
                           'Décès ' + self.dep_map[d])
-                         for d in depdid]
+                         for d in deps]
         else:
             if 'Naissance' in nd_val:
-                data = self.daten.loc[depnid].reset_index().groupby(
+                data = self.daten.loc[deps].reset_index().groupby(
                     ['date']).sum()
                 what += [(None, data, 'SIZE', 'Naissance cumulée')]
             if 'Décès' in nd_val:
-                data = self.dated.loc[depdid].reset_index().groupby(
+                data = self.dated.loc[deps].reset_index().groupby(
                     ['date']).sum()
                 what += [(None, data, 'SIZE', 'Décès cumulé')]
 
