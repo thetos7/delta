@@ -118,14 +118,15 @@ class Cancer():
             les superposer. Néanmoins vous pouvez utiliser l'option de superposition pour comparer des continents ayant des taux de participation sensiblement équivalents.
             
             #### Quelques données intéréssantes que nous avons pu relever :
-            Les trois premiers sites de cancer à travers le monde sont dans l'ordre : Poumon, Sein, Prostate
-            Dans le monde, le cancer le plus répandu fait toujours parti de la liste précédente excepté en l'Asie où le cancer le plus représenté est le cancer de l'Estomac.
-            Dans le monde, le cancer le plus représenté chez les jeunes enfants est le cancer du Cerveau.
-            Dans le monde, le cancer le plus représenté chez les 20-40 ans est le cancer du Sein.
-            Dans le monde, le cancer le plus représenté chez les 60+ le cancer des Poumons.
-            La majorité des cancers des Poumons sont dévéloppés par des hommes, 57% environ.
-            En France, c'est le cancer du Sein qui est le plus représenté.
+            * Les trois premiers sites de cancer à travers le monde sont dans l'ordre : Poumon, Sein, Prostate
+            * Dans le monde, le cancer le plus répandu fait toujours parti de la liste précédente excepté en l'Asie où le cancer le plus représenté est le cancer de l'Estomac.
+            * Dans le monde, le cancer le plus représenté chez les jeunes enfants est le cancer du Cerveau.
+            * Dans le monde, le cancer le plus représenté chez les 20-40 ans est le cancer du Sein.
+            * Dans le monde, le cancer le plus représenté chez les 60+ le cancer des Poumons.
+            * La majorité des cancers des Poumons sont dévéloppés par des hommes, 57% environ.
+            * En France, c'est le cancer du Sein qui est le plus représenté.
             
+            #### A propos
             * Données : [GHO](https://ci5.iarc.fr/CI5I-X/Pages/download.aspx)
             * (c) 2022 Cloé ESCUDIER et Romain GREGOIRE
             """),
