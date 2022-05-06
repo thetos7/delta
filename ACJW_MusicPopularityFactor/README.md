@@ -1,27 +1,19 @@
-Commentaire premier graphique
+# PYBD
+Alexandre Castello et Jacky Wu
 
-Le graphique représente les genres les plus populaires selon 4 notation différentes.
-- AOTY User Score
-- AOTY Critic Score
-- Metacritic User Score
-- Metacritic Critic Score
-
-Ces notes sont réparties en années(de 1940 à 2020)
-
-Vous pouvez également modifer le nombre de genres représenté à l'écran.
-
-
-
-
-ajouté le nombre de note ?? (aussi un moyen de valuer sa popularité)
+# Facteurs de popularité des musiques 
+## But
+Au travers de ce projet nous mettons en évidence les différents facteurs qui peuvent expliquer le succès d'une musique.
+## Prérequis
+Voir requirement.txt
+## Le projet
+Pour lancer le projet juste lancer le fichier python music.py
+    python3 music.py ou python3 delta.py
 
 
 
-Graph 2
-Ce graphique présente la corrélation entre la popularité d'une musique avec le nombre de personnes suivant son interprète sur Spotify.
 
-Ainsi nous pouvons en déduire que la popularité 
-
-
-Graph3
-
+Sources :
+[Spotify Dataset 1921-2020, 600k+ Tracks](https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-19212020-600k-tracks)
+[Contemporary album ratings and reviews](https://www.kaggle.com/datasets/kauvinlucas/30000-albums-aggregated-review-ratings)
+[Top 50 Spotify songs BY EACH COUNTRY](https://www.kaggle.com/datasets/leonardopena/top-50-spotify-songs-by-each-country)
