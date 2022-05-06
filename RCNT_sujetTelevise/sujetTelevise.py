@@ -14,6 +14,7 @@ from scipy import fft
 import datetime
 
 
+
 class TvSubject():
     def __init__(self, application=None):
 
@@ -102,21 +103,45 @@ class TvSubject():
         for col in data_watchtime.columns[2:]:
             data_watchtime[col] = pd.to_timedelta(data_watchtime[col]) / pd.Timedelta('1s')
             data_watchtime[col] = data_watchtime[col].apply(int)
+        data_watchtime = data_watchtime.set_index("MOIS")
+
+
+        # # # # # # # # # # # # # # # # # # #
+        # Other table due to multi-index    #
+        # # # # # # # # # # # # # # # # # # #
+        thematiques_names = ["Catastrophes", "Culture-loisirs", "Economie", "Education", "Environnement",
+                             "Faits divers", "Histoire-hommages", "International", "Justice", "Politique France",
+                             "Sante", "Sciences et techniques", "Societe", "Sport"]
+
+        data_watchtime_tot = data_watchtime.drop(["TF1", "France 2", "France 3", "Canal +", "Arte", "M6"], axis=1)
+        for i in thematiques_names:
+            data_watchtime_tot[i] = data_watchtime_tot[data_watchtime_tot["THEMATIQUES"] == i]["TOTAUX"]
+        data_watchtime_tot = data_watchtime_tot.drop(["THEMATIQUES", "TOTAUX"], axis=1).drop_duplicates()
+
+        data_count_ind = data_count.set_index("MOIS")
+        data_count_tot = data_count_ind.drop(["TF1", "France 2", "France 3", "Canal +", "Arte", "M6"], axis=1)
+        for i in thematiques_names:
+            data_count_tot[i] = data_count_tot[data_count_tot["THEMATIQUES"] == i]["TOTAUX"]
+        data_count_tot = data_count_tot.drop(["THEMATIQUES", "TOTAUX"], axis=1).drop_duplicates()
 
 
         self.data_count = data_count
         self.data_watchtime = data_watchtime
 
+        self.data_count_tot = data_count_tot
+        self.data_watchtime_tot = data_watchtime_tot
+
         self.main_layout = html.Div(children=[
-            html.H3(children='Nombre de décès par jour en France'),
+            html.H3(children='Quelques statistiques sur le sujet télévisées'),
             html.Div([dcc.Graph(id='mpj-main-graph'), ], style={'width': '100%', }),
             html.Div([dcc.RadioItems(id='mpj-mean',
-                                     options=[{'label': 'Courbe seule', 'value': 0},
+                                     options=[{'label': 'Courbe en fonction des chaines TV', 'value': 0},
                                               {'label': 'Courbe + Tendence générale', 'value': 1},
                                               {
                                                   'label': 'Courbe + Moyenne journalière (les décalages au 1er janv. indique la tendence)',
-                                                  'value': 2}],
-                                     value=2,
+                                                  'value': 2},
+                                              {'label': 'Courbe + Tendence générale', 'value': 3}],
+                                     value=0,
                                      labelStyle={'display': 'block'}),
                       ]),
             html.Br(),
@@ -130,8 +155,8 @@ class TvSubject():
             #### À propos
 
             * Sources : 
-                https://static.data.gouv.fr/resources/classement-thematique-des-sujets-de-journaux-televises-janvier-2005-septembre-2020/20201202-114045/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-nombre-de-sujets.csv
-                https://static.data.gouv.fr/resources/classement-thematique-des-sujets-de-journaux-televises-janvier-2005-septembre-2020/20201202-114231/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-durees.csv
+                * https://static.data.gouv.fr/resources/classement-thematique-des-sujets-de-journaux-televises-janvier-2005-septembre-2020/20201202-114045/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-nombre-de-sujets.csv
+                * https://static.data.gouv.fr/resources/classement-thematique-des-sujets-de-journaux-televises-janvier-2005-septembre-2020/20201202-114231/ina-barometre-jt-tv-donnees-mensuelles-2005-2020-durees.csv
 
             * 2022 Romain Cazin, Nicolas Trabet
             """)
@@ -152,23 +177,44 @@ class TvSubject():
             dash.dependencies.Output('mpj-main-graph', 'figure'),
             dash.dependencies.Input('mpj-mean', 'value'))(self.update_graph)
 
-    def update_graph(self, mean):
-        fig = px.line(self.df, template='plotly_white')
-        fig.update_traces(hovertemplate='%{y} décès le %{x:%d/%m/%y}', name='')
-        fig.update_layout(
-            # title = 'Évolution des prix de différentes énergies',
-            xaxis=dict(title=""),  # , range=['2010', '2021']),
-            yaxis=dict(title="Nombre de décès par jour"),
-            height=450,
-            showlegend=False,
-        )
-        if mean == 1:
-            reg = stats.linregress(np.arange(len(self.df)), self.df.morts)
-            fig.add_scatter(x=[self.df.index[0], self.df.index[-1]],
-                            y=[reg.intercept, reg.intercept + reg.slope * (len(self.df) - 1)], mode='lines',
-                            marker={'color': 'red'})
+    def update_graph(self, mean = 0):
+        themes = self.data_watchtime.groupby('THEMATIQUES').sum() / 3600  # en heure
+        if mean == 0:
+            fig = px.line(self.data_watchtime[self.data_watchtime["THEMATIQUES"] == "Education"].drop(["THEMATIQUES"], axis=1))
+            fig.update_layout(
+                title='time',
+                yaxis=dict(title='in sec')
+            )
+
+
+        elif mean == 1:
+            fig = px.line(self.data_watchtime_tot)
+            fig.update_layout(
+                title='time',
+                yaxis=dict(title='in sec')
+            )
+
         elif mean == 2:
-            fig.add_scatter(x=self.df.index, y=self.day_mean, mode='lines', marker={'color': 'red'})
+            graph = (self.data_watchtime.drop(["THEMATIQUES"], axis=1) / self.data_count.set_index("MOIS").drop(["THEMATIQUES"], axis=1)).mean()
+            layout_histo = dict(
+                title='Average time for french tv news programs depending on the Channel between 2005 to 2020',
+                xaxis=dict(title='Themes'),
+                yaxis=dict(title='How many time (in sec)'),
+            )
+            fig = px.bar(graph)
+            fig.update_layout(layout_histo)
+            fig.update_layout(xaxis={'categoryorder': 'total descending'})
+
+        elif mean == 3:
+            graph = (self.data_watchtime_tot / self.data_count_tot).mean()
+            layout_histo = dict(
+                title='Average time for french tv news programs depending on the subject between 2005 to 2020',
+                xaxis=dict(title='Themes'),
+                yaxis=dict(title='How many time (in sec)'),
+            )
+            fig = px.bar(graph)
+            fig.update_layout(layout_histo)
+            fig.update_layout(xaxis={'categoryorder': 'total descending'})
 
         return fig
 
