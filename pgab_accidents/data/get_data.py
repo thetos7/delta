@@ -208,8 +208,6 @@ sources = {
     },
 }
 
-df = pd.DataFrame()
-
 for year, src in sources.items():
     print(f"Collecting data for {year}")
     print("Reading user data...")
@@ -230,10 +228,9 @@ for year, src in sources.items():
     # print("Writing file(s)...")
     # usagers.to_csv(f"{year}/usagers.csv", index=False)
     # caracs.to_csv(f"{year}/caracteristiques.csv", index=False)
-    df = pd.concat([df, acc_caracs_grav])
+    acg = acc_caracs_grav.drop(columns=['hrmn', 'gps', 'adr', 'com', 'atm', 'int'], errors='ignore')
+    acg.to_pickle(f"acc_caracs_grav-{year}.pkl")
 
-df = df.drop(columns=['hrmn', 'gps', 'adr', 'com', 'atm', 'int'])
-df.to_pickle(f"acc_caracs_grav.pkl")
 
 print()
 print("Done.")
