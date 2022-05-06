@@ -148,7 +148,7 @@ class Top100BillboardUSA:
         """
         # Creating the figure
         max_weeks_on_board = self.df.groupby(by=["artist", "song"]).max("weeks-on-board").value_counts("weeks-on-board")
-        fig = max_weeks_on_board.reindex(range(1, len(max_weeks_on_board))).plot.bar()
+        fig = max_weeks_on_board.reindex(list(range(1, max_weeks_on_board.index.max() + 1)), fill_value=0).plot.bar()
         name = "Count"
         fig.update_layout(showlegend=False)
 
@@ -165,7 +165,9 @@ class Top100BillboardUSA:
         df_tmp = self.df[self.df["date"].dt.year == year]
         # Creating the figure
         max_weeks_on_board = df_tmp.groupby(by=["artist", "song"]).max("weeks-on-board").value_counts("weeks-on-board")
-        fig = max_weeks_on_board.reindex(range(1, len(max_weeks_on_board))).plot.bar()
+
+        # We take weeks-on-board up to 45 since there are no relevant data afterwards
+        fig = max_weeks_on_board.reindex(list(range(1, 45)), fill_value=0).plot.bar()
         fig.update_layout(showlegend=False)
         fig.update_layout(title="{}".format(year))
         fig.update_layout(xaxis_title="Nombre de semaines consécutives", yaxis_title="Nombre de musiques")
