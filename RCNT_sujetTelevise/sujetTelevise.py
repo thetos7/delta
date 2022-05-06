@@ -166,11 +166,25 @@ class TvSubject():
 
             html.Br(),
             dcc.Markdown("""
-            Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
-            En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la courbe, réinitialiser.
-
-            Notes :
-               * On met nos notes
+            - Observation :
+                * La fin d'année 2020 est marqué par le covid ce qui fausse les données...
+                * Canal + n'apparait plus en 2020 car a arreté ces JT.
+                * La définition des sujets est explicité sur le site de l'INA
+            - Notes :
+                * Cette premiere séries de graph présente les sujets prédominants dans les journeaux télévisés comme 
+                Societe,International ou l'international. On peut voir que sur le long terme aucune tendance ne s impose vraiment.
+                * Quelque soit le sujet les différentes chaines suivent globalement des tendances: la préoccupation actuelle
+                * Nous pouvons observer que les temps moyens des sujets des journeaux télévisés varient beaucoup en
+                fonction de la chaine et du sujet. Canal+ et M6 font des sujets beacoup plus court que la moyenne donc 
+                plus condensés. Des sujets comme le sport ou les catastrophes sont simples et ne nécessite pas beaucoup 
+                d'explications d'ou le temps.
+                
+            - A vous de jouer! Saurez vous reconnaitre ces evenements? :
+                * Fukushima
+                * Coupe du monde de 2018
+                * Emeute France banlieu 2005
+                * Crises financières 
+                * Procès de DSK
 
             #### À propos
 

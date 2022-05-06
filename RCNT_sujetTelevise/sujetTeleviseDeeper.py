@@ -141,11 +141,10 @@ class TvSubjectDeeper():
                       ]),
             html.Br(),
             dcc.Markdown("""
-            Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
-            En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la courbe, réinitialiser.
-
-            Notes :
-               * On met nos notes
+            + Notes :
+               * On peut analyser les enjeux societaux de chaque année en regardant les données. Meme si beaucoup de 
+               variations sont notables, un socle Société et International prédomine.
+               * Nous pouvons voir les sujets récurrents et les cycles dans les différents sujets.
 
             #### À propos
 
