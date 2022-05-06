@@ -1,11 +1,17 @@
-# Energy mix of different countries
+# Production électrique dans le monde
 
-source : https://www.kaggle.com/datasets/pralabhpoudel/world-energy-consumption
+Source : https://www.kaggle.com/datasets/pralabhpoudel/world-energy-consumption
 
-The dataset used describes the energy mix of every country in the world from 1900 to 2019 and 
-the variations for every energy production type.
+Ce set de donnée donne la répartition et la valeur des productions d'électricité par différentes sources 
+de la plupart des pays du monde depuis 1900.
 
-things to do ideas
-* Energy mix over a century graph for every country
-* Heatmap of nuclear, coal energy mix share
-* Evolution of coal use in different continents
+Nous avons utilisé ce set afin de visualiser les "mixs" énergétiques dans le monde ce qui permet d'observer 
+quels pays font le plus d'efforts afin de réduire leurs émissions carbones dont les énergies fossiles sont un des 
+principaux contributeurs.
+
+La visualisation de la production d'électricité au charbon et de l'évolution de cette production permet de 
+se visualiser à quel point ces pays prennent en compte les enjeux climatiques.
+
+#### Auteurs
+Yorick Madelain
+Jordan Failloux
