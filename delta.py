@@ -4,7 +4,8 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-
+from RCNT_sujetTelevise import sujetTelevise
+from RCNT_sujetTelevise import sujetTeleviseDeeper
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
@@ -12,10 +13,12 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+suj = sujetTelevise.TvSubject(app)
+sujp = sujetTeleviseDeeper.TvSubjectDeeper(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
-             children=[ 
+             children=[
                  dcc.Location(id='url', refresh=False),
                  html.Div(className="two columns",
                           children = [
@@ -25,6 +28,10 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
+                              html.Br(),
+                              dcc.Link(html.Button('Sujet tv', style={'width':"100%"}), href='/sujetTV'),
+                              html.Br(),
+                              dcc.Link(html.Button('Sujet TV deeper', style={'width':"100%"}), href='/sujetTVp'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -66,6 +73,10 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/sujetTV':
+        return suj.main_layout
+    elif pathname == '/sujetTVp':
+        return sujp.main_layout
     else:
         return home_page
 

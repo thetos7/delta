@@ -1,5 +1,3 @@
-import sys
-import glob
 import dash
 import flask
 from dash import dcc
@@ -15,7 +13,7 @@ import datetime
 
 
 
-class TvSubject():
+class TvSubjectDeeper():
     def __init__(self, application=None):
 
         # # # # # # # # # # # # # # #
@@ -132,13 +130,12 @@ class TvSubject():
         self.data_watchtime_tot = data_watchtime_tot
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Quelques statistiques sur les sujets télévisées francais entre 2005 et 2020'),
-            html.Div([dcc.Graph(id='sujet-main-graph'), ], style={'width': '100%', }),
-            html.Div([dcc.RadioItems(id='sujet-mean',
-                                     options=[{'label': 'Courbes du total des sujets', 'value': 1},
-                                              {'label': 'Courbes détaillées pour chaque sujet', 'value': 0},
-                                              {'label': "Temps moyen d'un programme TV en fonction de la chaine", 'value': 2},
-                                              {'label': "Temps moyen d'un programme TV en fonction du thème", 'value': 3}],
+            html.H3(children='Quelques statistiques plus poussées sur les sujets télévisées francais entre 2005 et 2020'),
+            html.Div([dcc.Graph(id='sujetp-main-graph'), ], style={'width': '100%', }),
+            html.Div([dcc.RadioItems(id='sujetp-mean',
+                                     options=[{'label': 'Graphique à barres en fonction des chaines TV', 'value': 0},
+                                              {'label': 'Graphique à barres en fonction des chaines TV par an', 'value': 1},
+                                              {'label': 'Graphique à barres en fonction des chaines TV sur chaque mois par an', 'value': 2}],
                                      value=0,
                                      labelStyle={'display': 'block'}),
                       ]),
@@ -172,51 +169,74 @@ class TvSubject():
             self.app.layout = self.main_layout
 
         self.app.callback(
-            dash.dependencies.Output('sujet-main-graph', 'figure'),
-            dash.dependencies.Input('sujet-mean', 'value'))(self.update_graph)
+            dash.dependencies.Output('sujetp-main-graph', 'figure'),
+            dash.dependencies.Input('sujetp-mean', 'value'))(self.update_graph)
 
-    def update_graph(self, mean = 1):
+    def update_graph(self, mean = 0):
         themes = self.data_watchtime.groupby('THEMATIQUES').sum() / 3600  # en heure
-        if mean == 0:
-            fig = px.line(self.data_watchtime[self.data_watchtime["THEMATIQUES"] == "Education"].drop(["THEMATIQUES"] , axis=1)/ 3600)
-            fig.update_layout(
-                title='Graphiques du temps télévisé pour les différents sujets',
-                yaxis=dict(title='Total en heure')
+        column_names = ['MOIS', 'THEMATIQUES', 'TF1', 'France 2', 'France 3', 'Canal +', 'Arte', 'M6', 'TOTAUX']
+        if mean == 1:
+            temp = self.data_watchtime.reset_index()
+            temp["YEAR"] = temp["MOIS"].dt.year
+            themes_dyn = temp  # en heure
+            layout_histo = dict(
+                title="Nombre d'heures par theme entre 2005 et 2020 année après année",
+                xaxis=dict(title='Thèmes'),
+                yaxis=dict(title="Nombre d'heures"),
             )
+            themesdynbis = themes_dyn.reset_index()
+            themesdynbis = themesdynbis.groupby(["YEAR", "THEMATIQUES"]).sum() / 3600
+            themesdynbis = themesdynbis.reset_index()
+            fig = px.bar(themesdynbis, x="THEMATIQUES", y=column_names[2:9], barmode="group", animation_frame="YEAR",
+                         animation_group="THEMATIQUES",
+                         hover_name="THEMATIQUES", range_y=[0, 190])
+            fig.update_layout(layout_histo)
 
 
-        elif mean == 1:
-            fig = px.line(self.data_watchtime_tot / 3600)
-            fig.update_layout(
-                title='Graphique pour chaque sujet détaillé en fonction des différentes chaines',
-                yaxis=dict(title='Total en heure')
+        elif mean == 0:  # en heure
+            layout_histo = dict(
+                title="Nombre d'heures par thème entre 2005 et 2020",
+                xaxis=dict(title='Thèmes'),
+                yaxis=dict(title="Nombre d'heures"),
             )
+            themesbis = themes.reset_index()
+            fig = px.bar(themesbis, x="THEMATIQUES", y=column_names[2:9], barmode="group")
+            fig.update_layout(layout_histo)
+            fig.update_layout(xaxis={'categoryorder': 'total descending'})
 
         elif mean == 2:
-            graph = (self.data_watchtime.drop(["THEMATIQUES"], axis=1) / self.data_count.set_index("MOIS").drop(["THEMATIQUES"], axis=1)).mean()
-            layout_histo = dict(
-                title='Temps moyen des programmes télévisées francais entre 2005 et 2020 en fonction de la chaine TV',
-                xaxis=dict(title='Thèmes'),
-                yaxis=dict(title='Combien de temps (en sec)'),
-            )
-            fig = px.bar(graph)
-            fig.update_layout(layout_histo)
-            fig.update_layout(xaxis={'categoryorder': 'total descending'})
+            data_count_month_and_year = self.data_count
+            data_count_month_and_year['Year'] = data_count_month_and_year['MOIS'].dt.year
+            data_count_month_and_year['Mois'] = data_count_month_and_year['MOIS'].dt.month
 
-        elif mean == 3:
-            graph = (self.data_watchtime_tot / self.data_count_tot).mean()
-            layout_histo = dict(
-                title='Temps moyen des programmes télévisées francais entre 2005 et 2020 en fonction du thème',
-                xaxis=dict(title='Thèmes'),
-                yaxis=dict(title='Combien de temps (en sec)'),
-            )
-            fig = px.bar(graph)
-            fig.update_layout(layout_histo)
-            fig.update_layout(xaxis={'categoryorder': 'total descending'})
+            month_dico = {1: "Janvier", 2: "Février", 3: "Mars", 4: "Avril", 5: "Mai", 6: "Juin", 7: "Juillet",
+                          8: "Aout", 9: "Septembre", 10: "Octobre", 11: "Novembre", 12: "Décembre"}
+
+            tab = data_count_month_and_year
+            tab["Mois"] = tab["Mois"].apply(lambda date: month_dico[date])
+
+            fig = px.histogram(tab, x=tab["THEMATIQUES"], y=["TF1", "France 2", "France 3", "Canal +", "Arte", "M6"],
+                               animation_frame="Year",
+                               # color = tab["lum"].apply(lambda i: luminosité[i-1]),
+                               color_discrete_sequence=['blue', 'red', 'violet', 'black', 'orange', 'green'],
+                               facet_col='Mois', facet_col_wrap=3,
+                               category_orders={"mois": range(1, 13)},  # , "x":thematiques, "color":chaine},
+                               labels={'x': 'Thematique', "y": 'Chaine Télévision'},
+                               title="Nombre d'heures par mois par thème entre 2005 et 2020 année après année"
+                               )
+            # let move the legend above the figure
+            fig.update_layout(
+                              legend=dict(orientation="h",
+                                          yanchor="bottom", y=1.05,
+                                          xanchor="right", x=1),
+
+                              autosize=False,
+                              width=1500,
+                              height=800)
 
         return fig
 
 
 if __name__ == '__main__':
-    sujet = TvSubject()
-    sujet.app.run_server(debug=True, port=8051)
+    sujetp = TvSubjectDeeper()
+    sujetp.app.run_server(debug=True, port=8051)
