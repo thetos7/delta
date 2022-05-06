@@ -12,6 +12,9 @@ Ce dépôt GitHub propose des pages Jupyter et des service Dash pour analyser de
 * [Prix de l'énergie](https://github.com/nicolastrabet/delta/tree/main/energies) : compare le prix grand public de différentes énergies en France
 * Journeaux télévisées francais : montre les grands themes des journeaux télévisées et analyse des tendance 
 
+### Get_Data.ipy
+
+
 Note : le choix du français est volontaire, il s'agit de promouvoir l'usage
        des données ouvertes auprès du grand public en France. Cela étant il
        est possible d'en faire une version dans une autre langue.
