@@ -21,7 +21,7 @@ class Cancer():
         
         self.continent = ['Asia', 'Europe', 'Africa', 'Oceania', 
                                  'North-america', 'South-america']
-        self.cancers = sorted(['Lip','Tongue','Mouth','Salivary glands','Tonsil','Oropharynx','Nasopharynx','Pyriform sinus','Hypopharynx','Oesophagus','Stomach','Small intestine','Colon','Rectosigmoid junction','Rectum','Anus','Liver','Gallbladder','Pancreas','Ill-defined digestive organs','Nasal cavity and middle ear','Accessory sinuses','Larynx','Trachea','Lung','Thymus','Heart, mediastinum and pleura','Bone','Skin','Mesothelioma','Kaposi sarcoma','Peripheral nerves', 'Peritoneum and retroperitoneum','Connective and soft tissue','Breast','Vulva','Vagina','Cervix uteri','Corpus uteri','Ovary','Other female genital organs','Placenta','Penis','Prostate','Other male genital organs','Kidney','Renal pelvis','Ureter','Bladder','Other urinary organs','Eye','Meninges', 'Central nervous system','Brain','Other parts of central nervous system','Thyroid','Adrenal gland','Other endoctrine','Non-Hodgkin lymphoma','Hodgkin disease',  'Immunoproliferative diseases','Multiple myeloma','Lymphoid leukaemia','Myeloid leukaemia','Leukaemia and unspecified','Myeloproliferative disorders','Myelodysplastic syndromes'])
+        self.cancers = sorted(['Lip','Tongue','Mouth','Salivary glands','Tonsil','Oropharynx','Nasopharynx','Pyriform sinus','Hypopharynx','Oesophagus','Stomach','Small intestine','Colon','Rectosigmoid junction','Rectum','Anus','Liver','Gallbladder','Pancreas','Ill-defined digestive organs','Nasal cavity and middle ear','Accessory sinuses','Larynx','Trachea','Lung','Thymus','Heart, mediastinum and pleura','Bone','Skin','Mesothelioma','Kaposi sarcoma','Peripheral nerves', 'Peritoneum and retroperitoneum','Connective and soft tissue','Breast','Vulva','Vagina','Cervix uteri','Corpus uteri','Ovary','Other female genital organs','Placenta','Penis','Prostate','Other male genital organs','Kidney','Renal pelvis','Ureter','Bladder','Other urinary organs','Eye','Meninges', 'Central nervous system','Brain','Other parts of central nervous system','Thyroid','Adrenal gland','Other endoctrine','Non-Hodgkin lymphoma','Hodgkin disease',  'Immunoproliferative diseases','Multiple myeloma','Lymphoid leukaemia','Myeloid leukaemia','Myeloproliferative disorders','Myelodysplastic syndromes'])
         self.age_group=[
                         '0-4',
                         '5-9',
@@ -98,6 +98,35 @@ class Cancer():
                                               ],
                                     value=['Female','Male'],
                                     style={'display':'block'})),
+            html.Br(),
+            html.Br(),
+            dcc.Markdown("""
+            ## Compilation de données sur le cancer à travers le monde:
+            #### Quel est le but de ce projet ?
+            * Aujourd'hui il existe de nombreuse maladie dans le monde que l'homme a pu soigner, mais il y en a une que l'on a vu croître sans pouvoir y faire quoi que ce soit: Le cancer.
+            En effet au cours des dernières années on a pu voir une augmentation très importante du nombre de cancer. Plusieurs raisons peuvent expliquer cette augmentation d'une part l'accroissement de la    
+            longévité mais également par une modification générale du style de vie de la population. Nous avons donc penser que recolter des données portant sur le nombre de cas à travers le monde pourrait être 
+            un sujet d'actualité. Pour ce faire nous avons choisi de représenter les données sous formes d'histogrammes qui reste l'une des formes de schematisations les plus riches et les plus simples pour 
+            mettre en évidence des compilations de données de répartition. Les histogrammes des rangées inférieures sont tous dépendants de l'histogramme principal représentant le nombre de cancer en fonction de
+            la localisation de celui, une colorayion a été ajouté pour représenter les continents.
+            
+            #### Comment utiliser notre projet ? 
+            * Tout d'abord il est important de rappeler que ces données sont compilés et partagées entre différents continents. Le nombre de personnes ayant participé à chaue essais est donc très hétérogène.
+            De ce fait si jamais votre objectif est d'essayer d'effectuer des comparaisons entre les différents continents la meilleure option reste de comparer leurs taux individuellement plutôt que de 
+            les superposer. Néanmoins vous pouvez utiliser l'option de superposition pour comparer des continents ayant des taux de participations sensiblement équivalents.
+            
+            #### Quelques données intéréssantes que nous avons pu relever :
+            Les trois premiers sites de cancer à travers le monde sont dans l'ordre : Poumon, Sein, Prostate
+            Dans le monde le cancer le plus répandu fait toujours parti de la liste précédentes excepté d'un l'Asie où le cancer le plus représenté est le cancer de l'Estomac.
+            Dans le monde le cancer le plus représenté chez les jeunes enfants est le cancer du Cerveau.
+            Dans le monde le cancer le plus représenté chez les 20-40 ans est le cancer du Sein.
+            Dans le monde le cancer le plus représenté chez les 60+ le cancer des Poumons.
+            La majorité des cancers des poumons sont dévéloppés par des hommes, 57% environ
+            En France c'est le cancer du Sein qui est le plus représenté
+            
+            * Données : [GHO](https://ci5.iarc.fr/CI5I-X/Pages/download.aspx)
+            * (c) 2022 Cloé ESCUDIER et Romain GREGOIRE
+            """),
             html.Br()])
         
 
