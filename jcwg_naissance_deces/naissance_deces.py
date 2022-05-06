@@ -189,10 +189,10 @@ class Naissance():
                * Cela se confirme en étudiant les départements unitairement, les zones à forte population ont plus de naissance que de décès.
                 On observe le phénomène inverse dans les départements moins peuplés.
                * On observe une croissance démographique en France, il y a plus de naissance que de décès.
-               * On repère les hivers avec un nombre plus important de mort durant ces périodes. 
+               * On repère les hivers avec un nombre plus important de mort durant ces périodes.
                * On observe moins de naissance de février à avril, pour un pic de naissance en juillet.
                * Les hommes ont en moyenne des enfants plus tard que les femmes.
-               * Les femmes vivent plus longtemps que les hommes
+               * Les femmes vivent plus longtemps que les hommes.
 
             #### À propos
 
@@ -260,11 +260,12 @@ class Naissance():
         # upate selected elements to reflect on both maps
         self.fig.update_traces(selectedpoints=[self.dep_idx_map[d] for d in deps])
 
-        mapbox_params = self.get_layout_params(relayout_data)
-        params = { k.removeprefix('mapbox.'): v for k, v in mapbox_params.items() }
+        if relayout_data is not None:
+            mapbox_params = self.get_layout_params(relayout_data)
+            params = { k.replace('mapbox.', ''): v for k, v in mapbox_params.items() }
 
-        # update layout to reflect on both maps
-        self.fig.update_mapboxes(params)
+            # update layout to reflect on both maps
+            self.fig.update_mapboxes(params)
 
         return self.fig
 
