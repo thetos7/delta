@@ -52,7 +52,10 @@ class Accidents:
         else:
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
-
+            
+    def run(self, debug=False, port=8050):
+        self.app.run_server(host="0.0.0.0", debug=debug, port=port)
+            
 if __name__ == '__main__':
     acc = Accidents()
-    acc.app.run_server(debug=True, port=8880)
+    acc.run(port=8065)
