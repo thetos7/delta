@@ -59,6 +59,7 @@ class Top100BillboardUSA:
 
         layout = html.Div([
             html.H1('Top 100 Billboard USA'),
+            html.Br(),
 
             html.H3('Informations à propos des données'),
             html.P(
@@ -66,6 +67,8 @@ class Top100BillboardUSA:
                 f"comprenant {len(self.df)} entrées dont {self.song_count} chansons et {self.artist_count} artistes "
                 f"uniques. "
             ),
+
+            html.Br(),
             html.Div([
                 html.H3("Distribution du nombre de semaines des musiques au Billboard, de 1958 à 2021"),
                 dcc.RadioItems(
@@ -81,27 +84,47 @@ class Top100BillboardUSA:
             Si l'on grossit, on peut également voir la 52e semaine sortir de la tendance.   
             En regardant les mêmes données mais par année,   
             il semblerait que le début des années 90 marque l'arrivée de cette tendance non proportionnelle.   
+               
             Il s'avère qu'à la fin de l'année 1991, le Billboard a institué une "règle de récurrence",   
             stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si elles se classent en dessous de la 50e place    
             et de même pour les chansons au classement depuis 1 an, si elles se trouvent en dessous de la 25e position.
             '''),
 
-            # dcc.Graph(id="new-artist-on-board", figure=self.get_new_artist_on_board_fig()),
-
+            html.Br(),
             html.Div([
                 html.H3('Entrées fulgurantes'),
+                dcc.Markdown('''
+                Plus de 1 000 chansons ont atteint la place convoitée de numéro un, mais il est beaucoup plus difficile pour une chanson de débuter en première position...
+                '''),
                 dcc.Graph(id="meteoric-entries-graph", figure=self.get_meteoric_entries_fig()),
-                html.P("TODO: add some text"),
+                dcc.Markdown('''
+                Bien qu'il ait été officiellement lancé en 1958, le Billboard n'a vu une entrée « fulgurante » pour la première fois qu'en 1995.   
+                Le Billboard a commencé à utiliser des données plus modernes sur la diffusion et les ventes à partir de 1991,   
+                ce qui a permis des calculs plus rapides et des classements plus précis.   
+                   
+                Qui d'autre que Mickael Jackson pour réaliser cet exploit en premier avec « You Are Not Alone » ?   
+                Il est amusant de constater que dans la même année, Whitney Houston et Mariah Carey deux fois ont également réussi ce tour de force.   
+                   
+                Si cela semble être un évènement assez exceptionnel, souvent lié à une sortie de film comme "Où sont les hommes ?", "Titanic" ou "Armageddon",   
+                ou bien à des chanteurs découverts du jour au lendemain grâce à des émissions telles que "American Idol", très populaire aux Etats-Unis,   
+                les années 2020 et 2021 ont vu ce phénomène apparaître 3 fois plus souvent.   
+                   
+                Un constat peu étonnant compte tenu de L'hyperconsommation de notre société, créant l'insatisfaction permanente et où les modes y sont éphémères. 
+                '''),
             ]),
+
+            html.Br(),
             html.Div([
-                html.H3('Graphs by artist'),
+                html.H3('Graphique des musiques d\'un artiste (cherchez votre interprète favori)'),
                 dcc.Dropdown(id="artist-dropdown", options=self.most_popular_artists, value='Michael Jackson'),
                 html.Div(id='artist-dropdown-output'),
             ]),
             html.Div([
                 html.H3('À propos'),
                 dcc.Markdown('''
-                * Source: [Kaggle - Billboard "The hot 100" songs](https://www.kaggle.com/datasets/dhruvildave/billboard-the-hot-100-songs)
+                Source:
+                * [Kaggle - Billboard "The hot 100" songs](https://www.kaggle.com/datasets/dhruvildave/billboard-the-hot-100-songs)
+                * [Fonctionnement du Billboard](https://www.billboard.com/billboard-charts-legend/)
                 * Copyright © 2022 - Aurélien Visentin - Eliot Leclair
                 '''),
             ]),
@@ -271,7 +294,6 @@ class Top100BillboardUSA:
                                         & (self.df["date"] != "1958-08-04 00:00:00"))] # en ignorant la toute premiere semaine (100 nouvelles entrées)
         ne_count = new_entry["date"].dt.strftime("%Y").value_counts()
         ne_count = ne_count.reindex(list(["{:4d}".format(x) for x in range(1990, 2022)]), fill_value=0)
-        #ne_count = new_entry.value_counts("date").sort_index()
         fig = px.bar(x=ne_count.index.values, y=ne_count.values, height=height)
         fig.update_traces(hovertemplate='%{y} entrées fulgurantes en %{x}')
         fig.update_xaxes(title="Date")
