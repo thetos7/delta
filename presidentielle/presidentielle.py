@@ -12,52 +12,58 @@ import dateutil as du
 from scipy import stats
 from scipy import fft
 import datetime
-
+import os
 
 class Presidentielles():
     def __init__(self, application=None):
-        df = pd.read_csv('https://raw.githubusercontent.com/nsppolls/nsppolls/master/presidentielle.csv')
-        df.drop(['id', 'echantillon', 'erreur_sup', 'sous_echantillon', 'commanditaire',
-                 'erreur_inf', 'population', 'rolling', 'media', 'parti'], axis=1, inplace=True)
-        df = df[df['nom_institut'] == 'Ipsos']
-        df["hypothese"].replace(np.nan, "tous", inplace=True)
-        df = df[(df['hypothese'] == "tous") & (df['tour'] == "Premier tour")]
-        df.reset_index()
-        df['date_enquete'] = pd.to_datetime(df['fin_enquete'])
-        df = df[df['tour'] == "Premier tour"]
-        df = df.sort_values(by="date_enquete")
+        cwd = os.getcwd()
+        print(cwd)
+
+        df = pd.read_csv('./presidentielle/data/sondages_tour_1.csv')
 
         fig_sond_t1 = px.line(df, y="intentions", x="date_enquete", color="candidat",
                               title='Sondage en vu du premier tous des présidentielles par candidat')
 
         self.df_sondage_t1 = df
 
-        df = pd.read_csv('https://raw.githubusercontent.com/nsppolls/nsppolls/master/presidentielle.csv')
+        df = pd.read_csv('./presidentielle/data/sondages_tour_2.csv')
 
-        df.drop(['parti', 'id', 'commanditaire', 'debut_enquete', 'population', 'rolling', 'media', 'sous_echantillon'],
-                axis=1, inplace=True)
-        df = df[df['tour'] == "Deuxième tour"]
-        df.replace("Hypothèse Macron", "Hypothèse Macron / Le Pen", inplace=True)
-        df.replace("Hypothèse Le Pen / Macron", "Hypothèse Macron / Le Pen", inplace=True)
-        df.replace(np.nan, "Hypothèse Macron / Le Pen", inplace=True)
-        df.reset_index(inplace=True)
-        df = df[df["hypothese"] == "Hypothèse Macron / Le Pen"]
-        df['date_enquete'] = pd.to_datetime(df['fin_enquete'])
-        df_ifop = df[df['nom_institut'] == 'Ifop']
-        df_ifop = df_ifop.sort_values(by="date_enquete")
+        df_lepen = df[df["candidat"] == "Marine Le Pen"]
+        df_macron = df[df["candidat"] == "Emmanuel Macron"]
 
-        fig_sond_t2 = px.line(df_ifop, x="date_enquete", y="intentions", color="candidat",
-                              title='Sondage des en vu du dexième tour des présidentielles par candidat')
-        # px.line(df_ifop, x="date_enquete", y="erreur_sup", color="candidat")
+        fig_sond_t2 = go.Figure()
+        fig_sond_t2.add_trace(go.Scatter(x=df_lepen["date_enquete"], y=df_lepen["intentions"], name="Marine Le Pen",
+                                         line=dict(color='royalblue', width=2)))
+        fig_sond_t2.add_trace(
+            go.Scatter(x=df_lepen["date_enquete"], y=df_lepen["erreur_sup"], name="Erreur Sup : Marine Le Pen",
+                       line=dict(color='royalblue', width=2, dash='dash')))
+        fig_sond_t2.add_trace(
+            go.Scatter(x=df_lepen["date_enquete"], y=df_lepen["erreur_inf"], name="Erreur Inf : Marine Le Pen",
+                       line=dict(color='royalblue', width=2, dash='dot')))
+
+        fig_sond_t2.add_trace(go.Scatter(x=df_macron["date_enquete"], y=df_macron["intentions"], name="Emmanuel Macron",
+                                         line=dict(color='firebrick', width=2)))
+        fig_sond_t2.add_trace(
+            go.Scatter(x=df_macron["date_enquete"], y=df_macron["erreur_sup"], name="Erreur Sup : Emmanuel Macron",
+                       line=dict(color='firebrick', width=2, dash='dash')))
+        fig_sond_t2.add_trace(
+            go.Scatter(x=df_macron["date_enquete"], y=df_macron["erreur_inf"], name="Erreur Inf : Emmanuel Macron",
+                       line=dict(color='firebrick', width=2, dash='dot')))
+
+        fig_sond_t2.update_layout(title='Sondages présidentiels du second tour avec prise en compte de l\'erreur',
+                                  xaxis_title='Temps',
+                                  yaxis_title='Pourcentage de vote')
+
+        # fig_tdp =
 
         self.df_sondage_t2 = df
         # self.day_mean = prediction
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Sondages présidentiels et temps de parole dans les médias'),
+            html.H2(children='Sondages présidentiels et temps de parole dans les médias'),
+            html.H3(children='Premier tour'),
             html.Div(
-                [dcc.Graph(id='sond_t1', figure=fig_sond_t1)
-                    , dcc.Graph(id='sond_t2', figure=fig_sond_t2)], style={'width': '100%', }),
+                [dcc.Graph(id='sond_t1', figure=fig_sond_t1)], style={'width': '100%', }),
             html.Div([dcc.RadioItems(id='mpj-mean',
                                      options=[{'label': 'Courbe seule', 'value': 0},
                                               {'label': 'Courbe + Tendence générale', 'value': 1},
@@ -67,16 +73,16 @@ class Presidentielles():
                                      value=2,
                                      labelStyle={'display': 'block'}),
                       ]),
+            html.H3(children='Second tour'),
+            html.Div(
+                [dcc.Graph(id='sond_t2', figure=fig_sond_t2)], style={'width': '100%', }),
+
             html.Br(),
-            dcc.Markdown("""
-            Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
-            En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la courbe, réinitialiser.
-
-            Sources : https://raw.githubusercontent.com/nsppolls/nsppolls/master/presidentielle.csv
-
-            Notes :
-               * test
-            """)
+            html.H3(children='À propos'),
+            dcc.Markdown(""" 
+                        * Données : [Nsppolls](https://github.com/nsppolls/nsppolls/blob/master/presidentielle.csv)
+                        * (c) 2022 Guillaume LARUE et Enguerrand de Gentile Duquesne
+                        """),
         ], style={
             'backgroundColor': 'white',
             'padding': '10px 50px 10px 50px',
