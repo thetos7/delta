@@ -1,3 +1,4 @@
+from gc import get_count
 import sys
 
 from requests import NullHandler
@@ -13,19 +14,26 @@ import dateutil as du
 
 class Spotify():
 
-    def format_caracteristiques():
+    def init_caracteristiques(self):
         df = pd.read_csv('spotify/data/SpotifyFeatures.csv')
         df = df.rename(columns={'artist_name':'artist', 'track_name':'title'})
+        
         dfmean = df.drop(columns=['artist', 'title', 'track_id', 'key', 'mode', 'time_signature'])
         dfmean = dfmean.groupby(['genre']).mean()
-        return dfmean
+        dfmean = dfmean.drop(index=['Children\'s Music'])
+        self.caracteristiques = dfmean
+
+        count = []
+        for genre in dfmean.index:
+            count.append(np.sum(df.genre == genre))
+        self.count = count
 
     def __init__(self, application = None):
         self.french = {'popularity':'popularité', 'acousticness':'accoustique', 'danceability':'dansabilité', 'duration_ms':'temps en ms',
         'energy':'énergie', 'instrumentalness':'instrumentalité', 'liveness':'vivacité', 'loudness':'intensité sonore', 'speechiness':'quantité de paroles',
         'tempo':'tempo', 'valence':'valence'}
 
-        self.caracteristiques = Spotify.format_caracteristiques()
+        self.init_caracteristiques()
 
         self.main_layout = html.Div(children=[
             html.H3(children='Caractéristiques de la popularité d\'une musique sur Spotify'),
@@ -55,15 +63,21 @@ class Spotify():
                         )
                     ]),
             html.Br(),
+            html.Br(),
             dcc.Markdown("""
-                Définition des caractériques du graphique ci-dessus : [Caractéristiques audio d'une musique](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
+                #### Notes :
+                    
+                La popularité d'un genre est un pourcentage. Celle d'une musique correspond à son nombre d'écoutes par rapport au nombre d'écoutes de la musique la plus écoutée.
+                Ainsi, la valeur utilisée correspond à la moyenne des popularités des musiques d'un genre
+                
+                Les autres caractériques du graphique sont définies à cette adresse : [Caractéristiques audio d'une musique](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
                 """),
             html.Br(),
             dcc.Markdown("""
                 #### À propos
 
                 * Sources : 
-                    * [Caréctéristiques et popularité des musiques de Spotify](https://www.kaggle.com/datasets/zaheenhamidani/ultimate-spotify-tracks-db) sur kaggle.com
+                    * [Caractéristiques et popularité des musiques de Spotify](https://www.kaggle.com/datasets/zaheenhamidani/ultimate-spotify-tracks-db) sur kaggle.com
                     * [Informations complémentaires sur la popularité, la date, ou la région](https://www.kaggle.com/datasets/dhruvildave/spotify-charts) sur kaggle.com
                 * (c) 2022 Thibaut Ambrosino, Melvin Gidel
                 """)
@@ -95,6 +109,8 @@ class Spotify():
                             'popularity': 'popularité',
                             df.columns[x_carac]: self.french[df.columns[x_carac]]
                         },
+                        size=self.count,
+                        height=750,
                     )
         return fig
 
