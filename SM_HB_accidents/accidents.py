@@ -48,12 +48,18 @@ class Accidents():
 
             Toutes les données portent sur les années 2015 à 2020, en France.
 
-            ### Analyse
+            #### Notes
 
-            * Le graphe principal
+            * En ce qui concerne la déclivité, la surface, les conditions atmosphériques, les intersections et le tracé de la route, on observe une vaste majorité d'accidents dans une 'normale'. On peut expliquer cela statistiquement par la fréquence d'apparition des phénomènes (e.g : la distance couverte par des routes hors intersection est très, de manière évidente,largement supérieure aux autres).
+            * On observe cependant sans surprise que le nombre d'accidents en intersection reste proportionellement bien plus élevé que sur route droite.
+            * Les routes communales et départementales semblent statistiquement plus mortifères que les autres (moins entretenues, moins de vigilance,..).
+            * Les accidents sont prévalents le jour car les routes sont bien plus fréquentées. Cependant, on observe en moyenne autant d'accidents la nuit pour une fréquentation inférieure (manque de luminosité fatiguant plus vite, fatigue entraînant une baisse de vigilance).
 
 
-            ### A propos
+            * Les mois de mars et surtout d'avril 2020 sont marqués par une drastique baisse des accidents en toute catégories, facilement corrélable avec la période de confinement, entrainant une baisse radicale de la frequentation des routes.
+
+
+            ####  A propos
 
             * Sources : https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2020/
             * Code source : https://github.com/StephaneMbll/delta
