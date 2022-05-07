@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from metacritic import metacritic
+from aa_sc_metacritic import metacritic
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -13,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+meta = metacritic.Metacritic(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -27,6 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
+                              dcc.Link(html.Button('Analyse Metacritic', style={'width':"100%"}), href='/aa_sc_metacritic'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -68,7 +70,7 @@ def display_page(pathname):
     elif pathname == '/deces':
         return dec.main_layout
     elif pathname == '/aa_sc_metacritic':
-        return metacritic.main_layout
+        return meta.main_layout
     else:
         return home_page
 
