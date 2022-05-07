@@ -189,7 +189,7 @@ class Top100BillboardUSA:
         max_weeks_on_board_count = df.groupby(by=["artist", "song"])["weeks-on-board"].max().value_counts()
         if reindex:
             max_weeks_on_board_count = max_weeks_on_board_count.reindex(
-                list(range(max_weeks_on_board_count.index.min(), max_weeks_on_board_count.index.max() + 1)),
+                list(range(1, max_weeks_on_board_count.index.max() + 1)),
                 fill_value=0
             )
         return max_weeks_on_board_count
