@@ -9,9 +9,12 @@ from dash import dcc
 from dash import html
 import plotly.graph_objects as go
 import PostBacStudies.get_data as gd
+from plotly.subplots import make_subplots
 
 class PostBac():
 
+
+    branches = ['Ecole d\'Ingénieur', 'Ecole de Commerce', 'BTS', 'BUT', 'CPGE', 'Licence', 'EFTS', 'IFSI', 'PACES', 'PASS', 'DUT', 'Management']
 
     introduction = """
     Bienvenue,
@@ -40,14 +43,21 @@ class PostBac():
             html.Div(style={'width' : '100%', 'margin' : 'auto'},
                      children=[dcc.Markdown(PostBac.admis)],),
             
-            html.H4(children="Evolution du pourcentage hommes/femmes par filliere"),
-            html.Div([ dcc.Graph(id='hf-hist'), ], style={'width':'100%', }),
+            
+            html.H4(children="Pourcentage de H/F par fillière"),
+            html.Div([ dcc.Graph(id='hf-pie'), ], style = {'width' : '100%', }),
+            
             dcc.Link('source', href=''),
             html.Div([ dcc.RadioItems(id='scatter-opts', 
                                      value=2,
                                      labelStyle={'display':'block'}) ,
                                      ]),
-            
+            html.P("Names:"),
+            dcc.Dropdown(id='years',
+                         options=PostBac.branches,
+                         value='BTS', 
+                         clearable=False
+                        ),
             html.H4(children="Pourcentage de boursier par fillière"),
             html.Div([ dcc.Graph(id='boursier-hist'), ], style={'width':'100%', }),
             dcc.Link('source', href=''),
@@ -65,6 +75,8 @@ class PostBac():
         else: 
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
+            
+
         self.app.callback(
                     dash.dependencies.Output('admis-hist', 'figure'),
                     dash.dependencies.Input('hist-opts', 'value'))(self.show_admis_hist)
@@ -72,8 +84,8 @@ class PostBac():
                     dash.dependencies.Output('boursier-hist', 'figure'),
                     dash.dependencies.Input('scatter-opts', 'value'))(self.show_boursier_hist)
         self.app.callback(
-                    dash.dependencies.Output('hf-hist', 'figure'),
-                    dash.dependencies.Input('scatter-opts', 'value'))(self.create_pie)
+                    dash.dependencies.Output('hf-pie', 'figure'),
+                    dash.dependencies.Input('years', 'value'))(self.show_branch_per_sex)
     
     
     def show_admis_hist(self, mean):  
@@ -83,7 +95,6 @@ class PostBac():
             y = self.df['Admis'],
             color = 'Filières très agrégées',
             labels={
-                "sum of Admis": "Admis",
                  "Session": "Année",
                  "Filières très agrégées": "Filières"
                  },
@@ -109,21 +120,51 @@ class PostBac():
         fig.update_layout(showlegend=False)
         return fig
         
-    def create_pie(self, mean):
-        fig_list = []
-        branch = 'BTS'
+    def show_branch_per_sex(self, branch):
         years = [2016, 2017, 2018, 2019, 2020, 2021]
-        for year in years:
-            SexLabels = ["Nombre d'hommes", 'Nombre de femmes']
+        # here we want our grid to be 2 x 3
+        rows = 2
+        cols = 3
+        
+        subplot_titles = ["Mixité dans la filière " + branch + ' en ' + str(x) for x in years]
+
+        specs = [[{'type':'domain'}] * cols] * rows
+        
+        fig = make_subplots(
+                rows=rows,
+                cols=cols,
+                subplot_titles=subplot_titles,
+                specs=specs)
+        
+        fig.update_annotations(font_size=12)
+        
+        for i, l in enumerate(years):
+            
+            SexLabels = ["Proportion d'hommes", 'Proportion de femmes']
             my_dict={
             'SEXE': SexLabels,
-            'SOMME':[self.df.loc[(self.df['Filières très agrégées'] == branch) & (self.df['Session'] == year)]["Nombre d'hommes"].sum(),
-                   self.df.loc[(self.df['Filières très agrégées'] == branch) & (self.df['Session'] == year)]["Nombre de femmes"].sum()]
+            'SOMME':[self.df.loc[(self.df['Filières très agrégées'] == branch) & (self.df['Session'] == l)]["Nombre d'hommes"].sum(),
+                   self.df.loc[(self.df['Filières très agrégées'] == branch) & (self.df['Session'] == l)]["Nombre de femmes"].sum()]
             }
-            df = pd.DataFrame(data=my_dict)
-            fig_list += df.plot.pie(title="Mixité dans la filière " + branch + ' en ' + str(year),y='SOMME',
-                        labels = SexLabels, figsize=(year - 2009, year - 2009), autopct='%1.1f%%')
-        return fig_list
+            dataframe = pd.DataFrame(data = my_dict)
+            # basic math to get col and row
+            row = i // cols + 1
+            col = i % (rows + 1) + 1
+            # this is the dataframe for every year
+            fig.add_trace(
+                go.Pie(labels = dataframe['SEXE'],
+                       values = dataframe["SOMME"],
+                       showlegend = True,
+                       textposition ='inside',
+                       textinfo = 'percent'),
+                 row = row,
+                 col = col
+
+            )
+
+        fig.update_layout(title="", title_x = 0.45)
+        return fig
+
 if __name__ == '__main__':
     mpj = Pbmc()
     mpj.app.run_server(debug=True, port=8051)
