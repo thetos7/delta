@@ -1,4 +1,3 @@
-# import dash_design_kit as ddk
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -111,7 +110,7 @@ class Top100BillboardUSA:
                 ou bien à des chanteurs découverts du jour au lendemain grâce à des émissions telles que "American Idol", très populaire aux Etats-Unis,   
                 les années 2020 et 2021 ont vu ce phénomène apparaître 3 fois plus souvent.   
                    
-                Un constat peu étonnant compte tenu de L'hyperconsommation de notre société, créant l'insatisfaction permanente et où les modes y sont éphémères. 
+                Un constat peu étonnant compte tenu de l'hyperconsommation de notre société, créant l'insatisfaction permanente et où les modes y sont éphémères. 
                 '''),
             ]),
 
