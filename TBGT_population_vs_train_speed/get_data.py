@@ -25,7 +25,7 @@ def _clean_train(train_df: pd.DataFrame) -> None:
 def get_train_data() -> pd.core.groupby.DataFrameGroupBy:
     train_df = pd.read_csv(TRAIN_PATH, sep=";")
     train_df.sort_values("Année", inplace=True)
-    train_df.sort_values("Relations", inplace=True)
+    train_df.sort_values("Relations", inplace=True, kind='stable')
     _clean_train(train_df)
 
     return train_df
