@@ -7,7 +7,7 @@ import plotly
 pd.options.plotting.backend = "plotly"
 
 # CSV databases from 2010 to 2020
-path = os.path.join(os.getcwd(), "pbmc_accidents_routiers_type_age_vehicule/data/*.csv")
+path = os.path.join(os.getcwd(), "pbmc_accidents_routiers/data/*.csv")
 files = glob.glob(path)
 
 def loadData() -> pd.DataFrame:
@@ -26,7 +26,19 @@ def loadData() -> pd.DataFrame:
 
     # Remove redundant "Accident" prefix in every row
     dataframe["Type Accident"].replace(to_replace="Accident *", value = "", regex=True, inplace=True)
-
+    dataframe["Type Accident"].replace(to_replace="Léger", value = "léger", regex=True, inplace=True)
+    
+    # - PL - Poids Lourd
+    # - VT - Véhicules Tourisme
+    # - VU - Véhicules Utilitaires
+    # - TC - Transport en Commun
+    # - Moto lourde
+    # - Moto légère
+    # - Cyclo
+    dataframe["Catégorie véhicule"].replace(to_replace="PL", value = "Poids Lourd", regex=True, inplace=True)
+    dataframe["Catégorie véhicule"].replace(to_replace="VT", value = "Véhicules Tourisme", regex=True, inplace=True)
+    dataframe["Catégorie véhicule"].replace(to_replace="VU", value = "Véhicules Utilitaires", regex=True, inplace=True)
+    dataframe["Catégorie véhicule"].replace(to_replace="TC", value = "Transport en Commun", regex=True, inplace=True)
     return dataframe
 
 # This function returns a dataframe matching the given specifications.
@@ -56,7 +68,7 @@ def getInfo(df : pd.DataFrame, year=None, accidentType=None, vehicleType=None, a
 def getMortality(df : pd.DataFrame):
 
     res = df.groupby(["Age véhicule", "Type Accident", "Année"])
-    mortality_df = pd.DataFrame({'Count' : res.size()}).reset_index()
+    mortality_df = pd.DataFrame({'count' : res.size()}).reset_index()
 
     return mortality_df
 
