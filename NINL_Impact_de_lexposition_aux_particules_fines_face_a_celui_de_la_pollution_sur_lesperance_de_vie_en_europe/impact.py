@@ -99,6 +99,14 @@ class Impact():
             dcc.Graph(id='imp-ratio-graph', figure=self.set_ratio_graph(), style={'width':'100%', 'display':'inline-block'}),
             dcc.Markdown("""
             Ce graphe montre que l'exposition aux particules fines à un impact plus important que l'exposition à la pollution sur l'espérance de vie.
+
+
+            #### À propos
+            * Sources : 
+                * https://ec.europa.eu/eurostat/databrowser/view/demo_mlexpec$DV_292/default/table?lang=fr
+                * https://ec.europa.eu/eurostat/databrowser/view/sdg_11_50/default/table?lang=fr
+                * https://ec.europa.eu/eurostat/databrowser/view/sdg_11_50/default/table?lang=fr
+            * (c) 2022 Nicolas Indjein - Nicolas Lorrain
             """)
         ], style={
             'backgroundColor': 'white',
