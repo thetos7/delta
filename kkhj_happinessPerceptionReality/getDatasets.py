@@ -3,8 +3,8 @@ from kkhj_happinessPerceptionReality.cleanEducationLevelData import *
 import pycountry_convert as pc
 
 
-# Merge all datasets into one
-def get_datasets():
+# Get all data by merging all datasets into one
+def get_data():
     # Extract datasets by completing missing values
     data = get_all_datasets()
     datasets = {'safety': data[1], 'unemployment': data[4],
