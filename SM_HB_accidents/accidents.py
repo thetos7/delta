@@ -7,35 +7,64 @@ import plotly.express as px
 
 class Accidents():
     def __init__(self, application = None):
-        df_final_test = pd.read_csv("SM_HB_accidents/data/final_df.csv")
+        df_final_test = pd.read_csv("SM_HB_accidents/data/final_df.csv").astype('int64')
         self.df = df_final_test
         # Traitement affichage
 
+        self.categories = {
+                "Catégorie de route" : "catr",
+                "Déclivité de la route" : "prof",
+                "Surface de la route" : "surf",
+                "Type de collision" : "col",
+                "Conditions atmosphériques" : "atm",
+                "Type d'intersection de la voie" : "int",
+                "Conditions d'éclairage de la route" : "lum",
+                "Tracé de la route" : "plan" }
 
         #Dash integration
 
         self.main_layout = html.Div([
             html.H3(children=['Contextualisation des accidents de la route']),
             html.Div([dcc.Graph(id='main-graph')], style={'width':'100%'}),
-            html.Div([dcc.RadioItems(id='line-to-histo',
-                options=[{'label' : "Histogramme", 'value':1},
-                    {'label' : "Ligne", 'value':0}],
-                value=1,
-                labelStyle={'display':'block'})]),
+            html.Div([
+                    dcc.RadioItems(id='line-to-histo',
+                        options= [
+                            {'label' : "Histogramme", 'value':1},
+                            {'label' : "Lignes", 'value':0} ],
+                        value=1,
+                        style={'display':'inline-block', 'width':'50%'}),
+                    dcc.Dropdown(id='cat-changer',
+                        options = list(self.categories),
+                        value="Catégorie de route",
+                        searchable = False,
+                        style={'display':'inline-block', 'width': '50%'})
+                    ]),
             html.Br(),
             dcc.Markdown("""
-               # Analyse
+            Le graphe ci-dessus est interactif :
+            * Choisissez de l'afficher en histogramme, ou en lignes
+            * Choisissez le paramètre que vous souhaitez étudier
+            * Un clic simple sur une catégorie l'excluera du graphe, un double-clic n'affichera qu'elle
 
-            #### A propos
+            Toutes les données portent sur les années 2015 à 2020, en France.
 
-            *Sources : https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2020/
+            ### Analyse
 
-            *(c) 2022 Hugo Boux & Stephane Mabille
-            """
-            )], style = {
-                'backgroundColor' : 'white',
-                'padding': '10px 50px 10px 50px'
-                })
+            * Le graphe principal
+
+
+            ### A propos
+
+            * Sources : https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2020/
+            * Code source : https://github.com/StephaneMbll/delta
+            * (c) 2022 Hugo Boux & Stephane Mabille
+
+
+                        """
+                        )], style = {
+                            'backgroundColor' : 'white',
+                            'padding': '10px 50px 10px 50px'
+                            })
 
         if application:
             self.app = application
@@ -45,18 +74,16 @@ class Accidents():
 
         self.app.callback(
                 dependencies.Output('main-graph', 'figure'),
+                dependencies.Input('cat-changer', 'value'),
                 dependencies.Input('line-to-histo', 'value'))(self.switch_graph_bar_line)
 
-#    def update_graph(self, value):
-#        return 
-
-    def switch_graph_bar_line(self, value):
-        strg = 'catr' 
+    def switch_graph_bar_line(self, cat, value):
+        category = self.categories[cat]
         data = self.df
         if (value == True):
-            return get_count_value_param_bar(strg, data)
+            return get_count_value_param_bar(category, data)
         else:
-            return get_count_value_param_line(strg, data)
+            return get_count_value_param_line(category, data)
 
 
 def switch_categorie(strg):
@@ -74,14 +101,14 @@ def switch_categorie(strg):
 
 def switch_titre(strg):
     switcher = {
-            "catr": "Nombre d'accident en fonction de la catégorie de la route de 2015 à 2020",
-            "plan": "Nombre d'accident en fonction du tracé en plan de la route de 2015 à 2020",
-            "surf": "Nombre d'accident en fonction de l'état de la surface de la route de 2015 à 2020",
-            "prof": "Nombre d'accident en fonction de la déclivité de la route de 2015 à 2020",
-            "lum": "Nombre d'accident en fonction des conditions d'éclairage de la route de 2015 à 2020",
-            "atm": "Nombre d'accident en fonction des conditions atmosphériques de 2015 à 2020",
-            "col": "Nombre d'accident en fonction du type de collision de 2015 à 2020",
-            "int": "Nombre d'accident en fonction du type d'intersection de la voie de 2015 à 2020" 
+            "catr": "Nombre d'accident en fonction de la catégorie de la route",
+            "plan": "Nombre d'accident en fonction du tracé en plan de la route",
+            "surf": "Nombre d'accident en fonction de l'état de la surface de la route",
+            "prof": "Nombre d'accident en fonction de la déclivité de la route",
+            "lum": "Nombre d'accident en fonction des conditions d'éclairage de la route",
+            "atm": "Nombre d'accident en fonction des conditions atmosphériques",
+            "col": "Nombre d'accident en fonction du type de collision",
+            "int": "Nombre d'accident en fonction du type d'intersection de la voie" 
             }
     return switcher.get(strg)
 
@@ -146,4 +173,4 @@ def get_count_value_param_line(strg, data):
 
 if __name__ == '__main__':
     SMBH = Accidents()
-    #SMBH.app.run_server(debug=True, port=8051)
+    SMBH.app.run_server(debug=True, port=8051)

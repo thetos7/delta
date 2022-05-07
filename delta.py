@@ -23,7 +23,7 @@ main_layout = html.Div([
                           children = [
                               html.Center(html.H2("Δelta δata")),
                               html.Br(),
-                              dcc.Link(html.Button("Accidents", style={'width':"100%"}), href='/accidents'),
+                              dcc.Link(html.Button("Accidents routiers", style={'width':"100%"}), href='/accidents'),
                               html.Br(),
                               dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
                               html.Br(),
