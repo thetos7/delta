@@ -1,4 +1,4 @@
-from kkhj_happinessPerceptionReality.getDatasets import get_data
+from kkhj_happinessPerceptionReality.get_data import *
 from kkhj_happinessPerceptionReality.missingValues import *
 from kkhj_happinessPerceptionReality.perceivedIndex import *
 import dash
