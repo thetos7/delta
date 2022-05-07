@@ -11,6 +11,7 @@ import plotly.express as px
 import dateutil as du
 from scipy import stats
 from scipy import fft
+import datetime
 
 
 class Deces:
@@ -18,68 +19,51 @@ class Deces:
         df = pd.concat([pd.read_pickle(f) for f in glob.glob("data/morts_par_jour-*")])
         df = df.groupby("deces").sum()
         df.sort_index(inplace=True)
-        df = df.loc["1973":]
+        last_month = "02/2022"
+        now = np.datetime64(datetime.datetime.now()).astype('datetime64[M]')
+        df = df.loc['1973':now - np.timedelta64(2, 'M')]
 
         # calcul de la moyenne journalière avec des fenêtres
+        # 2 passages pour retirer les valeurs qui dépassent l'écart type par rapport au sinus
         width = 10
-        prediction = pd.DataFrame({"x": np.zeros(len(df))}, index=df.index)
-        prediction_nb = pd.DataFrame({"x": np.zeros(len(df))}, index=df.index)
-        for step in range(1970, df.index[-1].year - width + 1):
-            dfp = df.loc[f"{step}":f"{step+width}"]
-            pente, v0 = np.polyfit(np.arange(len(dfp)), dfp.morts.values, 1)
-            y = fft.fft(dfp.morts)
-            y[y < 30 * len(dfp)] = 0
-            pred = fft.ifft(y)
-            pred -= dfp.morts.mean() - v0
-            pred += np.cumsum(
-                [
-                    pente,
-                ]
-                * len(dfp)
-            )
-            prediction.loc[f"{step}":f"{step+width}", "x"] += pred
-            prediction_nb.loc[f"{step}":f"{step+width}", "x"] += 1
-        prediction = np.array([p.real for p in prediction.x]) / prediction_nb.x
+        df2 = df.copy()
+        for _ in range(2):
+            prediction = pd.DataFrame({'x':np.zeros(len(df))}, index=df.index)
+            prediction_nb = pd.DataFrame({'x':np.zeros(len(df))}, index=df.index)
+            for step in range(1970, df.index[-1].year - width + 1):
+                dfp = df2.loc[f'{step}':f'{step+width}']
+                pente, v0 = np.polyfit(np.arange(len(dfp)), dfp.morts.values, 1)
+                y = fft.fft(dfp.morts)
+                y[y<30*len(dfp)] = 0
+                pred = fft.ifft(y)
+                pred -= dfp.morts.mean() - v0
+                pred += np.cumsum([pente,]*len(dfp))
+                prediction.loc[f'{step}':f'{step+width}', 'x'] += pred
+                prediction_nb.loc[f'{step}':f'{step+width}','x'] += 1
+            prediction = np.array([p.real for p in prediction.x]) / prediction_nb.x
+            std = np.std(df.morts - prediction)
+            df2.morts[df2.morts > prediction + std] = prediction.astype('int') + int(std)
+            df2.morts[df2.morts < prediction - std] = prediction.astype('int') - int(std)
+        del df2
 
         self.df = df
         self.day_mean = prediction
 
-        self.main_layout = html.Div(
-            children=[
-                html.H3(children="Nombre de décès par jour en France"),
-                html.Div(
-                    [
-                        dcc.Graph(id="mpj-main-graph"),
-                    ],
-                    style={
-                        "width": "100%",
-                    },
-                ),
-                html.Div(
-                    [
-                        dcc.RadioItems(
-                            id="mpj-mean",
-                            options=[
-                                {"label": "Courbe seule", "value": 0},
-                                {"label": "Tendence générale", "value": 1},
-                                {
-                                    "label": "Moyenne journalière (les décalages au 1er janv. indique la tendence)",
-                                    "value": 2,
-                                },
-                            ],
-                            value=0,
-                            labelStyle={"display": "block"},
-                        ),
-                    ]
-                ),
-                html.Br(),
-                dcc.Markdown(
-                    """
+        self.main_layout = html.Div(children=[
+            html.H3(children='Nombre de décès par jour en France'),
+            html.Div([ dcc.Graph(id='mpj-main-graph'), ], style={'width':'100%', }),
+            html.Div([ dcc.RadioItems(id='mpj-mean', 
+                                     options=[{'label':'Courbe seule', 'value':0},
+                                              {'label':'Courbe + Tendence générale', 'value':1}, 
+                                              {'label':'Courbe + Moyenne journalière (les décalages au 1er janv. indique la tendence)', 'value':2}], 
+                                     value=2,
+                                     labelStyle={'display':'block'}) ,
+                                     ]),
+            html.Br(),
+            dcc.Markdown("""
             Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
             En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la courbe, réinitialiser.
 
-            Sources : https://www.data.gouv.fr/fr/datasets/fichier-des-personnes-decedees/
-            
             Notes :
                * La grippe de l'hiver 1989-1990 a fait 20 000 morts (4,6 millions de malades en 11 semaines). La chute de la courbe au premier janvier 1990 est quand même très surprenante.
                * On repère bien les hivers avec grippe.
@@ -96,6 +80,16 @@ class Deces:
                 "backgroundColor": "white",
                 "padding": "10px 50px 10px 50px",
             },
+
+            #### À propos
+
+            * Sources : https://www.data.gouv.fr/fr/datasets/fichier-des-personnes-decedees/
+            * (c) 2022 Olivier Ricou
+            """)
+        ], style={
+            'backgroundColor': 'white',
+             'padding': '10px 50px 10px 50px',
+             }
         )
 
         if application:
