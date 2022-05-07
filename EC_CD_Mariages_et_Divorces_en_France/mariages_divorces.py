@@ -25,6 +25,10 @@ class Mariage():
             df.drop(columns = ['ANAIS1', 'DEPNAIS1', 'INDNAT1', 'ETAMAT1', 'ANAIS2', 'DEPNAIS2', 'INDNAT2','ETAMAT2',
                     'JSEMAINE', 'DEPDOM', 'TUDOM', 'TUCOM', 'NBENFCOM'], axis=1, inplace=True)
             
+        def convert(i):
+            return int(i)
+
+            
         self.L = ['janv', 'fev', 'mars', 'avril', 'mai', 'juin', 'juillet', 'aout', 'sept', 'oct','nov','dec']    
 
         mar_14 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2014.csv", sep=',', low_memory=False)
@@ -34,6 +38,13 @@ class Mariage():
         mar_18 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2018.csv", sep=',', low_memory=False)
         mar_19 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2019.csv", sep=',', low_memory=False)
         mar_20 = pd.read_csv("EC_CD_Mariages_et_Divorces_en_France/data/data_mariages_2020.csv", sep=',', low_memory=False)
+        mar = pd.read_excel('EC_CD_Mariages_et_Divorces_en_France/data/mariages par mois.xls', skiprows = {0,1, 2, 3, 5, 6},
+                            usecols = { 'Ensemble des mariages de l\'année', 'Mois du mariage',
+                                       'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre',
+                                       'Octobre', 'Novembre', 'Décembre'}, skipfooter = 1, dtype=int)
+        pacs = pd.read_excel('EC_CD_Mariages_et_Divorces_en_France/data/ensemble des pacs.xlsx',
+                             skiprows = {0,1, 2, 4}, usecols = {0, 4,5,6}, skipfooter = 16)
+        
         filter_df(mar_14)
         filter_df(mar_15)
         filter_df(mar_16)
@@ -48,9 +59,8 @@ class Mariage():
         deps = pd.read_excel('EC_CD_Mariages_et_Divorces_en_France/data/departements-francais.xls',
                              usecols = {'NOM', 'NUMÉRO'}, skipfooter = 7)
         deps.rename(columns={'NUMÉRO' : 'DEPARTEMENT'}, inplace = True)
-        
+            
         df = pd.concat([mar_14, mar_15, mar_16, mar_17, mar_18, mar_19, mar_20])
-       
         HH = df[(df['SEXE1'] == 'M') & (df['SEXE2'] == 'M')]
         graph = pd.DataFrame(HH.groupby('AMAR').size(), columns = ['HH'])
         FF = df[(df['SEXE1'] == 'F') & (df['SEXE2'] == 'F')]
@@ -72,6 +82,13 @@ class Mariage():
         map_f = pd.concat([map_f, deps], axis=1)
         for i in range (0,10):
             map_f.loc[map_f.DEPARTEMENT == i, "DEPARTEMENT"] = "0%i" % i
+            
+        graph = graph.reset_index()
+        graph['AMAR'] =  graph['AMAR'].apply(convert)    
+            
+            
+            
+        
         
         df = mar_14
         df = df[df['DEPMAR'] == self.dep] 
@@ -88,29 +105,29 @@ class Mariage():
         graph2 = graph2.sort_values(by=['MMAR'])
         graph2['MMAR'] =  graph2['MMAR'].apply(self.update_month)
        
-        self.year = 2014
+        self.year = 1946
         self.df = graph
         self.map_f = map_f
         self.departements = json.load(open('EC_CD_Mariages_et_Divorces_en_France/data/departements-version-simplifiee.geojson'))
         
-        self.fig = px.line(self.df)
-        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.DEPARTEMENT,
+        self.fig = px.line(graph)
+
+        self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations=self.map_f.DEPARTEMENT,
                            hover_name = self.map_f.NOM,
                            featureidkey = 'properties.code', 
-                           color=self.year, range_color=[200, 10000], color_continuous_scale="Viridis",
+                           color=2014, range_color=[200, 10000], color_continuous_scale="Viridis",
                            mapbox_style="carto-positron",
                            zoom=4.6, center = {"lat": 47, "lon": 2},
-                           opacity=0.5,
+                           opacity=0,
                            labels={self.year:'Nombre de Mariages'}
                           )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
         self.fig_histo = px.histogram(graph2, x = 'MMAR', y = ['HH', 'FF', 'HF'], barmode='group')
         self.fig.update_layout(
             title = 'Mariages en France depuis 2014',
-            xaxis = dict(title = 'Année du mariage'),
-            yaxis = dict(title = 'Nombre de mariages'), 
-            legend = dict(title = 'Type de mariage')
-    
+            xaxis = dict(title = 'Année de l\'Union'),
+            yaxis = dict(title = 'Nombre d\'Union'), 
+            legend = dict(title = 'Type d\'Union')
         )
         self.fig_histo.update_layout(
             title = 'Mariage et divorce %s en %s' % (self.dep_name(), self.year),
@@ -124,7 +141,7 @@ class Mariage():
             html.Div([
                 dcc.Graph(
                     id='mdf-map-graph',
-                    figure=self.fig_map,
+                    #figure=self.fig_map,
                     style={'width':'50%', }),
                 dcc.Graph(
                     id='mdf-main-graph',
@@ -136,11 +153,11 @@ class Mariage():
                        'justifyContent':'center', }),
             html.Div([
                     dcc.Slider(id='mdf-crossfilter-year-slider',
-                        min=2014,
+                        min=1946,
                         max=2020,
                         step=1,
-                        value=2014,
-                        marks={str(year): str(year) for year in range(2014, 2021)},),
+                        value=1946,
+                        marks={str(year): str(year) for year in range(1945, 2021, 5)},),
                     dcc.Interval(
                         id='mdf-auto-stepper',
                         interval=1000,
@@ -210,13 +227,15 @@ class Mariage():
            return self.files[self.year - 2014].sort_values(by=['MMAR'])
         
     def update_map(self):
+        opa = 0 if self.year < 2014 else 0.5
+        year = self.year if self.year > 2013 else 2014
         self.fig_map = px.choropleth_mapbox(self.map_f, geojson=self.departements, locations= self.map_f.DEPARTEMENT,
                            hover_name = self.map_f.NOM,
                            featureidkey = 'properties.code', 
-                           color=self.year, range_color=[200, 10000], color_continuous_scale="Viridis",
+                           color=year, range_color=[200, 10000], color_continuous_scale="Viridis",
                            mapbox_style="carto-positron",
                            zoom=4.6, center = {"lat": 47, "lon": 2},
-                           opacity=0.5,
+                           opacity=opa,
                            labels={self.year:'Nombre de Mariages'}
                           )
         self.fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
@@ -224,6 +243,8 @@ class Mariage():
     
     #TODO : mettre le nom département en titre Saloperie de Corse option de secours faire une fonction qui retourne ce qu'il faut
     def update_histo(self):
+        if self.year < 2014:
+            return
         df = self.get_file()
         df = df[df['DEPMAR'] == self.dep]
       
@@ -306,6 +327,9 @@ class Mariage():
         
     def on_interval(self, n_intervals, year, text):
         if text == self.STOP:
+            if self.year < 2014:
+                self.year += 1
+                return self.year
             if self.dep == '19':
                 self.dep = '2A'
             elif self.dep == '2A':
@@ -315,7 +339,7 @@ class Mariage():
             elif self.dep == '95':
                 self.dep = '01'
                 if year == 2020:
-                    self.year = 2014
+                    self.year = 1946
                 else:
                     self.year += 1
             else:
