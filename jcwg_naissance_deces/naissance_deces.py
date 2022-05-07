@@ -1,12 +1,11 @@
-import json
-
+from dash import dcc
+from dash import html
 import dash
+import json
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.subplots as sp
-from dash import dcc
-from dash import html
 
 
 class Naissance():
@@ -36,9 +35,9 @@ class Naissance():
         self.age_deces_axis = list(sorted(set(self.aged.reset_index()['AGE'])))
         self.dep_map = {d['properties']['code']: d['properties']['nom']
                         for d in self.dep['features']}
+        self.dep_idx_map = {d: i for i, d in enumerate(sorted(self.dep_map))}
 
-        self.dep_idx_map = { d: i for i, d in enumerate(sorted(self.dep_map)) }
-
+        # Double map Naissance/Deces
         self.fig = sp.make_subplots(
             rows=1,
             cols=2,
@@ -46,6 +45,7 @@ class Naissance():
             specs=[[{"type": "mapbox"}, {"type": "mapbox"}]],
         )
 
+        # Enable multi-element selection
         self.fig.update_layout(
             clickmode='event+select',
             hovermode='closest',
@@ -57,13 +57,15 @@ class Naissance():
 
         self.fig.update_mapboxes(
             style='carto-positron',
-            center={"lat": 47.0353, "lon": 2.2928 },
+            center={"lat": 47.0353, "lon": 2.2928},
             zoom=4.42,
         )
 
         # main layout
         self.main_layout = html.Div(children=[
             html.H3(children='Naissance et décès en France en 2019'),
+
+            # Map div.
             html.Div([
                 dcc.Graph(
                     id='map',
@@ -77,6 +79,7 @@ class Naissance():
                 }
             ),
 
+            # List of department name.
             html.Div([
                 html.Plaintext(id='list_department',
                                style={
@@ -94,6 +97,8 @@ class Naissance():
             ),
 
             html.Br(),
+
+            # Double graph with Naissance/Deces
             html.Div([
                 dcc.Graph(id='size_france',
                           style={'width': '95%', 'display': 'inline-block'}),
@@ -122,6 +127,7 @@ class Naissance():
                       'borderTop': 'thin lightgrey solid',
                       'justifyContent': 'center', }),
             html.Br(),
+
             html.Div([
                 dcc.Graph(id='size_naissance',
                           style={'width': '90%', 'display':
@@ -150,6 +156,7 @@ class Naissance():
                 dcc.Graph(id='size_deces',
                           style={'width': '90%',
                                  'display': 'inline-block', }),
+
                 html.Div([
                     html.Br(),
                     html.Br(),
@@ -209,58 +216,71 @@ class Naissance():
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
 
-        # Subgraph of the map
+        # Update subgraph when the selected department are updated.
         self.app.callback(
             dash.dependencies.Output('size_france', 'figure'),
             dash.dependencies.Input('map', 'selectedData'),
             dash.dependencies.Input('wps-naissance-deces-1', 'value'),
             dash.dependencies.Input('wps-uni-mg-1', 'value'),
-            )(self.size_france)
+        )(self.size_france)
         self.app.callback(
             dash.dependencies.Output('size_naissance', 'figure'),
             dash.dependencies.Input('map', 'selectedData'),
             dash.dependencies.Input('wps-uni-mg-2', 'value'),
             dash.dependencies.Input('wps-hf-2', 'value'),
-            )(self.size_naissance)
+        )(self.size_naissance)
         self.app.callback(
             dash.dependencies.Output('size_deces', 'figure'),
             dash.dependencies.Input('map', 'selectedData'),
             dash.dependencies.Input('wps-uni-mg-3', 'value'),
             dash.dependencies.Input('wps-hf-3', 'value'),
-            )(self.size_deces)
+        )(self.size_deces)
 
-        # Department names
+        # Update list of department names upon map selection.
         self.app.callback(
             dash.dependencies.Output('list_department', 'children'),
             dash.dependencies.Input('map', 'selectedData'),
-            )(self.list_dep)
+        )(self.list_dep)
 
         # Map layout sync
         self.app.callback(
             dash.dependencies.Output('map', 'figure'),
             dash.dependencies.Input('map', 'relayoutData'),
             dash.dependencies.Input('map', 'selectedData'),
-            )(self.map_sync)
+        )(self.map_sync)
 
     def get_layout_params(self, relayout_data):
+        """Get the layout data return by the callback.
 
-        key_gen = [lambda i: f'mapbox{i}.center', lambda i: f'mapbox{i}.zoom', lambda i: f'mapbox{i}.bearing', lambda i: f'mapbox{i}.pitch']
+        :param relayout_data: Update relayout of the map
+        :return: dict of the relayout data sanitized.
+        """
+        key_gen = [lambda i: f'mapbox{i}.center', lambda i: f'mapbox{i}.zoom',
+                   lambda i: f'mapbox{i}.bearing', lambda i: f'mapbox{i}.pitch']
 
-        params = { k(''): relayout_data.get(k('')) for k in key_gen if k('') in relayout_data }
-        params.update({ k(''): relayout_data.get(k(2)) for k in key_gen if k(2) in relayout_data })
+        params = {k(''): relayout_data.get(k('')) for k in key_gen if
+                  k('') in relayout_data}
+        params.update({k(''): relayout_data.get(k(2)) for k in key_gen if
+                       k(2) in relayout_data})
 
         return params
 
     def map_sync(self, relayout_data, selected_data):
+        """Update the layout of the other map.
 
+        :param relayout_data: layout of the updated map.
+        :return: New figure sync with the relayout data.
+        """
         deps = self.get_department(selected_data)
 
         # upate selected elements to reflect on both maps
-        self.fig.update_traces(selectedpoints=[self.dep_idx_map[d] for d in deps])
+        self.fig.update_traces(
+            selectedpoints=[self.dep_idx_map[d] for d in deps])
 
         if relayout_data is not None:
             mapbox_params = self.get_layout_params(relayout_data)
-            params = { k.replace('mapbox.', ''): v for k, v in mapbox_params.items() }
+            params = {k.replace('mapbox.', ''): v for k, v in
+                      mapbox_params.items()}
 
             # update layout to reflect on both maps
             self.fig.update_mapboxes(params)
@@ -268,6 +288,12 @@ class Naissance():
         return self.fig
 
     def list_dep(self, select_data):
+        """List the department selected, if all are selected return
+        'Toute la France'
+
+        :param select_data: selected data on the map.
+        :return: String of department.
+        """
         deps = self.get_department(select_data)
 
         if len(deps) == 96:
@@ -276,6 +302,10 @@ class Naissance():
             return ', '.join([self.dep_map[d] for d in deps])
 
     def fig_naissance(self):
+        """Update the map of the naissance on update.
+
+        :return: new figure
+        """
         return go.Choroplethmapbox(
             geojson=self.dep,
             name='',
@@ -300,6 +330,10 @@ class Naissance():
         )
 
     def fig_deces(self):
+        """Update the map of the deces on update.
+
+        :return: new figure
+        """
         return go.Choroplethmapbox(
             geojson=self.dep,
             name='',
@@ -324,30 +358,43 @@ class Naissance():
         )
 
     def get_department(self, hoverData):
+        """Get department id of all selected department. By default, return
+        every department in France.
+
+        :param hoverData: selected department informations.
+        :return: List of department id.
+        """
         if hoverData is None or hoverData['points'] == []:
             return list(self.dep_map.keys())
         return [p['location'] for p in hoverData['points']]
 
-    def size_france(self, selected_data, nd_val, unmg_val):
+    def size_france(self, selected_data, unit_mean, type):
+        """Graph about size of Naissance and Deces of every department.
+
+        :param selected_data: selected department.
+        :param unit_mean: 'Naissance' or 'Deces'.
+        :param type: 'Unitaire' or 'Moyenne'.
+        :return: figure of the graph.
+        """
         deps = self.get_department(selected_data)
 
         what = []
-        if unmg_val == 'Unitaire':
-            if 'Naissance' in nd_val:
+        if type == 'Unitaire':
+            if 'Naissance' in unit_mean:
                 what += [(d, self.daten, 'SIZE', 'Naissance ' +
                           self.dep_map[d])
                          for d in deps]
 
-            if 'Décès' in nd_val:
+            if 'Décès' in unit_mean:
                 what += [(d, self.dated, 'SIZE',
                           'Décès ' + self.dep_map[d])
                          for d in deps]
         else:
-            if 'Naissance' in nd_val:
+            if 'Naissance' in unit_mean:
                 data = self.daten.loc[deps].reset_index().groupby(
                     ['date']).sum()
                 what += [(None, data, 'SIZE', 'Naissance cumulée')]
-            if 'Décès' in nd_val:
+            if 'Décès' in unit_mean:
                 data = self.dated.loc[deps].reset_index().groupby(
                     ['date']).sum()
                 what += [(None, data, 'SIZE', 'Décès cumulé')]
@@ -355,8 +402,15 @@ class Naissance():
         return self.cts(self.date_axis, what,
                         "Nombre de naissance et décès par mois")
 
-    def size_naissance(self, clickData, unit_mean, type):
-        dep = self.get_department(clickData)
+    def size_naissance(self, selected_data, unit_mean, type):
+        """Graph about parents age when they have a child of every department.
+
+        :param selected_data: selected department.
+        :param unit_mean: 'Naissance' or 'Deces'.
+        :param type: 'Homme, 'Femme, 'Unitaire' or 'Moyenne'.
+        :return: figure of the graph.
+        """
+        dep = self.get_department(selected_data)
         what = []
 
         if unit_mean == 'Unitaire':
@@ -387,8 +441,15 @@ class Naissance():
         return self.cts(self.age_naissances_axis, what,
                         "Nombre de naissance en fonction de l'age")
 
-    def size_deces(self, clickData, unit_mean, type):
-        dep = self.get_department(clickData)
+    def size_deces(self, selected_data, unit_mean, type):
+        """Graph about age of death of male and female of every department.
+
+        :param selected_data: selected department.
+        :param unit_mean: 'Naissance' or 'Deces'.
+        :param type: 'Homme, 'Femme, 'Unitaire' or 'Moyenne'.
+        :return: figure of the graph.
+        """
+        dep = self.get_department(selected_data)
         what = []
 
         if unit_mean == 'Unitaire':
