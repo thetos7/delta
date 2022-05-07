@@ -21,22 +21,43 @@ class Spotify():
         return dfmean
 
     def __init__(self, application = None):
+        self.french = {'popularity':'popularité', 'acousticness':'accoustique', 'danceability':'dansabilité', 'duration_ms':'temps en ms',
+        'energy':'énergie', 'instrumentalness':'instrumentalité', 'liveness':'vivacité', 'loudness':'intensité sonore', 'speechiness':'quantité de paroles',
+        'tempo':'tempo', 'valence':'valence'}
+
         self.caracteristiques = Spotify.format_caracteristiques()
 
         self.main_layout = html.Div(children=[
             html.H3(children='Caractéristiques de la popularité d\'une musique sur Spotify'),
-            html.Div([ dcc.Graph(id='spo-main-graph'), ], style={'width':'100%', }),
             html.Div([
-                html.Div([ html.Div('Spotify'),
-                           dcc.RadioItems(
-                               id='spo-spo',
-                               options=[{'label':'Oui', 'value':0}, 
-                                        {'label':'Non','value':1}],
-                               value=1,
-                               labelStyle={'display':'block'},
-                           )
-                         ], style={'width': '9em'} )
+                html.Div([ dcc.Graph(id='carac-main-graph'), ], style={'width':'85%'}),
+                
+                html.Div([ 
+                    html.Div('Caractéristique axe x'),
+                    dcc.RadioItems(
+                        id='x-carac',
+                        options=[{'label':self.french[self.caracteristiques.columns[i]], 'value':i} for i in range(len(self.caracteristiques.columns))],
+                        value=2,
+                        labelStyle={'display':'block'},
+                        )
+                    ], style={'margin-left':'30px', 'margin-top':'100px','width': '10em', 'float':'right'} )
+                ], style={
+                    'padding-right': '30px', 
+                    'display':'flex'
+                }),
+            html.Div([ 
+                    html.Div('Échelle'),
+                    dcc.RadioItems(
+                        id='log',
+                        options=[{'label': i, 'value': i} for i in ['Linéaire', 'Log']],
+                        value='Linéaire',
+                        labelStyle={'display':'block'},
+                        )
                     ]),
+            html.Br(),
+            dcc.Markdown("""
+                Définition des caractériques du graphique ci-dessus : [Caractéristiques audio d'une musique](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
+                """),
             html.Br(),
             dcc.Markdown("""
                 #### À propos
@@ -60,14 +81,21 @@ class Spotify():
             self.app.layout = self.main_layout
 
         self.app.callback(
-                    dash.dependencies.Output('spo-main-graph', 'figure'),
-                    dash.dependencies.Input('spo-spo', 'value'))(self.update_graph)
+                    dash.dependencies.Output('carac-main-graph', 'figure'),
+                    dash.dependencies.Input('x-carac', 'value'),
+                    dash.dependencies.Input('log', 'value')
+                    )(self.update_graph)
 
-    def update_graph(self, spo):
+    def update_graph(self, x_carac, log):
         df = self.caracteristiques
-        fig = px.scatter(df, x='popularity', y='danceability', color=df.index, hover_name=df.index, log_x=False,
-                         title="Popularity of genres through the dance"
-                        )
+        log = log == 'Log'
+        fig = px.scatter(df, x=df.columns[x_carac], y='popularity', color=df.index, hover_name=df.index, log_x=log,
+                         title="Popularité des genres en fonction de certaines caractéristiques",
+                         labels={
+                            'popularity': 'popularité',
+                            df.columns[x_carac]: self.french[df.columns[x_carac]]
+                        },
+                    )
         return fig
 
 if __name__ == '__main__':
