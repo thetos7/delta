@@ -602,7 +602,7 @@ class PollutionFrancaise():
                      y="Values",
                      title="Répartition des influences de " + polluant +
                      " dans la région " + region + " le " + date + ".",
-                     color=["blue", "red", "green"])
+                     color="Values")
         return fig
 
 
