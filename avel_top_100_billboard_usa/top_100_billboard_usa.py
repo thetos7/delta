@@ -79,39 +79,35 @@ class Top100BillboardUSA:
                     inline=True,
                 ),
                 html.Div(id='weeks-on-board-count-plots'),
+                html.P("Si l'on regarde le graphe ci-dessus, on remarque deux pics aberrants: un premier, "
+                       "très extrême, à la 20e semaine, et un second, plus modéré, à la 52e semaine. "),
+                html.P("Il s'avère qu'à la fin de l'année 1991, le Billboard a institué une « règle de récurrence »."
+                       "stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si "
+                       "elles se classent en dessous de la 50e place et de même pour les chansons au classement "
+                       "depuis 1 an, si elles se trouvent en dessous de la 25e position."),
             ]),
-            dcc.Markdown('''
-            Un large pic est visible à la 20e semaine.   
-            Si l'on grossit, on peut également voir la 52e semaine sortir de la tendance.   
-            En regardant les mêmes données mais par année,   
-            il semblerait que le début des années 90 marque l'arrivée de cette tendance non proportionnelle.   
-               
-            Il s'avère qu'à la fin de l'année 1991, le Billboard a institué une "règle de récurrence",   
-            stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si elles se classent en dessous de la 50e place    
-            et de même pour les chansons au classement depuis 1 an, si elles se trouvent en dessous de la 25e position.
-            '''),
 
             html.Br(),
             html.Div([
                 html.H3('Entrées fulgurantes'),
-                dcc.Markdown('''
-                Plus de 1 000 chansons ont atteint la place convoitée de numéro un, mais il est beaucoup plus difficile pour une chanson de débuter en première position...
-                '''),
+                html.P("Plus de 1 000 chansons ont atteint la place convoitée de numéro un, mais il est "
+                       "beaucoup plus difficile pour une chanson de débuter en première position..."),
                 dcc.Graph(id="meteoric-entries-graph", figure=self.get_meteoric_entries_fig()),
-                dcc.Markdown('''
-                Bien qu'il ait été officiellement lancé en 1958, le Billboard n'a vu une entrée « fulgurante » pour la première fois qu'en 1995.   
-                Le Billboard a commencé à utiliser des données plus modernes sur la diffusion et les ventes à partir de 1991,   
-                ce qui a permis des calculs plus rapides et des classements plus précis.   
-                   
-                Qui d'autre que Mickael Jackson pour réaliser cet exploit en premier avec « You Are Not Alone » ?   
-                Il est amusant de constater que dans la même année, Whitney Houston et Mariah Carey deux fois ont également réussi ce tour de force.   
-                   
-                Si cela semble être un évènement assez exceptionnel, souvent lié à une sortie de film comme "Où sont les hommes ?", "Titanic" ou "Armageddon",   
-                ou bien à des chanteurs découverts du jour au lendemain grâce à des émissions telles que "American Idol", très populaire aux Etats-Unis,   
-                les années 2020 et 2021 ont vu ce phénomène apparaître 3 fois plus souvent.   
-                   
-                Un constat peu étonnant compte tenu de l'hyperconsommation de notre société, créant l'insatisfaction permanente et où les modes y sont éphémères. 
-                '''),
+                html.P("Bien qu'il ait été officiellement lancé en 1958, le Billboard n'a vu une entrée « fulgurante "
+                       "» pour la première fois qu'en 1995. En effet, des des données plus modernes sur la diffusion "
+                       "et les ventes ont commencées à être utilisées à partir de 1991. Cela a ainsi permit des "
+                       "calculs plus rapides et des classements plus précis"),
+                html.P(["Qui d'autre que Mickael Jackson pour réaliser cet exploit en premier avec « You Are Not "
+                        "Alone » ? ",
+                        html.Br(),
+                        "Il est amusant de constater que dans la même année, Whitney Houston et Mariah "
+                        "Carey deux fois ont également réussi ce tour de force."]),
+                html.P("Si cela semble être un évènement assez exceptionnel, souvent lié à une sortie de film comme « "
+                       "Où sont les hommes ? », « Titanic » ou « Armageddon », mais aussi à des chanteurs découverts "
+                       "du jour au lendemain grâce à des émissions telles que « American Idol », très populaire aux "
+                       "Etats-Unis. Les années 2020 et 2021 ont vu ce phénomène apparaître 3 fois plus souvent."),
+                html.P("Un constat peu étonnant compte tenu de l'hyperconsommation de notre société, "
+                       "créant l'insatisfaction permanente et où les modes y sont éphémères."),
             ]),
 
             html.Br(),
@@ -252,7 +248,7 @@ class Top100BillboardUSA:
             x="Semaine",
             y="Compte",
             animation_frame="Année",
-            range_x=[0, 52],
+            range_x=[0, 55],
             range_y=[0, 250],
             height=height,
         )
