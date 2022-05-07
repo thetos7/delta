@@ -103,9 +103,9 @@ class Impact():
 
             #### À propos
             * Sources : 
-                * https://ec.europa.eu/eurostat/databrowser/view/demo_mlexpec$DV_292/default/table?lang=fr
-                * https://ec.europa.eu/eurostat/databrowser/view/sdg_11_50/default/table?lang=fr
-                * https://ec.europa.eu/eurostat/databrowser/view/sdg_11_50/default/table?lang=fr
+                * [Espérance de vie par âge et sexe](https://ec.europa.eu/eurostat/databrowser/view/demo_mlexpec$DV_292/default/table?lang=fr) (Eurostat)
+                * [Exposition à la pollution de l'air par les particules fines](https://ec.europa.eu/eurostat/databrowser/view/sdg_11_50/default/table?lang=fr) (Eurostat)
+                * [Pollution, saleté ou autres problèmes environnementaux](https://ec.europa.eu/eurostat/databrowser/view/ilc_mddw02$DV_419/default/table?lang=fr) (Eurostat)
             * (c) 2022 Nicolas Indjein - Nicolas Lorrain
             """)
         ], style={
