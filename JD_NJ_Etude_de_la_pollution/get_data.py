@@ -6,7 +6,7 @@ import toolz
 # Other libraries
 import pandas as pd 
 
-# Global variables : 
+# ===== Global variables =====
 
 # The whole 2021 months list
 months_list = [
@@ -121,8 +121,9 @@ dict_regions = {
     'ZAR BASTIA': "Corse"
 }
 
-# Functions used : 
+# ===== Functions used =====
 
+# Function used to clean the dataset
 def clean_dataset(dataset):
     # Changing regions names and dropping columns
     df_to_clean = dataset.replace({"Zas": dict_regions})
@@ -165,6 +166,7 @@ def clean_dataset(dataset):
 
     return df_to_clean
 
+# Function used to clean our dataset before saving them to month
 def cleaning_and_saving_month(year_month, save_file=True) : 
     # Generating the list of the files to open to load the desired month
     month_file_list = [f[f.find(year_month):] for f in os.listdir('raw_data/pollution_data_year_2021') if f.find(year_month) != -1]
@@ -190,6 +192,7 @@ def dataset_load(month) :
     df_indexes_load["Date de début"] = pd.to_datetime(df_indexes_load["Date de début"])
     return df_indexes_load
 
+# Function used to make month influences sum for our data
 def create_month_dataframe_influences(dataframe, date):
     dataframe = dataframe.drop(
         columns=["Mesure", "Valeur", "Date de fin", "Date de début"])
@@ -230,6 +233,7 @@ def create_month_dataframe_influences(dataframe, date):
     resdf.index = pd.to_datetime(resdf.index)
     return resdf
 
+# Function used to create the monthly_influences dataframe
 def save_influences_csv(save_file=True) : 
     res = pd.DataFrame()
     for month in months_list :
@@ -241,6 +245,7 @@ def save_influences_csv(save_file=True) :
         res.to_csv(path_or_buf = "data/monthly_influences.csv", sep = ';')
     return res
 
+# Function used to make daily average for our data
 def day_average_data(dataset, do_display=False):
     # Final dataframe (we append for each day)
     res = pd.DataFrame()
@@ -270,6 +275,7 @@ def day_average_data(dataset, do_display=False):
     res = res.sort_index()
     return res
 
+# Function used to create the monthly_day_average dataframe
 def create_and_save_df_average_days(save_file = True) :
     res = pd.DataFrame()
     for month in months_list : 
@@ -284,6 +290,7 @@ def create_and_save_df_average_days(save_file = True) :
         res.to_csv(path_or_buf = "data/monthly_day_average.csv", sep = ';')
     return res
 
+# Function used to make hourly average for our data
 def hour_average_data(dataset, do_display=False):
     # Final dataframe (we append for each day)
     res = pd.DataFrame()
@@ -313,6 +320,7 @@ def hour_average_data(dataset, do_display=False):
     res = res.sort_index()
     return res
 
+# Function used to create the monthly_hour_average dataframe
 def create_and_save_df_average_hours(save_file = True) :
     res = pd.DataFrame()
     for month in months_list :
@@ -327,6 +335,7 @@ def create_and_save_df_average_hours(save_file = True) :
         res.to_csv(path_or_buf = "data/monthly_hour_average.csv", sep = ';')
     return res
 
+# Function used to unzip our data
 def unzip_data(): 
     if not 'pollution_data_year_2021' in os.listdir("raw_data") : 
         zipList = os.listdir("raw_data")
@@ -340,6 +349,7 @@ def unzip_data():
                 zipObj.extractall('raw_data/pollution_data_year_2021/')
                 # Done !
 
+# Check if the files exists and delete them if its the case to avoid conflicts
 def clean_files() : 
     # Try creating a folder for the monthly data
     try: 
@@ -357,6 +367,7 @@ def clean_files() :
         if "monthly_influences.csv" in os.listdir("data") : 
             os.remove("data/monthly_influences.csv")
 
+# Function to delete the files that we don't use anymore
 def delete_raw_and_temporary_files() :
     print("Starting deleting raw data...")
     if os.path.isdir('raw_data/pollution_data_year_2021'):
@@ -373,6 +384,18 @@ def delete_raw_and_temporary_files() :
     else:
         raise ValueError("Path {} is not a file or dir.".format('raw_data/month_cleaned_data'))
     print("Monthly data files deleted !\n")
+
+# Function used to load the monthly_day_average dataframe
+def load_day_average() : 
+    return pd.read_csv("data/monthly_day_average.csv")
+
+# Function used to load the monthly_hour_average dataframe
+def load_hour_average() : 
+    return pd.read_csv("data/monthly_hour_average.csv")
+
+# Function used to load the monthly_influences dataframe
+def load_influences() : 
+    return pd.read_csv("data/monthly_influences.csv")
 
 def main() : 
     # Unzip the data
@@ -402,7 +425,10 @@ def main() :
     print("Creating and saving the dataframe of the hourly average values for each region done !\n")
     
     # Removing all the raw and temporaty data to as we don't need it anymore
+    print("Starting removing unused files...")
     delete_raw_and_temporary_files()
-    
+    print("Unused files removed !\n")
+  
 
-main()
+if __name__ == '__main__':
+    main()
