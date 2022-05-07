@@ -12,3 +12,5 @@ Les fichiers python dont le nom commence par "clean" permettent de assembler ces
 
 Pour exécuter le code, il suffit d'exécuter le ficher delta.py et de cliquer sur "Conception du Bonheur" dans la liste des projets.
 Il sera alors possible de modifier le pourcentage des quatres paramètres pris en considération et de voir évoluer l'indice du bonheur.
+
+La base de donnée pour illustrer le critère « niveau d’éducation » ne contient pas assez de données. Nous avons donc décider de ne pas l'inclure afin d'avoir un nombre considérable de pays représentés. Nous avons mis les parties concernées dans les commentaires TODO.  Lorsqu’une nouvelle base de donnée plus complète est trouvée, il suffira simplement de décommenter les lignes concerner pour intégrer ce critère.
