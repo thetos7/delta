@@ -1,4 +1,4 @@
-# Rendu pour le projet de PYBD - Jules Dorbeau et Noe Jenn-Treyer, SCIA 2023
+# Rendu pour le projet de PYBD - Jules Dorbeau et Noé Jenn-Treyer, SCIA 2023
 
 Voici notre rendu pour ce projet de création d'une application Dash afin de réaliser une présentation sur des données. 
 
@@ -14,9 +14,11 @@ La première est de passer par ce lien qui vous donnera accès directement à no
 
 https://dash-pybd-jules-dorbeau.herokuapp.com/
 
+(Le chargement peut prendre un peu de temps)
+
 ### Deuxième option : 
 
-La deuxième est directement passer lancer nos deux fichiers .py avec Python. 
+La deuxième est directement lancer nos deux fichiers .py avec Python.
 
 Pour cela voici les étapes à suivre : 
 
