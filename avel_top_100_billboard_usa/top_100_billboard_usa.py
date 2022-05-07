@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 from dash import dcc
 from dash import html, Dash, Output, Input, dash_table
-
+import numpy as np
 pd.options.plotting.backend = "plotly"
 
 
@@ -34,7 +34,6 @@ def generate_dash_table(dataframe: pd.DataFrame, max_rows: int = 10):
         page_size=max_rows
     )
 
-
 class Top100BillboardUSA:
     def __init__(self, application: Dash = None):
         # Importing the data
@@ -42,10 +41,9 @@ class Top100BillboardUSA:
 
         # Creating the Dash application
         self.app = Dash(__name__) if application is None else application
-        default_graph_height = 600
         self.radio_button_options = {
-            "Total pour toutes les années": self.get_weeks_on_board_fig(default_graph_height),
-            "Total par année": self.get_weeks_on_board_fig_year(default_graph_height),
+            "Total pour toutes les années": self.get_weeks_on_board_fig(),
+            "Total par année": self.get_weeks_on_board_fig_year(),
         }
 
         # Creating layout and adding callbacks
@@ -88,13 +86,18 @@ class Top100BillboardUSA:
             De même pour les chansons au classement depuis 1 an, si elles se trouvent en dessous de la 25e position.   
             '''),
 
-            dcc.Graph(id="tt", figure=self.get_new_artist_on_board_fig()),
+            # dcc.Graph(id="new-artist-on-board", figure=self.get_new_artist_on_board_fig()),
 
-            # html.Div([
-            #     "Input: ",
-            #     dcc.Input(id='my-input', value='', type='text')
-            # ]),
-            # html.Table(id='foo'),
+            html.Div([
+                html.H3('Entrées fulgurantes'),
+                dcc.Graph(id="meteoric-entries-graph", figure=self.get_meteoric_entries_fig()),
+                html.P("TODO: add some text"),
+            ]),
+            html.Div([
+                html.H3('Graphs by artist'),
+                dcc.Dropdown(id="artist-dropdown", options=self.most_popular_artists, value='Michael Jackson'),
+                html.Div(id='artist-dropdown-output'),
+            ]),
             html.Div([
                 html.H3('À propos'),
                 dcc.Markdown('''
@@ -117,8 +120,14 @@ class Top100BillboardUSA:
             Output('artist-dropdown-output', 'children'),
             Input('artist-dropdown', 'value')
         )
-        def update_artist_dropdown(input_value):
-            return generate_dash_table(self.df[self.df['artist'] == input_value])
+        def update_artist_dropdown(artist_name):
+            if len(artist_name) == 0:
+                return []
+            children = [
+                dcc.Graph(id=f'music-of-{artist_name}-graph', figure=self.get_music_of_artist_fig(artist_name)),
+                # generate_dash_table(self.df[self.df['artist'] == artist_name]),
+            ]
+            return children
 
         @self.app.callback(
             Output('weeks-on-board-count-plots', 'children'),
@@ -133,6 +142,41 @@ class Top100BillboardUSA:
         df = pd.read_csv('data/top_100_billboard_usa.csv')
         df["date"] = pd.to_datetime(df["date"])
         return df
+
+    def get_music_of_artist_fig(self, artist, df=None, height=1000):
+        df = self.df if df is None else df
+        df_selected_artist = df[df["artist"] == artist]
+        fig = go.Figure()
+
+        fig.update_yaxes(range=[100, 0])
+        fig.update_layout(
+            title=f"Songs ranking by {artist}",
+            xaxis_title="Date",
+            yaxis_title="Classement",
+            height=height,
+            legend={
+                "font": {"size": 7},
+                "orientation": "h",
+                "yanchor": "bottom",
+                "xanchor": "center",
+                "y": 1.02,
+                "x": 1
+            }
+        )
+
+
+        for song in df_selected_artist["song"].unique():
+            filtered_song_df = df_selected_artist[df_selected_artist["song"] == song].copy()
+            tmp = go.Scatter()
+            fig.add_scatter(
+                x=filtered_song_df["date"],
+                y=filtered_song_df["rank"],
+                name=song,
+                mode='lines+markers',
+
+            )
+
+        return fig
 
     def get_max_weeks_on_board_count(self, df=None, reindex=True) -> pd.Series:
         """
@@ -220,6 +264,18 @@ class Top100BillboardUSA:
             labels={'x': 'Années', 'y': 'Nombre de nouveaux artistes'}
         )
 
+    def get_meteoric_entries_fig(self, height=600) -> go.Figure:
+
+        new_entry = self.df.loc[np.where((self.df["last-week"]).isna())]
+        new_entry = new_entry[
+            new_entry["date"] != "1958-08-04 00:00:00"]  # en ignorant la toute premiere semaine (100 nouvelles entrées)
+        ne_count = new_entry.value_counts("date").sort_index()
+        fig = px.line(x=ne_count.index.values, y=ne_count.values, height=height)
+        fig.update_traces(hovertemplate='%{y} entrées fulgurantes en %{x}')
+        fig.update_xaxes(title="Date")
+        fig.update_yaxes(title="Nombre d'entrées fulgurantes")
+        return fig
+
     @property
     def artist_count(self):
         return len(self.df["artist"].unique())
@@ -227,6 +283,12 @@ class Top100BillboardUSA:
     @property
     def song_count(self):
         return len(self.df["song"].unique())
+
+    @property
+    def most_popular_artists(self):
+        most_popular_songs = self.df.groupby(by=["artist", "song"], as_index=False)["weeks-on-board"].max()
+        # Sorting by people that have the most well ranked songs in the billboard
+        return most_popular_songs.groupby("artist")["weeks-on-board"].sum().sort_values(ascending=False).index
 
 
 if __name__ == '__main__':
