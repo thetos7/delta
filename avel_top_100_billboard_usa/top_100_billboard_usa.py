@@ -145,7 +145,7 @@ class Top100BillboardUSA:
         df["date"] = pd.to_datetime(df["date"])
         return df
 
-    def get_music_of_artist_fig(self, artist, df=None, height=1000):
+    def get_music_of_artist_fig(self, artist, df=None, height=850):
         df = self.df if df is None else df
         df_selected_artist = df[df["artist"] == artist]
         fig = go.Figure()
@@ -158,11 +158,11 @@ class Top100BillboardUSA:
             height=height,
             legend={
                 "font": {"size": 7},
-                "orientation": "h",
-                "yanchor": "bottom",
-                "xanchor": "center",
-                "y": 1.02,
-                "x": 1
+                # "orientation": "h",
+                # "yanchor": "bottom",
+                # "xanchor": "center",
+                # "y": 1.02,
+                # "x": 1
             }
         )
 
