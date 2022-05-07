@@ -1,3 +1,4 @@
+from gc import get_count
 import sys
 
 from requests import NullHandler
@@ -13,34 +14,62 @@ import dateutil as du
 
 class Spotify():
 
-    def format_caracteristiques():
+    def init_characteristics(self):
         df = pd.read_csv('spotify/data/SpotifyFeatures.csv')
         df = df.rename(columns={'artist_name':'artist', 'track_name':'title'})
+        df.loc[df.genre == 'Children’s Music', 'genre'] = 'Children\'s Music'
+        self.musics = df
+
         dfmean = df.drop(columns=['artist', 'title', 'track_id', 'key', 'mode', 'time_signature'])
         dfmean = dfmean.groupby(['genre']).mean()
-        return dfmean
+        self.characteristics = dfmean
+        self.genres = dfmean.index
+
+        dftopten = pd.DataFrame(columns=df.columns)
+        for genre in dfmean.index:
+            topten = df[df.genre == genre].iloc[np.argpartition(df[df.genre == genre].popularity, -10)[-10:]]
+            dftopten = pd.concat([dftopten, topten])
+        dftopten = dftopten.drop(columns=['artist', 'title', 'track_id', 'key', 'mode', 'time_signature'])
+        dftopten = dftopten.groupby(['genre']).mean()
+        self.topten = dftopten
+
+        count = []
+        for genre in dfmean.index:
+            count.append(np.sum(df.genre == genre))
+        self.count = count
 
     def __init__(self, application = None):
         self.french = {'popularity':'popularité', 'acousticness':'accoustique', 'danceability':'dansabilité', 'duration_ms':'temps en ms',
         'energy':'énergie', 'instrumentalness':'instrumentalité', 'liveness':'vivacité', 'loudness':'intensité sonore', 'speechiness':'quantité de paroles',
         'tempo':'tempo', 'valence':'valence'}
 
-        self.caracteristiques = Spotify.format_caracteristiques()
+        self.init_characteristics()
 
         self.main_layout = html.Div(children=[
             html.H3(children='Caractéristiques de la popularité d\'une musique sur Spotify'),
             html.Div([
-                html.Div([ dcc.Graph(id='carac-main-graph'), ], style={'width':'85%'}),
+                html.Div([ dcc.Graph(id='charac-main-graph'), ], style={'width':'85%'}),
                 
-                html.Div([ 
-                    html.Div('Caractéristique axe x'),
-                    dcc.RadioItems(
-                        id='x-carac',
-                        options=[{'label':self.french[self.caracteristiques.columns[i]], 'value':i} for i in range(len(self.caracteristiques.columns))],
-                        value=2,
-                        labelStyle={'display':'block'},
-                        )
-                    ], style={'margin-left':'30px', 'margin-top':'100px','width': '10em', 'float':'right'} )
+                html.Div([
+                    html.Div([
+                        html.Div('Caractéristique axe x'),
+                        dcc.RadioItems(
+                            id='x-charac',
+                            options=[{'label':self.french[self.characteristics.columns[i]], 'value':i} for i in range(len(self.characteristics.columns))],
+                            value=2,
+                            labelStyle={'display':'block'},
+                            ),
+                        html.Br(),
+                        html.Div('Moyenne par genre sur le top :'),
+                        dcc.RadioItems(
+                            id='topten',
+                            options=[{'label':'10 000', 'value':False},
+                                     {'label':'10', 'value':True}],
+                            value=False,
+                            labelStyle={'display':'block'},
+                            )
+                        ], style={'margin-left':'30px', 'margin-top':'100px','width': '10em', 'float':'right'} )
+                    ])      
                 ], style={
                     'padding-right': '30px', 
                     'display':'flex'
@@ -55,15 +84,21 @@ class Spotify():
                         )
                     ]),
             html.Br(),
+            html.Br(),
             dcc.Markdown("""
-                Définition des caractériques du graphique ci-dessus : [Caractéristiques audio d'une musique](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
+                #### Notes :
+                    
+                La popularité d'un genre est un pourcentage. Celle d'une musique correspond à son nombre d'écoutes par rapport au nombre d'écoutes de la musique la plus écoutée.
+                Ainsi, la valeur utilisée correspond à la moyenne des popularités des musiques d'un genre
+                
+                Les autres caractériques du graphique sont définies à cette adresse : [Caractéristiques audio d'une musique](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features)
                 """),
             html.Br(),
             dcc.Markdown("""
                 #### À propos
 
                 * Sources : 
-                    * [Caréctéristiques et popularité des musiques de Spotify](https://www.kaggle.com/datasets/zaheenhamidani/ultimate-spotify-tracks-db) sur kaggle.com
+                    * [Caractéristiques et popularité des musiques de Spotify](https://www.kaggle.com/datasets/zaheenhamidani/ultimate-spotify-tracks-db) sur kaggle.com
                     * [Informations complémentaires sur la popularité, la date, ou la région](https://www.kaggle.com/datasets/dhruvildave/spotify-charts) sur kaggle.com
                 * (c) 2022 Thibaut Ambrosino, Melvin Gidel
                 """)
@@ -81,20 +116,24 @@ class Spotify():
             self.app.layout = self.main_layout
 
         self.app.callback(
-                    dash.dependencies.Output('carac-main-graph', 'figure'),
-                    dash.dependencies.Input('x-carac', 'value'),
-                    dash.dependencies.Input('log', 'value')
+                    dash.dependencies.Output('charac-main-graph', 'figure'),
+                    dash.dependencies.Input('x-charac', 'value'),
+                    dash.dependencies.Input('log', 'value'),
+                    dash.dependencies.Input('topten', 'value')
                     )(self.update_graph)
 
-    def update_graph(self, x_carac, log):
-        df = self.caracteristiques
+    def update_graph(self, x_carac, log, topten):
+        df,size = (self.characteristics,self.count) if not(topten) else (self.topten,[10 for _ in self.genres])
+
         log = log == 'Log'
         fig = px.scatter(df, x=df.columns[x_carac], y='popularity', color=df.index, hover_name=df.index, log_x=log,
-                         title="Popularité des genres en fonction de certaines caractéristiques",
-                         labels={
+                        title="Popularité des genres en fonction de certaines caractéristiques",
+                        labels={
                             'popularity': 'popularité',
                             df.columns[x_carac]: self.french[df.columns[x_carac]]
                         },
+                        size=size,
+                        height=750,
                     )
         return fig
 
