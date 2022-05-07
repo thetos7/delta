@@ -275,7 +275,7 @@ class Top100BillboardUSA:
         ]  # en ignorant la toute premiere semaine (100 nouvelles entrées)
         ne_count = new_entry["date"].dt.year.value_counts()
         ne_count = ne_count.reindex(list(range(1990, 2022)), fill_value=0)
-        # ne_count = new_entry.value_counts("date").sort_index()
+
         fig = px.bar(x=ne_count.index.values, y=ne_count.values, height=height)
         fig.update_traces(hovertemplate='%{y} entrées fulgurantes en %{x}')
         fig.update_xaxes(title="Date", tickmode='linear')
