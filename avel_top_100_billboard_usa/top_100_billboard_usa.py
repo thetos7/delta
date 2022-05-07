@@ -78,12 +78,12 @@ class Top100BillboardUSA:
             ]),
             dcc.Markdown('''
             Un large pic est visible à la 20e semaine.   
-            En grossissant on voit également la 52e semaine sortant de la tendance.   
-            Regardons ce même graphique par année. => lien autre page ? [test](/recurrent_rule)   
-            Il semblerait que le début des années 90 marque l'arrivée de cette tendance non proportionelle.   
+            Si l'on grossit, on peut également voir la 52e semaine sortir de la tendance.   
+            En regardant les mêmes données mais par année,   
+            il semblerait que le début des années 90 marque l'arrivée de cette tendance non proportionnelle.   
             Il s'avère qu'à la fin de l'année 1991, le Billboard a institué une "règle de récurrence",   
-            stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si elles se classent en dessous de la 50e place.   
-            De même pour les chansons au classement depuis 1 an, si elles se trouvent en dessous de la 25e position.   
+            stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si elles se classent en dessous de la 50e place    
+            et de même pour les chansons au classement depuis 1 an, si elles se trouvent en dessous de la 25e position.
             '''),
 
             # dcc.Graph(id="new-artist-on-board", figure=self.get_new_artist_on_board_fig()),
@@ -266,11 +266,13 @@ class Top100BillboardUSA:
 
     def get_meteoric_entries_fig(self, height=600) -> go.Figure:
 
-        new_entry = self.df.loc[np.where((self.df["last-week"]).isna())]
-        new_entry = new_entry[
-            new_entry["date"] != "1958-08-04 00:00:00"]  # en ignorant la toute premiere semaine (100 nouvelles entrées)
-        ne_count = new_entry.value_counts("date").sort_index()
-        fig = px.line(x=ne_count.index.values, y=ne_count.values, height=height)
+        new_entry = self.df.loc[np.where((self.df["last-week"]).isna()
+                                        & (self.df["rank"] == 1)
+                                        & (self.df["date"] != "1958-08-04 00:00:00"))] # en ignorant la toute premiere semaine (100 nouvelles entrées)
+        ne_count = new_entry["date"].dt.strftime("%Y").value_counts()
+        ne_count = ne_count.reindex(list(["{:4d}".format(x) for x in range(1990, 2022)]), fill_value=0)
+        #ne_count = new_entry.value_counts("date").sort_index()
+        fig = px.bar(x=ne_count.index.values, y=ne_count.values, height=height)
         fig.update_traces(hovertemplate='%{y} entrées fulgurantes en %{x}')
         fig.update_xaxes(title="Date")
         fig.update_yaxes(title="Nombre d'entrées fulgurantes")
