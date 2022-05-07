@@ -52,8 +52,8 @@ class Naissance():
             margin=dict(l=0, r=0, t=30, b=0),
         )
 
-        self.fig.add_trace(self.fig_naissance(), row=1, col=1)
-        self.fig.add_trace(self.fig_deces(), row=1, col=2)
+        self.fig.add_trace(self.create_fig_naissances(), row=1, col=1)
+        self.fig.add_trace(self.create_fig_deces(), row=1, col=2)
 
         self.fig.update_mapboxes(
             style='carto-positron',
@@ -242,34 +242,33 @@ class Naissance():
             dash.dependencies.Input('map', 'selectedData'),
         )(self.list_dep)
 
-        # Map layout sync
+        # Sync mapboxes layout and selection.
         self.app.callback(
             dash.dependencies.Output('map', 'figure'),
             dash.dependencies.Input('map', 'relayoutData'),
             dash.dependencies.Input('map', 'selectedData'),
         )(self.map_sync)
 
-    def get_layout_params(self, relayout_data):
-        """Get the layout data return by the callback.
+    def get_mapbox_layout_params(self, relayout_data):
+        """Get the layout data from any mapbox in the figure.
 
         :param relayout_data: Update relayout of the map
         :return: dict of the relayout data sanitized.
         """
-        key_gen = [lambda i: f'mapbox{i}.center', lambda i: f'mapbox{i}.zoom',
-                   lambda i: f'mapbox{i}.bearing', lambda i: f'mapbox{i}.pitch']
+        keys = ['center', 'zoom', 'bearing', 'pitch']
 
-        params = {k(''): relayout_data.get(k('')) for k in key_gen if
-                  k('') in relayout_data}
-        params.update({k(''): relayout_data.get(k(2)) for k in key_gen if
-                       k(2) in relayout_data})
+        params = dict()
+        for data_key in relayout_data.keys():
+            params.update({ k: relayout_data[data_key] for k in keys if k in data_key })
 
         return params
 
     def map_sync(self, relayout_data, selected_data):
-        """Update the layout of the other map.
+        """Update the layout and selection of other maps.
 
         :param relayout_data: layout of the updated map.
-        :return: New figure sync with the relayout data.
+        :param selected_data: select data of the updated map.
+        :return: New figure with all maps synced.
         """
         deps = self.get_department(selected_data)
 
@@ -278,31 +277,29 @@ class Naissance():
             selectedpoints=[self.dep_idx_map[d] for d in deps])
 
         if relayout_data is not None:
-            mapbox_params = self.get_layout_params(relayout_data)
-            params = {k.replace('mapbox.', ''): v for k, v in
-                      mapbox_params.items()}
+            params = self.get_mapbox_layout_params(relayout_data)
 
             # update layout to reflect on both maps
             self.fig.update_mapboxes(params)
 
         return self.fig
 
-    def list_dep(self, select_data):
+    def list_dep(self, selected_data):
         """List the department selected, if all are selected return
         'Toute la France'
 
-        :param select_data: selected data on the map.
-        :return: String of department.
+        :param selected_data: selected data on the map.
+        :return: String of departments.
         """
-        deps = self.get_department(select_data)
+        deps = self.get_department(selected_data)
 
         if len(deps) == 96:
             return 'Toute la France'
         else:
             return ', '.join([self.dep_map[d] for d in deps])
 
-    def fig_naissance(self):
-        """Update the map of the naissance on update.
+    def create_fig_naissances(self):
+        """Setup `Naissances` figure.
 
         :return: new figure
         """
@@ -329,8 +326,8 @@ class Naissance():
             zmax=np.log10(self.zmax),
         )
 
-    def fig_deces(self):
-        """Update the map of the deces on update.
+    def create_fig_deces(self):
+        """Setup `Décès` figure.
 
         :return: new figure
         """
@@ -357,16 +354,16 @@ class Naissance():
             zmax=np.log10(self.zmax),
         )
 
-    def get_department(self, hoverData):
-        """Get department id of all selected department. By default, return
+    def get_department(self, selected_data):
+        """Get department id of all selected departments. By default, return
         every department in France.
 
-        :param hoverData: selected department informations.
+        :param selected_data: selected department data.
         :return: List of department id.
         """
-        if hoverData is None or hoverData['points'] == []:
+        if selected_data is None or selected_data['points'] == []:
             return list(self.dep_map.keys())
-        return [p['location'] for p in hoverData['points']]
+        return [p['location'] for p in selected_data['points']]
 
     def size_france(self, selected_data, unit_mean, type):
         """Graph about size of Naissance and Deces of every department.
