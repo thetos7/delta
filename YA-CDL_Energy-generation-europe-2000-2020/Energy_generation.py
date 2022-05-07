@@ -1,3 +1,4 @@
+import sys
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import plotly.express as px
@@ -456,8 +457,11 @@ class EuropeEnergyGeneration():
         input_value = 'France' if clickData == None else clickData['points'][0]['text']
         return f"Distribution of Energy Type in {input_value}"
 
-    def run(self, debug=False, port=8050):
-        self.app.run_server(host="0.0.0.0", debug=debug, port=port)
+    def run(self, host = "0.0.0.0", debug = False, port = 8050):
+        if host == "0.0.0.0":
+            self.app.run_server(host="0.0.0.0", debug=debug, port=port)
+        else:
+            self.app.run_server(host = host, debug = debug)
         self.update_sunburst_country(None, 2020)
         self.update_sunburst_europe(2020)
         self.update_line_plot(0)
@@ -466,4 +470,7 @@ class EuropeEnergyGeneration():
 
 if __name__ == '__main__':
     eeg = EuropeEnergyGeneration()
-    eeg.run(port=8056, debug=False)
+    if len(sys.argv) > 1:
+        eeg.run(host = sys.argv[1], debug=False)
+    else:
+        eeg.run(host="0.0.0.0", debug=False)

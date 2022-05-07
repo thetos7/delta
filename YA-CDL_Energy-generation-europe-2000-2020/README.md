@@ -18,6 +18,14 @@ It features:
 * Sources
 
 ## Run the visualisation
+
+### Method 1
+
+The project has been deployed to heroku, you can find the visualisation here:
+[https://eu-energy-generation.herokuapp.com/](https://eu-energy-generation.herokuapp.com/)
+
+### Method 2
+
 1) Install python 3.10.4
 2) Install required packages
 
@@ -34,7 +42,7 @@ Run the following command to launch the server
 python3 Energy_generation.py
 ```
 
-4) Connect to http://127.0.0.1:8056/
+4) Connect to http://127.0.0.1:8050/
 
 ### Data
 Data : [DataWorld, from data of Ember-Climate](https://data.world/makeovermonday/2021w5)
