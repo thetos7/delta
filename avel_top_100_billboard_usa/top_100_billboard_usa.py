@@ -102,12 +102,14 @@ class Top100BillboardUSA:
                         html.Br(),
                         "Il est amusant de constater que dans la même année, Whitney Houston et Mariah "
                         "Carey deux fois ont également réussi ce tour de force."]),
-                html.P("Si cela semble être un évènement assez exceptionnel, souvent lié à une sortie de film comme « "
-                       "Où sont les hommes ? », « Titanic » ou « Armageddon », mais aussi à des chanteurs découverts "
-                       "du jour au lendemain grâce à des émissions telles que « American Idol », très populaire aux "
-                       "Etats-Unis. Les années 2020 et 2021 ont vu ce phénomène apparaître 3 fois plus souvent."),
-                html.P("Un constat peu étonnant compte tenu de l'hyperconsommation de notre société, "
-                       "créant l'insatisfaction permanente et où les modes y sont éphémères."),
+                html.P(["Si cela semble être un évènement assez exceptionnel, souvent lié à une sortie de film comme "
+                        "« Où sont les hommes ? », « Titanic » ou « Armageddon », mais aussi à des chanteurs "
+                        "découverts  du jour au lendemain grâce à des émissions telles que « American Idol », "
+                        "très populaire aux Etats-Unis.",
+                        html.Br(),
+                        "Les années 2020 et 2021 ont vu ce phénomène apparaître 3 fois plus souvent, ce qui est un "
+                        "constat peu étonnant compte tenu de l'hyperconsommation de notre société, "
+                        "créant l'insatisfaction permanente et où les modes y sont éphémères."]),
             ]),
 
             html.Br(),
