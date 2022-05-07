@@ -14,6 +14,7 @@ from scipy import fft
 import datetime
 import os
 
+
 class Presidentielles():
     def __init__(self, application=None):
         cwd = os.getcwd()
@@ -54,16 +55,33 @@ class Presidentielles():
                                   xaxis_title='Temps',
                                   yaxis_title='Pourcentage de vote')
 
-        # fig_tdp =
-
-        self.df_sondage_t2 = df
+        df_tdp = pd.read_csv('./presidentielle/data/temps_de_parole_presidentielles_2022.csv')
+        print(pd.unique(df_tdp['Candidat']))
+        print(pd.unique(df_tdp['Période']))
+        # self.df_sondage_t2 = df
         # self.day_mean = prediction
+        # '2022-04-08'
+        fig_tdp_t1 = px.bar(df_tdp[df_tdp['Période'] == '2022-03-27'], x='Candidat', y="Somme",
+                            color='Chaîne', barmode="group", labels={
+                "Période": "Temps en jours",
+                "Somme": "Temps de parole en minutes",
+                "Chaîne": "Chaîne"
+            }, title="Zemmour : Évolution du temps de parole en fonction du temps")
+
+        fig_tdp_t2 = px.bar(df_tdp[(df_tdp['Période'] == '2022-04-08') & ((df_tdp['Candidat'] == 'Macron') | (df_tdp['Candidat'] == 'Lepen')) ], x='Candidat', y="Somme",
+                            color='Chaîne', barmode="group", labels={
+                "Période": "Temps en jours",
+                "Somme": "Temps de parole en minutes",
+                "Chaîne": "Chaîne"
+            }, title="Zemmour : Évolution du temps de parole en fonction du temps")
 
         self.main_layout = html.Div(children=[
             html.H2(children='Sondages présidentiels et temps de parole dans les médias'),
             html.H3(children='Premier tour'),
             html.Div(
                 [dcc.Graph(id='sond_t1', figure=fig_sond_t1)], style={'width': '100%', }),
+            html.Div(
+                [dcc.Graph(id='dtp_t1', figure=fig_tdp_t1)], style={'width': '100%', }),
             html.Div([dcc.RadioItems(id='mpj-mean',
                                      options=[{'label': 'Courbe seule', 'value': 0},
                                               {'label': 'Courbe + Tendence générale', 'value': 1},
@@ -77,10 +95,14 @@ class Presidentielles():
             html.Div(
                 [dcc.Graph(id='sond_t2', figure=fig_sond_t2)], style={'width': '100%', }),
 
+            html.Div(
+                [dcc.Graph(id='dtp_t2', figure=fig_tdp_t2)], style={'width': '100%', }),
+
             html.Br(),
             html.H3(children='À propos'),
             dcc.Markdown(""" 
-                        * Données : [Nsppolls](https://github.com/nsppolls/nsppolls/blob/master/presidentielle.csv)
+                        * Données sondage: [Nsppolls](https://github.com/nsppolls/nsppolls/blob/master/presidentielle.csv)
+                        * Données temps de parole : [CSA](https://www.csa.fr/Proteger/Garantie-des-droits-et-libertes/Proteger-le-pluralisme-politique/La-presidentielle-2022)
                         * (c) 2022 Guillaume LARUE et Enguerrand de Gentile Duquesne
                         """),
         ], style={
