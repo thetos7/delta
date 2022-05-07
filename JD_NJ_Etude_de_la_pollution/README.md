@@ -26,9 +26,11 @@ Pour commencer, il vous faudra installer les librairies requises pour ce projet 
     
     pip install -r requirements.txt
 
-Ensuite, ayant déjà fourni les données traitées, vous n'avez pas forcément besoin de passer par la partie de traitement des données qui est la suivante : 
+La suite se déroulera dans le dossier de notre projet :
 
     cd JD_NJ_Etude_de_la_pollution
+
+Ensuite, ayant déjà fourni les données traitées, vous n'avez pas forcément besoin de passer par la partie de traitement des données qui est la suivante (qui peut prendre autour de 15 minutes) :
 
     python3 get_data.py
     
