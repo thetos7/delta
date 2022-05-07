@@ -4,7 +4,7 @@ import os
 import glob
 
 
-list_column = ['Session', 'Admis', 'Filières très agrégées', 'Effectif total des candidatures', 'Filières très agrégées', 'Effectif des admis boursiers'] 
+list_column = ['Session', 'Admis', 'Filières très agrégées', 'Effectif total des candidatures', 'Filières très agrégées', 'Effectif des admis boursiers', 'Nombre d\'hommes', 'Nombre de femmes'] 
 
 def remove_useless_column(df):
 
@@ -34,6 +34,7 @@ def rename_columns(dataframe):
     dataframe.rename(columns = {'Effectif total des candidats ayant accepté la proposition de l’établissement (admis)' : 'Candidats admis parcoursup'}, inplace = True)
     dataframe.rename(columns = {'Effectif total des candidats admis' : 'Admis'}, inplace = True)
     dataframe.rename(columns = {'Effectif total des candidats' : 'Effectif total des candidatures'}, inplace = True)
+    dataframe.rename(columns = {'Effectif total des candidats admis, dont filles' : 'Nombre de femmes'}, inplace = True)
     return dataframe
     
 def fuse_similar_columns(dataframe):
@@ -43,6 +44,7 @@ def fuse_similar_columns(dataframe):
     dataframe['Filières très agrégées'] += dataframe['Filière de formation très agrégée']
     dataframe['Effectif total des candidatures'] += dataframe['Effectif total des candidats pour une formation']
     dataframe['Effectif des admis boursiers'] += dataframe['Dont effectif des admis boursiers néo bacheliers']
+    dataframe['Nombre de femmes'] += dataframe['Dont effectif des candidates admises']
     return dataframe
     
 def load_data():
@@ -60,5 +62,9 @@ def load_data():
     dataframe.loc[dataframe['Filières très agrégées'] == 'Ingénieur', 'Filières très agrégées'] = "Ecole d'Ingénieur"
     dataframe.loc[dataframe['Filières très agrégées'] == 'Autre', 'Filières très agrégées'] = 'Autre formation'
 
+
+    dataframe["Nombre d'hommes"] = dataframe['Admis'].copy()
+    dataframe["Nombre d'hommes"] -= dataframe['Nombre de femmes']
+    
     dataframe = remove_useless_column(dataframe)
     return dataframe
