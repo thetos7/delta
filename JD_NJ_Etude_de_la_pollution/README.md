@@ -22,11 +22,13 @@ La deuxième est directement lancer nos deux fichiers .py avec Python.
 
 Pour cela voici les étapes à suivre : 
 
-Pour commencer, il vous faudra installer les librairies requises pour ce projet :
-
+Pour commencer, il vous faudra installer les librairies requises pour ce projet avec le ficher requirements situé à la racine du git :
+    
     pip install -r requirements.txt
 
 Ensuite, ayant déjà fourni les données traitées, vous n'avez pas forcément besoin de passer par la partie de traitement des données qui est la suivante : 
+
+    cd JD_NJ_Etude_de_la_pollution
 
     python3 get_data.py
     
