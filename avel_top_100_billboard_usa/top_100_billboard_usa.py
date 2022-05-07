@@ -1,10 +1,11 @@
 # import dash_design_kit as ddk
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 from dash import dcc
 from dash import html, Dash, Output, Input, dash_table
-import numpy as np
+
 pd.options.plotting.backend = "plotly"
 
 
@@ -33,6 +34,7 @@ def generate_dash_table(dataframe: pd.DataFrame, max_rows: int = 10):
         columns=[{'id': c, 'name': c} for c in dataframe.columns],
         page_size=max_rows
     )
+
 
 class Top100BillboardUSA:
     def __init__(self, application: Dash = None):
@@ -166,7 +168,7 @@ class Top100BillboardUSA:
         df["date"] = pd.to_datetime(df["date"])
         return df
 
-    def get_music_of_artist_fig(self, artist, df=None, height=1000):
+    def get_music_of_artist_fig(self, artist, df=None, height=850):
         df = self.df if df is None else df
         df_selected_artist = df[df["artist"] == artist]
         fig = go.Figure()
@@ -179,14 +181,13 @@ class Top100BillboardUSA:
             height=height,
             legend={
                 "font": {"size": 7},
-                "orientation": "h",
-                "yanchor": "bottom",
-                "xanchor": "center",
-                "y": 1.02,
-                "x": 1
+                # "orientation": "h",
+                # "yanchor": "bottom",
+                # "xanchor": "center",
+                # "y": 1.02,
+                # "x": 1
             }
         )
-
 
         for song in df_selected_artist["song"].unique():
             filtered_song_df = df_selected_artist[df_selected_artist["song"] == song].copy()
@@ -211,7 +212,7 @@ class Top100BillboardUSA:
         max_weeks_on_board_count = df.groupby(by=["artist", "song"])["weeks-on-board"].max().value_counts()
         if reindex:
             max_weeks_on_board_count = max_weeks_on_board_count.reindex(
-                list(range(max_weeks_on_board_count.index.min(), max_weeks_on_board_count.index.max() + 1)),
+                list(range(1, max_weeks_on_board_count.index.max() + 1)),
                 fill_value=0
             )
         return max_weeks_on_board_count
@@ -288,15 +289,19 @@ class Top100BillboardUSA:
         )
 
     def get_meteoric_entries_fig(self, height=600) -> go.Figure:
+        new_entry = self.df.loc[
+            np.where(
+                (self.df["last-week"]).isna()
+                & (self.df["rank"] == 1)
+                & (self.df["date"] != pd.to_datetime("1958-08-04 00:00:00"))
+            )
+        ]  # en ignorant la toute premiere semaine (100 nouvelles entrées)
+        ne_count = new_entry["date"].dt.year.value_counts()
+        ne_count = ne_count.reindex(list(range(1990, 2022)), fill_value=0)
 
-        new_entry = self.df.loc[np.where((self.df["last-week"]).isna()
-                                        & (self.df["rank"] == 1)
-                                        & (self.df["date"] != "1958-08-04 00:00:00"))] # en ignorant la toute premiere semaine (100 nouvelles entrées)
-        ne_count = new_entry["date"].dt.strftime("%Y").value_counts()
-        ne_count = ne_count.reindex(list(["{:4d}".format(x) for x in range(1990, 2022)]), fill_value=0)
         fig = px.bar(x=ne_count.index.values, y=ne_count.values, height=height)
         fig.update_traces(hovertemplate='%{y} entrées fulgurantes en %{x}')
-        fig.update_xaxes(title="Date")
+        fig.update_xaxes(title="Date", tickmode='linear')
         fig.update_yaxes(title="Nombre d'entrées fulgurantes")
         return fig
 
