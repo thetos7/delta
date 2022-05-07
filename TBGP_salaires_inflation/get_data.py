@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import logging
+logging.basicConfig(level=logging.INFO)
+
 
 infl_conv = {
     'AUS': 'AU',
@@ -70,13 +73,20 @@ def fill_missing_years(wages, countries):
     return pd.concat([wages, to_add], ignore_index=True, axis=0)
 
 def clean_inflation(inflation):
-    inflation.LOCATION = inflation.LOCATION.apply(lambda s: infl_conv[s])
+    logging.info('Cleaning inflation dataset...')
+    inflation = inflation[inflation.FREQUENCY == 'A']
+    inflation = inflation[inflation.SUBJECT == 'TOT']
+    inflation = inflation[inflation.MEASURE == 'AGRWTH']
+    inflation.drop(['FREQUENCY', 'SUBJECT', 'MEASURE'], axis='columns', inplace=True)
     inflation.rename({'LOCATION': 'country', 'TIME': 'year'}, axis='columns', inplace=True)
+    inflation.country = inflation.country.apply(lambda s: infl_conv[s] if s in infl_conv else s)
     return inflation
 
 def clean_wages(wages):
+    logging.info('Cleaning wages dataset...')
     wages = wages[wages.indic_il == 'MED_E']
     wages = wages[wages.unit == 'EUR']
+    wages = wages[wages.age.isin(['TOTAL', 'Y_GE65', 'Y50-64', 'Y25-49', 'Y16-24'])]
     wages.geo[wages.geo == 'UK'] = 'GB'
     wages.rename({'geo': 'country', 'TIME_PERIOD': 'year', }, axis='columns', inplace=True)
     wages.drop(['indic_il', 'unit'], axis='columns', inplace=True)
@@ -102,11 +112,21 @@ def merge_dataframes(inflation, wages):
     ret.dropna(inplace=True)
     return ret
 
-def get_data(path):
-    wages = pd.read_csv(f'{path}/data/salaires.csv', usecols=['age', 'sex', 'indic_il', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE'], parse_dates=['TIME_PERIOD'])
-    inflation = pd.read_csv(f'{path}/data/inflation.csv', usecols=['LOCATION', 'TIME', 'Value'], parse_dates=['TIME'])
+def get_data():
+    logging.info('Fetching wages data...')
+    wages = pd.read_csv('https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ILC_DI03/?format=SDMX-CSV&compressed=true', compression='gzip', usecols=['age', 'sex', 'indic_il', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE'], parse_dates=['TIME_PERIOD'])
+
+    logging.info('Fetching inflation data...')
+    inflation = pd.read_csv('https://stats.oecd.org/sdmx-json/data/DP_LIVE/.CPI.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=fr', usecols=['LOCATION', 'TIME', 'Value', 'FREQUENCY', 'SUBJECT', 'MEASURE'], parse_dates=['TIME'])
 
     inflation, wages = clean_inflation(inflation), clean_wages(wages)
     wages = fill_missing_years(wages, inflation.country.unique())
 
-    return merge_dataframes(compute_cumulative(inflation, wages), wages)
+    logging.info('Merging dataframes...')
+    df = merge_dataframes(compute_cumulative(inflation, wages), wages)
+
+    logging.info('Saving dataframe...')
+    df.to_pickle('./data/dataframe.pkl')
+
+if __name__ == '__main__':
+    get_data()

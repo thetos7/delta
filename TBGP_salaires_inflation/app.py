@@ -5,17 +5,16 @@ from dash import html
 import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
-if __name__ == '__main__':
-    import get_data
-else:
-    from TBGP_salaires_inflation import get_data
+import pandas as pd
 import json
 
 path = '.' if __name__ == '__main__' else 'TBGP_salaires_inflation'
 
 class SalaryInflation():
     def __init__(self, application = None):
-        self.df = get_data.get_data(path)
+        print(1)
+        self.df = pd.read_pickle(f'{path}/data/dataframe.pkl')
+        print(1)
         self.years = self.df.year.unique().astype('datetime64[Y]').astype(int) + 1970
         self.geodata = json.load(open(f'{path}/data/europe.geojson'))
         self.main_layout = html.Div(children=[
@@ -25,7 +24,7 @@ class SalaryInflation():
 
             dcc.Markdown("""
             La couleur représente le ratio entre le salaire médian de l'année choisie
-            et le salaire éstimé selon le taux d'inflation et le salaire médian de référénce.
+            et le salaire estimé selon le taux d'inflation et le salaire médian de référénce.
 
             Les couleurs vers le rouge indiquent donc une perte de pouvoir d'achat, tandis que les couleurs vers le bleu
             indiquent une hausse et le jaune indique un maintien.
