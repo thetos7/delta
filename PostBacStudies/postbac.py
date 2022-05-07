@@ -33,7 +33,7 @@ class PostBac():
             html.H5(children='Thomas Chivet et Antoine Vergnaud'),
             html.Div(style={'width' : '100%', 'margin' : 'auto'},
                     children=[dcc.Markdown(PostBac.introduction)],),
-            html.H4(children="Nombre d'admis en fonction des annéés"),
+            html.H4(children="Nombre d'admis en fonction des années"),
             html.Div([ dcc.Graph(id='admis-hist'), ], style={'width':'100%'}),
             html.Div([ dcc.RadioItems(id='hist-opts', 
                                      value=2,
@@ -43,7 +43,15 @@ class PostBac():
             html.Div(style={'width' : '100%', 'margin' : 'auto'},
                      children=[dcc.Markdown(PostBac.admis)],),
             
+            html.H4(children="Pourcentage de candidats n'ayant reçu aucune affectation en fonction des années"),
+            html.Div([ dcc.Graph(id='unaffiliated-line'), ], style={'width':'100%'}),
             
+            html.Div([ dcc.RadioItems(id='line-opts', 
+                                     value=2,
+                                     labelStyle={'display':'block'}) ,
+                                     ]),
+            dcc.Link('Sources', href='https://data.enseignementsup-recherche.gouv.fr/pages/explorer/?q=&sort=modified&refine.keyword=orientation'),
+
             html.H4(children="Pourcentage de H/F par fillière"),
             html.Div([ dcc.Graph(id='hf-pie'), ], style = {'width' : '100%', }),
             
@@ -81,11 +89,15 @@ class PostBac():
                     dash.dependencies.Output('admis-hist', 'figure'),
                     dash.dependencies.Input('hist-opts', 'value'))(self.show_admis_hist)
         self.app.callback(
+                    dash.dependencies.Output('unaffiliated-line', 'figure'),
+                    dash.dependencies.Input('line-opts', 'value'))(self.show_unaffiliated_candidates)
+        self.app.callback(
                     dash.dependencies.Output('boursier-hist', 'figure'),
                     dash.dependencies.Input('scatter-opts', 'value'))(self.show_boursier_hist)
         self.app.callback(
                     dash.dependencies.Output('hf-pie', 'figure'),
                     dash.dependencies.Input('years', 'value'))(self.show_branch_per_sex)
+        
     
     
     def show_admis_hist(self, mean):  
@@ -102,6 +114,21 @@ class PostBac():
         fig.update_layout(bargap = 0.2)    
         return fig
         
+    def show_unaffiliated_candidates(self, mean):
+        data = [[2016, 761659], [2017, 852262], [2018, 812082], [2019, 937332], [2020, 985538], [2021, 965531]]
+        candidatesNbDf = pd.DataFrame(data, columns = ['Session', 'Nombre de candidats'])
+        fig = px.line(
+                candidatesNbDf,
+                x = 'Session',
+                y = self.df.groupby(['Session'])['Admis'].sum() * 100 / candidatesNbDf['Nombre de candidats'].sum(),
+                range_y = [0,20],
+                markers=True,
+                labels={
+                 "y": "Pourcentage de candidats non affectés",
+                 },
+                )
+        return fig
+    
     def show_boursier_hist(self, mean):  
         df = self.df.groupby(['Session', 'Filières très agrégées'])[['Admis', 'Effectif des admis boursiers']].sum()
         fig = px.histogram(
@@ -140,11 +167,11 @@ class PostBac():
         
         for i, l in enumerate(years):
             
-            SexLabels = ["Proportion d'hommes", 'Proportion de femmes']
+            SexLabels = ["Proportion d'hommes", 'Proportion de femmes','Pas de données']
             my_dict={
             'SEXE': SexLabels,
             'SOMME':[self.df.loc[(self.df['Filières très agrégées'] == branch) & (self.df['Session'] == l)]["Nombre d'hommes"].sum(),
-                   self.df.loc[(self.df['Filières très agrégées'] == branch) & (self.df['Session'] == l)]["Nombre de femmes"].sum()]
+                   self.df.loc[(self.df['Filières très agrégées'] == branch) & (self.df['Session'] == l)]["Nombre de femmes"].sum(), 1]
             }
             dataframe = pd.DataFrame(data = my_dict)
             # basic math to get col and row
@@ -163,6 +190,7 @@ class PostBac():
             )
 
         fig.update_layout(title="", title_x = 0.45)
+        fig.update_traces(marker = dict(colors = ['#1109B1', '#D90000', 'gray']))
         return fig
 
 if __name__ == '__main__':
