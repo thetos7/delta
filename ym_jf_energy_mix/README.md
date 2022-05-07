@@ -12,6 +12,9 @@ principaux contributeurs.
 La visualisation de la production d'électricité au charbon et de l'évolution de cette production permet de 
 se visualiser à quel point ces pays prennent en compte les enjeux climatiques.
 
+### Données
+La base de donnée n'est pas présente sur le dépot, consulter le fichier get_data.py pour l'obtenir.
+
 #### Auteurs
 Yorick Madelain
 Jordan Failloux
