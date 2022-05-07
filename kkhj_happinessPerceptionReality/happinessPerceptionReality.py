@@ -1,4 +1,4 @@
-from kkhj_happinessPerceptionReality.getDatasets import get_datasets
+from kkhj_happinessPerceptionReality.getDatasets import get_data
 from kkhj_happinessPerceptionReality.missingValues import *
 from kkhj_happinessPerceptionReality.perceivedIndex import *
 import dash
@@ -15,7 +15,7 @@ class HappinessPerceptionReality():
 
     def __init__(self, application=None):
         # Extract datasets
-        datasets = get_datasets()
+        datasets = get_data()
 
         # Store importance rates
         importanceRate = {'safety': 0.25,
