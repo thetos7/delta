@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
 import logging
+from urllib import request
 logging.basicConfig(level=logging.INFO)
+import os
 
 
 infl_conv = {
@@ -113,6 +115,9 @@ def merge_dataframes(inflation, wages):
     return ret
 
 def get_data():
+    if not os.path.exists('./data'):
+        os.mkdir('./data')
+
     logging.info('Fetching wages data...')
     wages = pd.read_csv('https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/ILC_DI03/?format=SDMX-CSV&compressed=true', compression='gzip', usecols=['age', 'sex', 'indic_il', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE'], parse_dates=['TIME_PERIOD'])
 
@@ -127,6 +132,9 @@ def get_data():
 
     logging.info('Saving dataframe...')
     df.to_pickle('./data/dataframe.pkl')
+
+    logging.info('downloading geojson')
+    request.urlretrieve('https://raw.githubusercontent.com/leakyMirror/map-of-europe/master/GeoJSON/europe.geojson', 'data/europe.geojson')
 
 if __name__ == '__main__':
     get_data()
