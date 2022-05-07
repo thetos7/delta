@@ -24,6 +24,7 @@ class DecesFranceRevenu():
 
         self.main_layout = html.Div(children=[
             html.H3(children='Décès en France selon le revenu par département'),
+            html.Div('Yann Buisson & Julien Delaforge'),
             html.Div([ dcc.Graph(id='drd-main-graph'), ], style={'width':'100%', }),
             html.Div([ dcc.RadioItems(id='drd-value',
                                      options=[{'label':'Revenu/Pourcentage de morts', 'value':0},
