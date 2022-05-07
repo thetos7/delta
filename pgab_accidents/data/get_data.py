@@ -228,7 +228,7 @@ for year, src in sources.items():
     # print("Writing file(s)...")
     # usagers.to_csv(f"{year}/usagers.csv", index=False)
     # caracs.to_csv(f"{year}/caracteristiques.csv", index=False)
-    acg = acc_caracs_grav.drop(columns=['hrmn', 'gps', 'adr', 'com', 'atm', 'int'], errors='ignore')
+    acg = acc_caracs_grav.drop(columns=['hrmn', 'gps', 'adr', 'com', 'atm', 'int', 'an'], errors='ignore')
     acg.to_pickle(f"acc_caracs_grav-{year}.pkl")
 
 
