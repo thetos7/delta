@@ -13,6 +13,7 @@ DB_URL = (
 
 def download_db(db_url, dst_path):
     print("Downloading database...")
+    os.makedirs(os.path.dirname(dst_path))
     dst = open(dst_path, "wb")
     response = requests.get(db_url, stream=True)
     total_length = response.headers.get("content-length")
