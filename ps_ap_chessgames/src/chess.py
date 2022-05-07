@@ -20,7 +20,8 @@ class Chess:
         file_directory = os.path.dirname(os.path.abspath(__file__))
         self.chess_games = pd.read_csv(
             os.path.join(
-                file_directory, "../data/lichess_db_standard_rated_2013-11.csv"
+                os.path.dirname(file_directory),
+                "data/lichess_db_standard_rated_2013-11.csv",
             ),
             dtype=data.types,
         )
