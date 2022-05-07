@@ -127,8 +127,10 @@ class TBGT:
         if (relation == self.RELATION_DEFAULT):
             return self._get_global_pop_fig()
 
+        min_date = self.train_df.groupby("Relations").get_group(relation).dropna()["Année"].iloc[0]
+
         fig = self.pop_df[relation.split(" - ")].plot()
-        fig.update_xaxes(title_text="Années")
+        fig.update_xaxes(title_text="Années", range=[min_date, 2019])
         fig.update_yaxes(title_text="Croissance en %")
         fig.update_layout(title="Croissance de la population des deux villes")
         self._set_legend_and_margin(fig)
