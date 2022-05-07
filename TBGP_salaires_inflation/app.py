@@ -7,101 +7,103 @@ import plotly.express as px
 import numpy as np
 import pandas as pd
 import json
+import os
 
 path = '.' if __name__ == '__main__' else 'TBGP_salaires_inflation'
 
 class SalaryInflation():
     def __init__(self, application = None):
-        print(1)
-        self.df = pd.read_pickle(f'{path}/data/dataframe.pkl')
-        print(1)
-        self.years = self.df.year.unique().astype('datetime64[Y]').astype(int) + 1970
-        self.geodata = json.load(open(f'{path}/data/europe.geojson'))
-        self.main_layout = html.Div(children=[
-            html.H3(children='Comparaison salaire / inflation en Europe',
+        self.df = pd.read_pickle(f'{path}/data/dataframe.pkl') if os.path.exists(f'{path}/data/dataframe.pkl') else None
+        self.geodata = json.load(open(f'{path}/data/europe.geojson')) if os.path.exists(f'{path}/data/europe.geojson') else None
+        if not self.df is None:
+            self.years = self.df.year.unique().astype('datetime64[Y]').astype(int) + 1970
+            self.main_layout = html.Div(children=[
+                html.H3(children='Comparaison salaire / inflation en Europe',
                     style={'textAlign': 'center'}),
-            html.Div([dcc.Graph(id='tbgp-si-map'),
+                html.Div([dcc.Graph(id='tbgp-si-map'),
 
-            dcc.Markdown("""
-            La couleur représente le ratio entre le salaire médian de l'année choisie
-            et le salaire estimé selon le taux d'inflation et le salaire médian de référénce.
+                    dcc.Markdown("""
+                        La couleur représente le ratio entre le salaire médian de l'année choisie
+                        et le salaire estimé selon le taux d'inflation et le salaire médian de référénce.
 
-            Les couleurs vers le rouge indiquent donc une perte de pouvoir d'achat, tandis que les couleurs vers le bleu
-            indiquent une hausse et le jaune indique un maintien.
-            """),
+                        Les couleurs vers le rouge indiquent donc une perte de pouvoir d'achat, tandis que les couleurs vers le bleu
+                        indiquent une hausse et le jaune indique un maintien.
+                        """),
 
-            html.Div(id='tbgp-si-year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
+                    html.Div(id='tbgp-si-year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
 
-            dcc.RangeSlider(
-                id='tbgp-si-year-filter-slider',
-                min=self.years[0],
-                max=self.years[-1],
-                step=1,
-                pushable=1,
-                value=[2006, 2018],
-                marks={str(year): str(year)
-                       for year in range(self.years[0], self.years[-1]+1, 5)}
-            ),
-            html.Div([
+                dcc.RangeSlider(
+                    id='tbgp-si-year-filter-slider',
+                    min=self.years[0],
+                    max=self.years[-1],
+                    step=1,
+                    pushable=1,
+                    value=[2006, 2018],
+                    marks={str(year): str(year)
+                        for year in range(self.years[0], self.years[-1]+1, 5)}
+                    ),
                 html.Div([
-                    dcc.Graph(id='tbgp-si-graph',
-                        style={'width': '85%', 'display': 'inline-block'}),
                     html.Div([
-                        html.Button('Union Européenne', id='tbgp-si-europe_button', style={'width': '100%'}),
-                        html.Div(html.U('Sexe :'), style={'padding-top': '10%'}),
-                        dcc.RadioItems(id='tbgp-si-sex', options=[
-                            {'label': 'Total', 'value': 'T'},
-                            {'label': 'Hommes', 'value': 'M'},
-                            {'label': 'Femmes', 'value': 'F'},
-                        ], value='T', labelStyle={'display': 'block'}),
-                        html.Div(html.U('Age :'), style={'padding-top': '5%'}),
-                        dcc.RadioItems(id='tbgp-si-age', options=[
-                            {'label': 'Total', 'value': 'TOTAL'},
-                            {'label': 'Plus de 65 ans', 'value': 'Y_GE65'},
-                            {'label': '50-64 ans', 'value': 'Y50-64'},
-                            {'label': '25-49 ans', 'value': 'Y25-49'},
-                            {'label': '16-24 ans', 'value': 'Y16-24'},
-                        ], value='TOTAL', labelStyle={'display': 'block'}),
-                    ], style={'width': '15%', 'display': 'block', 'padding-left': '1%' }),
-                ], style={'display': 'flex', 'justifyContent': 'center', }),
-                html.Div('* Salaire attendu si on prend uniquement l\'évolution de l\'inflation en compte')
-            ]),
-            dcc.Markdown("""
-            Ce projet montre l'évolution du salaire médian en Europe par rapport
-            à l'inflation. Notre méthode est simple : nous prenons une année de
-            référence, puis nous multiplions le salaire médian de cette année
-            par le taux d'inflation. La comparaison du salaire médian réel avec
-            celui estimé par l'inflation nous donne une estimation du gain ou de
-            la perte de pouvoir d'achat des habitants du pays en question.
+                        dcc.Graph(id='tbgp-si-graph',
+                            style={'width': '85%', 'display': 'inline-block'}),
+                        html.Div([
+                            html.Button('Union Européenne', id='tbgp-si-europe_button', style={'width': '100%'}),
+                            html.Div(html.U('Sexe :'), style={'padding-top': '10%'}),
+                            dcc.RadioItems(id='tbgp-si-sex', options=[
+                                {'label': 'Total', 'value': 'T'},
+                                {'label': 'Hommes', 'value': 'M'},
+                                {'label': 'Femmes', 'value': 'F'},
+                                ], value='T', labelStyle={'display': 'block'}),
+                            html.Div(html.U('Age :'), style={'padding-top': '5%'}),
+                            dcc.RadioItems(id='tbgp-si-age', options=[
+                                {'label': 'Total', 'value': 'TOTAL'},
+                                {'label': 'Plus de 65 ans', 'value': 'Y_GE65'},
+                                {'label': '50-64 ans', 'value': 'Y50-64'},
+                                {'label': '25-49 ans', 'value': 'Y25-49'},
+                                {'label': '16-24 ans', 'value': 'Y16-24'},
+                                ], value='TOTAL', labelStyle={'display': 'block'}),
+                            ], style={'width': '15%', 'display': 'block', 'padding-left': '1%' }),
+                        ], style={'display': 'flex', 'justifyContent': 'center', }),
+                    html.Div('* Salaire attendu si on prend uniquement l\'évolution de l\'inflation en compte')
+                    ]),
+                dcc.Markdown("""
+                    Ce projet montre l'évolution du salaire médian en Europe par rapport
+                    à l'inflation. Notre méthode est simple : nous prenons une année de
+                    référence, puis nous multiplions le salaire médian de cette année
+                    par le taux d'inflation. La comparaison du salaire médian réel avec
+                    celui estimé par l'inflation nous donne une estimation du gain ou de
+                    la perte de pouvoir d'achat des habitants du pays en question.
 
-            La carte est interactive : cliquer sur un pays permet de mettre à
-            jour le graphique selon les statistiques de ce pays.
+                    La carte est interactive : cliquer sur un pays permet de mettre à
+                    jour le graphique selon les statistiques de ce pays.
 
-            Le graphique affiche les statistiques de l'Union Européenne par
-            défaut. Un bouton est à votre disposition si vous voulez afficher
-            les stats de cette dernière sans recharger la page.
+                    Le graphique affiche les statistiques de l'Union Européenne par
+                    défaut. Un bouton est à votre disposition si vous voulez afficher
+                    les stats de cette dernière sans recharger la page.
 
-            Vous pouvez également isoler les statistiques selon l'âge et le
-            sexe.
+                    Vous pouvez également isoler les statistiques selon l'âge et le
+                    sexe.
 
-            Enfin, un slider est à votre disposition afin de changer l'année de référence
-            pour l'inflation et l'année à comparer.
+                    Enfin, un slider est à votre disposition afin de changer l'année de référence
+                    pour l'inflation et l'année à comparer.
 
-            Observations :
-            * Les courbes sont toujours similaires selon les sexes, nous
-            remarquons juste que les valeurs sont généralement plus faibles pour les femmes.
-            * Il faut faire attention au fait que les plus de 65 ans en 2020 ne
-            sont pas les mêmes qu'en 1995. Ce biais doit être pris en compte
-            avant de tirer des conclusions de ces courbes.
+                    Observations :
+                    * Les courbes sont toujours similaires selon les sexes, nous
+                    remarquons juste que les valeurs sont généralement plus faibles pour les femmes.
+                    * Il faut faire attention au fait que les plus de 65 ans en 2020 ne
+                    sont pas les mêmes qu'en 1995. Ce biais doit être pris en compte
+                    avant de tirer des conclusions de ces courbes.
 
-            ### A propos
+                    ### A propos
 
-            * Sources :
-                * [Le salaire médian en Europe selon l'âge et le sexe](https://ec.europa.eu/eurostat/fr/web/products-datasets/-/ILC_DI03) par Eurostat
-                * [L'évolution annuelle de l'inflation depuis 1995](https://data.oecd.org/fr/price/inflation-ipc.htm) par l'OCDE
-            * (c) 2022 Guillaume POISSON et Théo BACHIR
-            """),
-        ])
+                    * Sources :
+                    * [Le salaire médian en Europe selon l'âge et le sexe](https://ec.europa.eu/eurostat/fr/web/products-datasets/-/ILC_DI03) par Eurostat
+                    * [L'évolution annuelle de l'inflation depuis 1995](https://data.oecd.org/fr/price/inflation-ipc.htm) par l'OCDE
+                    * (c) 2022 Guillaume POISSON et Théo BACHIR
+                    """),
+            ])
+        else:
+            self.main_layout = dcc.Markdown('You need to fetch the data first.\n Please take a look at "TBGP_salaires_inflation/README.md" for more information.')
 
         if application:
             self.app = application
@@ -109,23 +111,24 @@ class SalaryInflation():
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
 
-        self.app.callback(
-            dash.dependencies.Output('tbgp-si-map', 'clickData'),
-            dash.dependencies.Input('tbgp-si-europe_button', 'n_clicks'))(self.set_ue)
-        self.app.callback(
-            dash.dependencies.Output('tbgp-si-year', 'children'),
-            dash.dependencies.Input('tbgp-si-year-filter-slider', 'value'))(self.update_year)
+        if not self.df is None:
+            self.app.callback(
+                    dash.dependencies.Output('tbgp-si-map', 'clickData'),
+                    dash.dependencies.Input('tbgp-si-europe_button', 'n_clicks'))(self.set_ue)
+            self.app.callback(
+                dash.dependencies.Output('tbgp-si-year', 'children'),
+                dash.dependencies.Input('tbgp-si-year-filter-slider', 'value'))(self.update_year)
 
-        self.app.callback(
-            dash.dependencies.Output('tbgp-si-map', 'figure'),
-            dash.dependencies.Input('tbgp-si-year-filter-slider', 'value'))(self.update_map)
+            self.app.callback(
+                dash.dependencies.Output('tbgp-si-map', 'figure'),
+                dash.dependencies.Input('tbgp-si-year-filter-slider', 'value'))(self.update_map)
 
-        self.app.callback(
-            dash.dependencies.Output('tbgp-si-graph', 'figure'),
-            [dash.dependencies.Input('tbgp-si-map', 'clickData'),
-             dash.dependencies.Input('tbgp-si-sex', 'value'),
-             dash.dependencies.Input('tbgp-si-age', 'value'),
-             dash.dependencies.Input('tbgp-si-year-filter-slider', 'value')])(self.update_graph)
+            self.app.callback(
+                dash.dependencies.Output('tbgp-si-graph', 'figure'),
+                [dash.dependencies.Input('tbgp-si-map', 'clickData'),
+                    dash.dependencies.Input('tbgp-si-sex', 'value'),
+                    dash.dependencies.Input('tbgp-si-age', 'value'),
+                    dash.dependencies.Input('tbgp-si-year-filter-slider', 'value')])(self.update_graph)
 
 
     def set_ue(self, n):
