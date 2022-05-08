@@ -28,8 +28,6 @@ Un sous-diagramme polaire permet de résumer le genre séléctionné dans le dia
 ```sh
 spotify/
     - data/
-        - charts.csv
-        - SpotifyFeatures.csv
         - data.tar.gz
         - get_data.py
     - Popularité des musiques.ipynb
