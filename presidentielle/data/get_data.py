@@ -439,20 +439,20 @@ def get_tdp_melenchon():
         'Tranche (9h-18h)(durée)'] + df_pt1_melenchon['Tranche (18h-24h)(durée)'])
 
     df_pt2_melenchon["Somme"] = (
-                df_pt2_melenchon['Tranche (6h-9h)(durée)'] + df_pt2_melenchon['Tranche (6h-9h)(durée)'] +
-                df_pt2_melenchon['Tranche (9h-18h)(durée)'] + df_pt2_melenchon['Tranche (18h-24h)(durée)'])
+            df_pt2_melenchon['Tranche (6h-9h)(durée)'] + df_pt2_melenchon['Tranche (6h-9h)(durée)'] +
+            df_pt2_melenchon['Tranche (9h-18h)(durée)'] + df_pt2_melenchon['Tranche (18h-24h)(durée)'])
 
     df_sp1_melenchon["Somme"] = (
-                df_sp1_melenchon['Tranche (6h-9h)(durée)'] + df_sp1_melenchon['Tranche (6h-9h)(durée)'] +
-                df_sp1_melenchon['Tranche (9h-18h)(durée)'] + df_sp1_melenchon['Tranche (18h-24h)(durée)'])
+            df_sp1_melenchon['Tranche (6h-9h)(durée)'] + df_sp1_melenchon['Tranche (6h-9h)(durée)'] +
+            df_sp1_melenchon['Tranche (9h-18h)(durée)'] + df_sp1_melenchon['Tranche (18h-24h)(durée)'])
 
     df_sp2_melenchon["Somme"] = (
-                df_sp2_melenchon['Tranche (6h-9h)(durée)'] + df_sp2_melenchon['Tranche (6h-9h)(durée)'] +
-                df_sp2_melenchon['Tranche (9h-18h)(durée)'] + df_sp2_melenchon['Tranche (18h-24h)(durée)'])
+            df_sp2_melenchon['Tranche (6h-9h)(durée)'] + df_sp2_melenchon['Tranche (6h-9h)(durée)'] +
+            df_sp2_melenchon['Tranche (9h-18h)(durée)'] + df_sp2_melenchon['Tranche (18h-24h)(durée)'])
 
     df_sp3_melenchon["Somme"] = (
-                df_sp3_melenchon['Tranche (6h-9h)(durée)'] + df_sp3_melenchon['Tranche (6h-9h)(durée)'] +
-                df_sp3_melenchon['Tranche (9h-18h)(durée)'] + df_sp3_melenchon['Tranche (18h-24h)(durée)'])
+            df_sp3_melenchon['Tranche (6h-9h)(durée)'] + df_sp3_melenchon['Tranche (6h-9h)(durée)'] +
+            df_sp3_melenchon['Tranche (9h-18h)(durée)'] + df_sp3_melenchon['Tranche (18h-24h)(durée)'])
 
     df_sp1_melenchon['Période'] = pd.to_datetime(df_sp1_melenchon['Période'], dayfirst=True)
     df_sp2_melenchon['Période'] = pd.to_datetime(df_sp2_melenchon['Période'], dayfirst=True)
@@ -532,6 +532,7 @@ def get_tdp_pecresse():
         [df_sp1_pecresse[l], df_sp2_pecresse[l], df_sp3_pecresse[l], df_pt1_pecresse[l], df_pt2_pecresse[l]])
     return df_pecresse
 
+
 def get_tdp_poutou():
     df_pt1_poutou = pd.read_csv("poutou/premier_tour_1_poutou.csv", sep=";").fillna(0)
     df_pt2_poutou = pd.read_csv("poutou/premier_tour_2_poutou.csv", sep=";").fillna(0)
@@ -591,6 +592,7 @@ def get_tdp_poutou():
 
     df_poutou = pd.concat([df_sp1_poutou[l], df_sp2_poutou[l], df_sp3_poutou[l], df_pt1_poutou[l], df_pt2_poutou[l]])
     return df_poutou
+
 
 def get_tdp_roussel():
     df_pt1_roussel = pd.read_csv("roussel/premier_tour_1_roussel.csv", sep=";").fillna(0)
@@ -715,6 +717,7 @@ def get_tdp_zemmour():
         [df_sp1_zemmour[l], df_sp2_zemmour[l], df_sp3_zemmour[l], df_pt1_zemmour[l], df_pt2_zemmour[l]])
     return df_zemmour
 
+
 def get_tdp_lassalle():
     df_pt1_lassalle = pd.read_csv("lassalle/premier_tour_1_lassalle.csv", sep=";").fillna(0)
     df_pt2_lassalle = pd.read_csv("lassalle/premier_tour_2_lassalle.csv", sep=";").fillna(0)
@@ -779,7 +782,6 @@ def get_tdp_lassalle():
     df_lassalle = pd.concat(
         [df_sp1_lassalle[l], df_sp2_lassalle[l], df_sp3_lassalle[l], df_pt1_lassalle[l], df_pt2_lassalle[l]])
     return df_lassalle
-
 
 
 def get_temps_de_parole():
