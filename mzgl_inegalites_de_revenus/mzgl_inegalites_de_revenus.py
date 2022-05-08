@@ -3,7 +3,7 @@ import numpy as np
 from dash import html, dcc
 import plotly.graph_objects as go
 import plotly.express as px
-import mzgl_inegalites_de_revenus.data.get_data as gd
+import mzgl_inegalites_de_revenus.get_data as gd
 
 list_yaxis = [f"p{i}p{i+1}" for i in range(0, 100)]
 
@@ -698,8 +698,3 @@ class Inegalites_de_revenus:
 
     def run(self, debug=False, port=8050):
         self.app.run_server(host="0.0.0.0", debug=debug, port=port)
-
-
-if __name__ == "__main__":
-    ine = Inegalites_de_revenus()
-    ine.app.run_server(debug=True, port=8051)
