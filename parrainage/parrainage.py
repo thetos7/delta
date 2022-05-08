@@ -121,7 +121,7 @@ class Parrainage():
             featureidkey="properties.nom",
             mapbox_style='carto-positron',
             color="Score",
-            color_discrete_sequence=[1],
+            color_continuous_scale=px.colors.sequential.Blues,
             hover_data={'Score': True},
             zoom=3.8,
             center={'lat': 47, 'lon': 2},

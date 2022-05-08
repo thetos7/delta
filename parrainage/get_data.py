@@ -6,3 +6,9 @@ def fetch_data():
     csv_file = open('parrainage/data/parrainagestotal.csv', 'wb')
     csv_file.write(req.content)
     csv_file.close()
+
+    url_geojson = "https://france-geojson.gregoiredavid.fr/repo/departements.geojson"
+    req = requests.get(url_geojson, allow_redirects=True)
+    csv_file = open('parrainage/data/departements.geojson', 'wb')
+    csv_file.write(req.content)
+    csv_file.close()
