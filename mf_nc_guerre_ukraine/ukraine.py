@@ -13,28 +13,27 @@ from scipy import stats
 from scipy import fft
 import datetime
 import os
+import mf_nc_guerre_ukraine.data.get_data as gd
 
 class Ukraine():
     def __init__(self, application = None):
-        self.equipement = pd.read_pickle('ukraine/data/russia_losses_equipment.pkl').fillna(method='ffill')
-        self.personnel = pd.read_pickle('ukraine/data/russia_losses_personnel.pkl').fillna(method='ffill')
+        self.START = "START"
+        self.STOP = "STOP"
+        self.equipement = gd.get_data('mf_nc_guerre_ukraine/data/russia_losses_equipment.pkl', ffill=True)
+        self.personnel = gd.get_data('mf_nc_guerre_ukraine/data/russia_losses_personnel.pkl', ffill=True)
+        self.personnel.rename({'POW':'Prisonnier de guerre', 'personnel':'Armee' },axis = 1, inplace = True)
 
-        self.threads = pd.read_pickle('ukraine/data/threads.pkl').filter(['created_at', 'num_comments', 'score', 'upvote_ratio']).fillna(0)
-        self.threads.created_at = self.threads.created_at.apply(lambda x: x[:10])
-        self.threads = self.threads.groupby('created_at').agg(list)
-        self.threads.num_comments = self.threads.num_comments.apply(lambda x: sum(x))
-        self.threads.score = self.threads.score.apply(lambda x: sum(x))
-        self.threads.upvote_ratio = self.threads.upvote_ratio.apply(lambda x: sum(x)/float(len(x)))
+        self.threads = gd.get_tweeter_threads('mf_nc_guerre_ukraine/data/threads.pkl')
 
         self.main_layout = html.Div(children=[
-            html.H3(children='Évolution du Stock d\'armement  de la Russie'),
+            html.H3(children='Évolution du Stock d\'armement de la Russie'),
             html.Div([ dcc.Graph(id='equipement-main-graph'), ], style={'width':'100%', }),
             html.Div([
                 html.Div([ html.Div('equipement'),
                            dcc.Dropdown(
                                id='equipement-dropdown',
                                options= [label for label in self.equipement.columns[2:]],
-                               value=1,
+                               value=[label for label in self.equipement.columns[2:5]],
                                multi=True,
                            )
                          ], style={'width': '15em'} ),
@@ -55,7 +54,8 @@ class Ukraine():
 
                 html.Br(),
                 dcc.Markdown("""
-                Le graphique est interactif. Vous pouvez voir l'equipement en fonction du temps de chaque pays
+                Ce graphique represente l'evolution du materiel militaire Russie de puis le debut de la guerre.
+                Sans surprise, on peut constater un pique d'achats d'armes des Russes au moment de l'attaque avec une evolution lineaire pour chaque equipement.
             
                 """),
                 html.Br(),
@@ -90,13 +90,12 @@ class Ukraine():
 
                      html.Br(),
                      dcc.Markdown("""
-                     Le graphique est interactif. Vous pouvez voir l'equipement en fonction du temps de chaque pays
+                     Nous pour regarder ici l'evolution de l'armee Russe et de ses prisonnier des guerres depuis le debut de la guerre
+                     Notes :
+                        * A partir du 31 Mars, nous n'avons plus d'informations sur les prisonniers de guerres en Russie et c'est pour cela qu'il n'y pas d'evolution des batonnets mais nous pouvons supposer une importante evolution de cette courbe
+                     
 
                      """),
-
-                
-
-
 
 
                 html.Br(),
@@ -111,17 +110,22 @@ class Ukraine():
                                 min=0,
                                 max=len(self.threads.index),
                                 step = 5,
-                                value=0,
+                                value=45,
                                 marks={str("day " + str(i)): str("day " + str(i)) for i in range(0,len(self.threads.index),10)},
                         ),
                         style={'display':'inline-block', 'width':"90%"}
                     ),
                     dcc.Interval(            # fire a callback periodically
-                        id='wps-auto-stepper',
+                        id='auto-stepper',
                         interval=500,       # in milliseconds
                         max_intervals = -1,  # start running
                         n_intervals = 0
                 ),
+                html.Button(
+                            self.START,
+                            id='button-start-stop', 
+                            style={'display':'inline-block'}
+                        ),
                 html.Div([ dcc.RadioItems(id='tweet-format', 
                                      options=[{'label':'Tweet', 'value':0},
                                               {'label':'Score', 'value':1}, 
@@ -133,6 +137,18 @@ class Ukraine():
                     'padding': '0px 50px', 
                     'width':'100%'
                 }),
+                html.Br(),
+                html.Br(),
+                dcc.Markdown("""
+                Ici nous pouvons observer l'evolution des Threads portant du la guerre en Ukraine sur Tweeter.
+                On peut constater un pique de re-tweet le 24 fevrier qui represente le jour de l'invasion
+
+                #### À propos
+                * Données : 
+                    * [2022 ukraine russian war stat](https://www.kaggle.com/datasets/piterfm/2022-ukraine-russian-war)
+                    * [Russian Invasion of Ukraine](https://www.kaggle.com/datasets/ioexception/rworldnews-russian-invasion-of-ukraine)
+                * (c) 2022 Massil Ferhani - Nikoloz Chaduneli
+                """),
         ], style={
             'backgroundColor': 'white',
              'padding': '10px 50px 10px 50px',
@@ -146,7 +162,6 @@ class Ukraine():
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
 
-
         self.app.callback(
                     dash.dependencies.Output('equipement-main-graph', 'figure'),
                     [dash.dependencies.Input('equipement-dropdown', 'value'), 
@@ -157,10 +172,25 @@ class Ukraine():
                     [dash.dependencies.Input('personnel-type', 'value')])(self.update_personnel)
         
         self.app.callback(
+            dash.dependencies.Output('button-start-stop', 'children'),
+            dash.dependencies.Input('button-start-stop', 'n_clicks'),
+            dash.dependencies.State('button-start-stop', 'children'))(self.button_on_click)
+        
+        self.app.callback(
+            dash.dependencies.Output('auto-stepper', 'max_interval'),
+            [dash.dependencies.Input('button-start-stop', 'children')])(self.run_movie)
+        
+        self.app.callback(
+            dash.dependencies.Output('tweets-slider', 'value'),
+            dash.dependencies.Input('auto-stepper', 'n_intervals'),
+            [dash.dependencies.State('tweets-slider', 'value'),
+             dash.dependencies.State('button-start-stop', 'children')])(self.on_interval)
+
+        self.app.callback(
                     dash.dependencies.Output('Tweet-main-graph', 'figure'),
                     [dash.dependencies.Input('tweet-format', 'value'),
                         dash.dependencies.Input('tweets-slider', 'value'), ])(self.update_tweet)
-        
+
     def update_equipement(self, equipement, axis):
         if not isinstance(equipement, list) or not len(equipement):
             return {}
@@ -169,7 +199,7 @@ class Ukraine():
         df = self.equipement[equipement]
         df = df.set_index('date')
         fig = px.line(df[df.columns[0]], template='plotly_white')
-        
+
         for c in df.columns[1:]:
             fig.add_scatter(x = df.index, y=df[c], mode='lines', name=c, text=c, hoverinfo='x+y+text')
             fig.update_layout(
@@ -179,48 +209,60 @@ class Ukraine():
                 legend = {'title': "equipement"},
                 )
         return fig
-    
+
     def update_personnel(self, personnel):
         if personnel == 0:
-            select = ["date", "personnel"]
+            select = ["date", "Armee"] 
         elif personnel == 1:
-            select = ["date", "POW"]
+            select = ["date", "Prisonnier de guerre"]
         else:
-            select = ["date", "personnel", "POW"]
+            select = ["date", 'Prisonnier de guerre', 'Armee']
         df = self.personnel[select]
         df = df.set_index('date')
-        fig = px.line(df[df.columns[0]], template='plotly_white')
-        
-        for c in df.columns[1:]:
-            fig.add_scatter(x = df.index, y=df[c], mode='lines', name=c, text=c, hoverinfo='x+y+text')
-            fig.update_layout(
-                yaxis = dict(type= 'log'),
-                height=450,
-                hovermode='closest',
-                legend = {'title': "equipement"},
-                )
+        fig = px.bar(df, x=df.index, y=df.columns)
+        fig.update_layout(
+            yaxis = dict(type= 'log'),
+        )
         return fig
     
+    def on_interval(self, n_intervals, step, text):
+        if text == self.STOP:  # then we are running
+            return (step + 1) % len(self.threads.index)
+        else:
+            return step  # nothing changes
+    
+    def button_on_click(self, n_clicks, text):
+        if text == self.START:
+            return self.STOP
+        else:
+            return self.START
+
+    # this one is triggered by the previous one because we cannot have 2 outputs
+    # in the same callback
+    def run_movie(self, text):
+        if text == self.START:    # then it means we are stopped
+            return 0 
+        else:
+            return -1
+
     def update_tweet(self, button, slider):
         tab = ""
+        x = ""
         if  button == 0 :
             tab = "num_comments"
+            x = "Nombre de re-tweet par jour"
         elif button == 1 :
             tab = "score"
+            x = "Score"
         else:
             tab = "upvote_ratio"
+            y = "Ratio"
         df = self.threads[[tab]].head(slider)
-        #fig = px.line(df[df.columns[0]], template='plotly_white')
-        #fig.add_scatter(x = df.index, y=df, mode='lines', name=tab, text=tab, hoverinfo='x+y+text')
-        #fig.update_layout(
-        #        height=450,
-        #        hovermode='closest',
-        #        )
         fig = px.line(df, template='plotly_white')
         fig.update_layout(
             #title = 'Évolution des prix de différentes énergies',
             xaxis = dict(title=""), # , range=['2010', '2021']), 
-            yaxis = dict(title="Nombre de re-tweet par jour"), 
+            yaxis = dict(title=x, type='log'), 
             height=450,
             showlegend=False,
         ) 

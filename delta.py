@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from ukraine import ukraine
+from mf_nc_guerre_ukraine import ukraine
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
