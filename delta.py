@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from EC_CD_Mariages_et_Divorces_en_France import mariages_divorces as md
+from EC_CD_Evolution_des_Mariages_en_France import mariages_en_France as md
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
