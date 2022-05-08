@@ -14,29 +14,11 @@ class DeathAnalysis():
     
     def __init__(self, application = None):
         #open Data
-        frame = pd.read_csv("deathanalysis/data/data.csv")
+        frame = pd.read_csv("deathanalysis/data/data.csv", sep=";")
         #Create Frame
 	    #New Start
         frame = frame.fillna(0)
-        self.mask_year = frame[(frame['Year']==2007)]
-        self.mask_country = frame['Entity'] == 'France'
-        #frame = frame.drop(['Code'], axis=1)
-        frame = frame.drop(["Number of executions (Amnesty International)"], axis=1)
-        frame = frame.drop(frame[frame.Code == 0].index)
-        frame = frame.drop(frame[frame.Code == "OWID_WRL"].index)
-        
-        
-        number_of_countries = ['Pays le plus touché', 'Les 3 pays les plus touchés', 'Les 5 pays les plus touchés', 'Les 10 pays les plus touchés', 'Les 20 pays les plus touchés']
 
-        frame.set_axis(['Country', 'Code', 'Year', 'Méningite', 'Cancer', 'Feu, chaleur et substances brulante'
-                         , 'Malaria', 'Noyade', 'Aggression physique', 'SIDA', 'Overdose médicamenteuse'
-                        , 'Tuberculose', 'Accident routier', 'Trouble maternel', 'Infection respiratoire'
-                        , 'Désordre Néonatal', 'Alcoolisme', 'Forces de la nature'
-                        , 'Maladie diarrhéique', 'Exposition à la chaleur et au froid environmentale', 'Déficite nutritionnel'
-                        , 'Auto infligé', 'Conflit et terrorisme', 'Diabetes', 'Empoisonement', 'Malnutrition', 'Terrorisme', 'Maladie cardiovasculaire'
-                        , 'maladie rénale chronique', 'maladie réspiratoire chronique', 'Cirrhose et autre maladie chronique du foie', 'Maladie digestive', 'Hépatite aiguë'
-                        , 'Alzheimer et autre démences', 'maladie de Parkinson'], axis=1, inplace=True)
-                                
         self.select_columns = ['Méningite', 'Cancer', 'Feu, chaleur et substances brulante'
                          , 'Malaria', 'Noyade', 'Aggression physique', 'SIDA', 'Overdose médicamenteuse'
                         , 'Tuberculose', 'Accident routier', 'Trouble maternel', 'Infection respiratoire'
@@ -44,7 +26,13 @@ class DeathAnalysis():
                         , 'Maladie diarrhéique', 'Exposition à la chaleur et au froid environmentale', 'Déficite nutritionnel'
                         , 'Auto infligé', 'Conflit et terrorisme', 'Diabetes', 'Empoisonement', 'Malnutrition', 'Terrorisme', 'Maladie cardiovasculaire'
                         , 'maladie rénale chronique', 'maladie réspiratoire chronique', 'Cirrhose et autre maladie chronique du foie', 'Maladie digestive', 'Hépatite aiguë'
-                        , 'Alzheimer et autre démences', 'maladie de Parkinson']   
+                        , 'Alzheimer et autre démences', 'maladie de Parkinson'] 
+
+        self.mask_year = frame[(frame['Year']==2007)]
+        self.mask_country = frame['Country'] == 'France'
+        
+        
+        number_of_countries = ['Pays le plus touché', 'Les 3 pays les plus touchés', 'Les 5 pays les plus touchés', 'Les 10 pays les plus touchés', 'Les 20 pays les plus touchés']
 
         #Extract Series
         country = frame['Country']
@@ -113,9 +101,10 @@ class DeathAnalysis():
 
         html.Div([  dcc.Dropdown( number_of_countries, 'Les 10 pays les plus touchés',placeholder='Select top countries...', id='countries-dropdown')]),
         
-        ])
         html.Br(),
         dcc.Markdown("""
+        #### Information Générale
+
         La carte du monde intéractive permet de nous montrer avec précision l'impact et l'évolution de la cause de mortalité étudié à travers le temps.
         On observe une disparité entre les pays développés et les pays en voie de développement.
 
@@ -123,14 +112,18 @@ class DeathAnalysis():
 
         Le graphique en nuage de point indique l'évolution de la cause sur les trentes dernières années.
 
-        Comme exemple nous pouvons citer la hausse du cancer au Canada et de la diminution de la malaria en Inde.
+        Comme exemple, nous pouvons citer la hausse du cancer au Canada (En %) et de la diminution de la malaria en Inde (En %) (Visible sur la carte intéractive).
         #### À propos
 
         * Données : https://ourworldindata.org/causes-of-death
 
         * (c) 2022 Jean-Baptiste DELOGES Hugo CANTON-BACARA
-        """)
+        """),
+        ]),
         
+  
+        html.Br(),
+
 
         if application:
             self.app = application
