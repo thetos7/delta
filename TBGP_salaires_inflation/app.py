@@ -104,8 +104,8 @@ class SalaryInflation():
                     ### A propos
 
                     * Sources :
-                    * [Le salaire médian en Europe selon l'âge et le sexe](https://ec.europa.eu/eurostat/fr/web/products-datasets/-/ILC_DI03) par Eurostat
-                    * [L'évolution annuelle de l'inflation depuis 1995](https://data.oecd.org/fr/price/inflation-ipc.htm) par l'OCDE
+                        * [Le salaire médian en Europe selon l'âge et le sexe](https://ec.europa.eu/eurostat/fr/web/products-datasets/-/ILC_DI03) par Eurostat
+                        * [L'évolution annuelle de l'inflation depuis 1995](https://data.oecd.org/fr/price/inflation-ipc.htm) par l'OCDE
                     * (c) 2022 Guillaume POISSON et Théo BACHIR
                     """),
             ])
