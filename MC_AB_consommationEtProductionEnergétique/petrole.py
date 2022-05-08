@@ -92,7 +92,7 @@ class Petrole():
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
                 html.Div([
-                    html.H2('Les plus gros exportateurs de pétrole:'),
+                    html.H2('Les 10 plus gros exportateurs de pétrole:'),
                     html.Div([ dcc.Graph(id='big-import-graph'), ], style={'width': '100em' })])
             ], style={'display': 'flex', 'justify-content': 'space-between'}),
             html.Div([
