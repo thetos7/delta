@@ -4,25 +4,11 @@ import plotly.express as px
 import dash
 from dash import Dash, html, dcc
 
-def get_data() : 
-    data = pd.read_csv("aa_sc_metacritic/data/vgcritics.csv")
-    data = data.loc[(data.critics > 5) & (data.genre != "No info")]
-    data = data.loc[data['user score'] != 'tbd']
-    data['r-date'] = pd.to_datetime(data['r-date'], format='%B %d, %Y')
-    
-    data_sales = pd.read_csv("aa_sc_metacritic/data/vgsales.csv")
-    
-    # Same name easier merged between both data base  
-    name_corres = [("Xone", "XboxOne"), ("X360", "Xbox360"), ("XB", "Xbox"), ("PS4", "PlayStation4"), ("PS3", "PlayStation3"), ("PS2", "PlayStation2"), ("PS", "PlayStation"), ("GC", "GameCube"), ("GBA", "GameBoyAdvance"), ("N64", "Nintendo64"), ("PSV", "Playstation")]
-    data_sales.rename(columns = {"Name": "name", "Platform": "platform"}, inplace = True)
-    for pair in name_corres : 
-        data_sales.loc[data_sales['platform'] == pair[0], 'platform'] = pair[1]
-        
-    return data, data_sales
 
 class Metacritic():
     def __init__(self, application=None): 
-        self.data, self.data_sales = get_data()
+        self.data = pd.read_pickle("aa_sc_metacritic/data/vgcritics.pkl")
+        self.data_sales = pd.read_pickle("aa_sc_metacritic/data/vgsales.pkl")
         
         genre_list = ["Action", "Adventure", "Arcade", "Sports", "Fighting", "Open-World", "Role-Playing", "RPG", "Platformer", "Fantasy", "Shooter", "Simulation", "Racing", "Survival"]
         fig_plat = self.update_graph_plateforme(2007)

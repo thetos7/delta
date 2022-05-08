@@ -4,7 +4,7 @@ def get_data():
     data = pd.read_csv("vgcritics.csv")
     data = data.loc[(data.critics > 5) & (data.genre != "No info")]
     data = data.loc[data['user score'] != 'tbd']
-    data['r-date'] = pd.to_datetime(self.data['r-date'], format='%B %d, %Y')
+    data['r-date'] = pd.to_datetime(data['r-date'], format='%B %d, %Y')
     
     data_sales = pd.read_csv("vgsales.csv")
     
@@ -14,7 +14,7 @@ def get_data():
     for pair in name_corres : 
         data_sales.loc[data_sales['platform'] == pair[0], 'platform'] = pair[1]
 
-    data.to_csv("vgcritics_clean.csv")
-    data_sales.to_csv("vgsales_clean.csv")
+    data.to_pickle("vgcritics.pkl")
+    data_sales.to_pickle("vgsales.pkl")
 
 get_data()
