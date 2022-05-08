@@ -16,7 +16,7 @@ class Parrainage():
 
     def __init__(self, application = None):
         fetch_data()
-        self.df = pd.read_csv("parrainage/data/parrainagestotal.csv", sep=";")
+        self.df = pd.read_csv("parrainage/data/parrainagestotal.csv", sep=";", infer_datetime_format=True)
         self.df['Date de publication'] = pd.to_datetime(self.df['Date de publication'], format='%d/%m/%Y')
         self.candidats_occurences = self.df['Candidat'].value_counts()
         self.candidats_list = self.candidats_occurences[self.candidats_occurences > 500].keys()
@@ -47,6 +47,18 @@ class Parrainage():
                 }),            
             html.Br(),
             html.Div([ dcc.Graph(id='par-main-map') ], style={'width':'100%'}),    
+            dcc.Markdown("""
+                ### Commentaires
+                - Bénéficiant d'un fort ancrage territoriale, Valérie PÉCRESSE fait partie des candidats ayant rapidement atteint le seuil des 500 signatures. C'est elle qui parvient à récolter le plus de parrainages au total. On peut constater qu'un grand nombre de ces signatures provient de son fief, l'Île-de-France, où elle est présidente de région.
+                - Emmanuel MACRON récolte également un grand nombre de signatures dés le début de la course, bénéficiant de son status de président sortant.
+                - Anne HIDALGO bénéficie de l'ancrage territoriale du Parti Socialiste. On peut remarquer le nombre élevé de parrainages dans le sud-ouest, où de nombreux élus socialistes siègent.
+                - Jean-Luc MÉLENCHON parvient à obtenir les 500 signatures plus tardivement et bénéficie d'une accélération sur la fin de la période. Il ne dispose pas d'ancrage territorial particulier.
+                - Malgré son omni-présence médiatique, Éric ZEMMOUR obtient ses 500 signatures avec difficulté. La plupart proviennent de zones rurales : on peut par exemple remarquer qu'il n'a reçu aucun parrainage d'élus Parisiens, et un très faible nombre en Île-de-France.
+                - Yanick JADOT reçoit un grand nombre de parrainages dans le département du Rhône. Cela s'explique par le fait que la métropole de Lyon est administrée par son parti, Europe Écologie les Verts.
+                - Jean LASSALLE bénéficie d'un grand nombre de signatures depuis le département où il a été maire puis député. Par ailleurs, il est intéressant de remarquer qu'il est le candidat à obtenir le plus de parrainages depuis la Corse.
+                - Fabien ROUSSEL obtient son plus grand de parrainages dans le département du Nord, qu'il représente en tant que député.
+                - Marine LE PEN reçoit la plupart de ses signatures depuis des départements ruraux. Elle réunit le plus de parrainages dans le département du Pas-de-Calais, où elle est député.
+            """),
             dcc.Markdown("""
                 # Sources
                     * [Jeu de données parrainage des candidats pour l'élection présidentielle 2022](https://www.data.gouv.fr/fr/datasets/parrainages-des-candidats-a-lelection-presidentielle-francaise-de-2022/)
@@ -95,12 +107,12 @@ class Parrainage():
 
 
         df_count_by_date = pd.DataFrame(
-            {"Parrainages ce jour": count_by_date["size"], "Parrainages total": count_by_date["size"].cumsum()}, index=index)
+            {"Nouveaux parrainages": count_by_date["size"], "Parrainages au total": count_by_date["size"].cumsum()}, index=index)
 
         df_count_by_date = df_count_by_date.reset_index().melt('date', var_name="Catégorie", value_name="y")
 
-        fig = px.line(df_count_by_date, template='plotly_white', x='date', y='y', color='Catégorie')
-        fig.update_traces(hovertemplate='%{y} parrainages le %{x:%d/%m/%y}')
+        fig = px.line(df_count_by_date, template='plotly_white', x='date', y='y', color='Catégorie', line_shape='spline')
+        fig.update_traces(hovertemplate='%{y} parrainages le %{x:%d/%m/%y}', mode="lines+markers")
         fig.update_layout(hovermode="x unified", title="Évolution du nombre de parrainages par candidat à la présidentielle")
         fig.update_layout(
             xaxis = dict(title="Date de publication", tickformat="%d-%m-%Y"),
@@ -114,7 +126,7 @@ class Parrainage():
         
         candidat_df = self.df[self.df['Candidat'] == candidat]
         department_candidat_df = candidat_df.groupby("Département")
-        candidat_repertition_per_departement = department_candidat_df["Département"].count().to_frame(name="Score").reset_index()
+        candidat_repertition_per_departement = department_candidat_df["Département"].count().to_frame(name="Parrainages").reset_index()
 
         fig_map = px.choropleth_mapbox(
             candidat_repertition_per_departement,
@@ -122,9 +134,9 @@ class Parrainage():
             locations='Département',
             featureidkey="properties.nom",
             mapbox_style='carto-positron',
-            color="Score",
+            color="Parrainages",
             color_continuous_scale=px.colors.sequential.Blues,
-            hover_data={'Score': True},
+            hover_data={'Parrainages': True},
             zoom=3.8,
             center={'lat': 47, 'lon': 2},
             opacity=1.0,
