@@ -14,7 +14,7 @@ class DeathAnalysis():
     
     def __init__(self, application = None):
         #open Data
-        frame = pd.read_csv("deathanalysis/data/death.csv")
+        frame = pd.read_csv("deathanalysis/data/data.csv")
         #Create Frame
 	    #New Start
         frame = frame.fillna(0)
@@ -116,14 +116,19 @@ class DeathAnalysis():
         ])
         html.Br(),
         dcc.Markdown("""
-        Le graphique est interactif. Vous pouvez séléctionner la cause que vous souhaitez étudier.
+        La carte du monde intéractive permet de nous montrer avec précision l'impact et l'évolution de la cause de mortalité étudié à travers le temps.
+        On observe une disparité entre les pays développés et les pays en voie de développement.
 
+        Le graphique en camembert indique le positionnement des pays vis-à-vis de la cause
 
+        Le graphique en nuage de point indique l'évolution de la cause sur les trentes dernières années.
+
+        Comme exemple nous pouvons citer la hausse du cancer au Canada et de la diminution de la malaria en Inde.
         #### À propos
 
-        * Sources : https://ourworldindata.org/causes-of-death
+        * Données : https://ourworldindata.org/causes-of-death
 
-        * (c) 2022 Olivier Ricou
+        * (c) 2022 Jean-Baptiste DELOGES Hugo CANTON-BACARA
         """)
         
 
