@@ -26,7 +26,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
                               html.Br(),
-                              dcc.Link(html.Button('CO₂ vs population urbaine', style={'width':"100%"}), href='/tc_urban'),
+                              dcc.Link(html.Button('CO₂ vs Urbanisation', style={'width':"100%"}), href='/tc_urban'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
