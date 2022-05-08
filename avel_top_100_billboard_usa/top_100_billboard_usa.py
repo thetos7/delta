@@ -79,9 +79,9 @@ class Top100BillboardUSA:
                     inline=True,
                 ),
                 html.Div(id='weeks-on-board-count-plots'),
-                html.P("Si l'on regarde le graphe ci-dessus, on remarque deux pics aberrants: un premier, "
+                html.P("Si l'on regarde le graphe ci-dessus, on remarque deux pics aberrants : un premier, "
                        "très extrême, à la 20e semaine, et un second, plus modéré, à la 52e semaine. "),
-                html.P("Il s'avère qu'à la fin de l'année 1991, le Billboard a institué une « règle de récurrence »."
+                html.P("Il s'avère qu'à la fin de l'année 1991, le Billboard a institué une « règle de récurrence ». "
                        "Elle stipule que les chansons qui ont figuré au classement pendant 20 semaines sont retirées "
                        "si elles se classent en dessous de la 50e place et de même pour les chansons au classement "
                        "depuis 1 an, si elles se trouvent en dessous de la 25e position."),
@@ -96,20 +96,20 @@ class Top100BillboardUSA:
                 html.P("Bien qu'il ait été officiellement lancé en 1958, le Billboard n'a vu une entrée « fulgurante "
                        "» pour la première fois qu'en 1995. En effet, des données plus modernes sur la diffusion "
                        "et les ventes ont commencé à être utilisées à partir de 1991. Cela a ainsi permis des "
-                       "calculs plus rapides et des classements plus précis"),
+                       "calculs plus rapides et des classements plus précis."),
                 html.P(["Qui d'autre que Mickael Jackson pour réaliser cet exploit en premier avec « You Are Not "
                         "Alone » ? ",
                         html.Br(),
                         "Il est amusant de constater que dans la même année, Whitney Houston et Mariah "
                         "Carey ont également réussi ce tour de force par deux fois."]),
-                html.P(["Si l'on ignore les années 2020 et 2021, cela semble être un évènement très exceptionnel. Il "
+                html.P(["Si l'on ignore les années 2020 et 2021, cela semble être un événement très exceptionnel. Il "
                         "est souvent lié à des sorties de films comme « Où sont les hommes ? », « Titanic » ou encore "
                         "« Armageddon ». Des chanteurs découverts du jour au lendemain grâce à des émissions comme « "
-                        "American Idol », très populaire aux Etats-Unis, sont également à l'origine de cet "
-                        "évènement.",
+                        "American Idol », très populaire aux Etats-Unis, sont également à l'origine de ces "
+                        "événements.",
                         html.Br(),
-                        "On remarque cependant que les années 2020 et 2021 voient ce phénomène apparaître 3 fois plus "
-                        "souvent : constat peu étonnant compte tenu de l'hyperconsommation de notre société qui crée "
+                        "On remarque cependant que ce phénomène est apparu 3 fois plus souvent ces deux dernières années "
+                        ": constat peu étonnant compte tenu de l'hyperconsommation de notre société qui crée "
                         "l'insatisfaction permanente où les modes y sont de plus en plus éphémères."]),
             ]),
 
@@ -173,7 +173,7 @@ class Top100BillboardUSA:
 
         fig.update_yaxes(range=[100, 0])
         fig.update_layout(
-            title=f"Songs ranking for {artist}",
+            title=f"Classement des musiques de {artist}",
             xaxis_title="Date",
             yaxis_title="Classement",
             height=height,
