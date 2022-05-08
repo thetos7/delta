@@ -64,8 +64,8 @@ class RGPD():
             html.H4(children="Évolution du nombre de notifications et DPOs"),
             dcc.Markdown("""Le data frame suivant montre la correspondance entre la nomenclature de l'INSEE et le secteur d'activité.  
             Les nomenclatures d'activités ont été élaborées principalement en vue de faciliter l'organisation de l'information économique et sociale.  
-            Cette nomenclature est utilisée dans les graphiques suivants.  
             Source: https://www.insee.fr/fr/metadonnees/nafr2/sousClasse/01.12Z?champRecherche=false  
+            Cette nomenclature est utilisée dans les graphiques suivants.  
             Remarque: La derniere ligne contenant X/Inconnu à été rajouté par nos soin afin de pouvoir prendre en compte les valeures manquantes.  
             """),
             html.Div([ dcc.Graph(figure=self.update_1_insee())], style={'width':'100%', }),
@@ -123,7 +123,7 @@ class RGPD():
             dcc.Markdown("""
             ** Pour le nombre brut de notifications par mois.**  
             * L'activité est globalement homogène avec une tendance à la hausse.  
-            * Le premier mois est vide car les notifications prennent du un peu de temps pour être traitées par la CNIL, et seront conptées dans le deuxième mois.  
+            * Le premier mois est vide car les notifications prennent un peu de temps pour être traitées par la CNIL, et seront conptées dans le deuxième mois.  
             * Il y 3 gros pics de notifications dans 3 secteurs d'activité biens précis qui sont : "hébergement et restauration", "santé humaine et action sociale" et "activités spécialisées, scientifiques et techniques".  
             """),
             html.Br(),
@@ -189,15 +189,15 @@ class RGPD():
 
             dcc.Markdown("""
             #### À propos
-            Sources : 
-            * [Nomenclature de l'INSEE](https://www.insee.fr/fr/metadonnees/nafr2/section/A?champRecherche=false) sur insee.fr
-            * [Liste des DPO](https://www.data.gouv.fr/fr/datasets/organismes-ayant-designe-un-e-delegue-e-a-la-protection-des-donnees-dpd-dpo/) sur data.gouv.fr
-            * [Liste des Notifications](https://www.data.gouv.fr/fr/datasets/notifications-a-la-cnil-de-violations-de-donnees-a-caractere-personnel/) sur data.gouv.fr
-            * [Budget de la CNIL](https://www.data.gouv.fr/fr/datasets/budget-de-la-cnil-1/) sur data.gouv.fr
-            * [Montant des sanctions](https://www.cnil.fr/fr/les-sanctions-prononcees-par-la-cnil) sur cnil.fr
-            * [Controles de la CNIL](https://www.data.gouv.fr/fr/datasets/controles-realises-par-la-cnil/) sur data.gouv.fr
-            * [Mise en demeure de la CNIL](https://www.data.gouv.fr/fr/datasets/mises-en-demeure-prononcees-par-la-cnil/) sur data.gouv.fr
-            * [Sanctions de la CNIL](https://www.data.gouv.fr/fr/datasets/sanctions-prononcees-par-la-cnil/) sur data.gouv.fr
+            Sources :  
+            * [Nomenclature de l'INSEE](https://www.insee.fr/fr/metadonnees/nafr2/section/A?champRecherche=false) sur insee.fr  
+            * [Liste des DPO](https://www.data.gouv.fr/fr/datasets/organismes-ayant-designe-un-e-delegue-e-a-la-protection-des-donnees-dpd-dpo/) sur data.gouv.fr  
+            * [Liste des Notifications](https://www.data.gouv.fr/fr/datasets/notifications-a-la-cnil-de-violations-de-donnees-a-caractere-personnel/) sur data.gouv.fr  
+            * [Budget de la CNIL](https://www.data.gouv.fr/fr/datasets/budget-de-la-cnil-1/) sur data.gouv.fr  
+            * [Montant des sanctions](https://www.cnil.fr/fr/les-sanctions-prononcees-par-la-cnil) sur cnil.fr  
+            * [Controles de la CNIL](https://www.data.gouv.fr/fr/datasets/controles-realises-par-la-cnil/) sur data.gouv.fr  
+            * [Mise en demeure de la CNIL](https://www.data.gouv.fr/fr/datasets/mises-en-demeure-prononcees-par-la-cnil/) sur data.gouv.fr  
+            * [Sanctions de la CNIL](https://www.data.gouv.fr/fr/datasets/sanctions-prononcees-par-la-cnil/) sur data.gouv.fr  
             (c) 2022 Théo Perinet et Marc Monteil
             """)
         ], style={
@@ -279,7 +279,7 @@ class RGPD():
     
     def update_2_argent(self, echelle):
         df = self.budget_cnil_sanctions
-        df.columns = ["Budget de la CNIL", "Somme des montants des sanctions"]
+        df.columns = ["Somme des montants des sanctions", "Budget de la CNIL"]
 
         fig = px.line(df)
 
