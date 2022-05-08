@@ -54,8 +54,7 @@ class Accidents():
             * On observe cependant sans surprise que le nombre d'accidents en intersection reste proportionellement bien plus élevé que sur route droite.
             * Les routes communales et départementales semblent statistiquement plus mortifères que les autres (moins entretenues, moins de vigilance,..).
             * Les accidents sont prévalents le jour car les routes sont bien plus fréquentées. Cependant, on observe en moyenne autant d'accidents la nuit pour une fréquentation inférieure (manque de luminosité fatiguant plus vite, fatigue entraînant une baisse de vigilance).
-
-
+            * On obverse aussi une forte baisse des accidents sur les routes tracées en 's' à partir de 2018. Les routes tracées en 's' sont principalement départementales ou nationales et cette baisse est liée au changement de limitation de vitesse sur ces routes, passant de 90km/h à 80km/h.
             * Les mois de mars et surtout d'avril 2020 sont marqués par une drastique baisse des accidents en toute catégories, facilement corrélable avec la période de confinement, entrainant une baisse radicale de la frequentation des routes.
 
 
@@ -145,6 +144,7 @@ class Accidents():
                 color = data[column2].astype('int64').apply(lambda i: switch_categorie(column2)[i-1]),
                 color_discrete_sequence=color_list_test,
                 labels = {'x':switch_legende(column1), "color":switch_legende(column2)},
+                title="Nombre d'accident en fonction " + switch_titre_histo(column1) + " et " + switch_titre_histo(column2)
                 )
         fig.update_layout(legend=dict( orientation = "h",
             yanchor = "bottom", y = 1.05,
@@ -180,6 +180,19 @@ def switch_titre(strg):
             "int": "Nombre d'accident en fonction du type d'intersection de la voie" 
             }
     return switcher.get(strg)
+
+def switch_titre_histo(strg):
+        switcher = {
+            "catr": "de la catégorie de la route",
+            "plan": "du tracé en plan",
+            "surf": "de l'état de la surface",
+            "prof": "de la déclivité",
+            "lum": "de l'éclairage",
+            "atm": "des conditions atmosphériques",
+            "col": "du type de collision",
+            "int": "du type d'intersection de la voie" 
+        }
+        return switcher.get(strg)
 
 def switcher_categorie(strg, df_test):
     if (strg == "catr"):
