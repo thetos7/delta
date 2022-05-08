@@ -3,7 +3,9 @@ import dash
 from dash.dependencies import Input, Output
 import dash_daq as daq
 import flask
+import matplotlib.pyplot as plt
 from dash import dcc
+from dash import dash_table
 from dash import html
 from dash import callback_context
 import pandas as pd
@@ -29,38 +31,74 @@ def int_to_time(i):
   return res
 
 
-def month_to_subset(month):
+def month_to_subset(month, north):
     if month == 1:
+        if north:
+            return 'NH Jan'
         return 'SH Jan'
     if month == 2:
+        if north:
+            return 'NH Feb'
         return 'SH Feb'
     if month == 3:
+        if north:
+            return 'NH Mar'
         return 'SH Mar'
     if month == 4:
+        if north:
+            return 'NH Apr'
         return 'SH Apr'
     if month == 5:
+        if north:
+            return 'NH May'
         return 'SH May'
     if month == 6:
+        if north:
+            return 'NH Jun'
         return 'SH Jun'
     if month == 7:
+        if north:
+            return 'NH Jul'
         return 'SH Jul'
     if month == 8:
+        if north:
+            return 'NH Aug'
         return 'SH Aug'
     if month == 9:
+        if north:
+            return 'NH Sep'
         return 'SH Sep'
     if month == 10:
+        if north:
+            return 'NH Oct'
         return 'SH Oct'
     if month == 11:
+        if north:
+            return 'NH Nov'
         return 'SH Nov'
     if month == 12:
+        if north:
+            return 'NH Dec'
         return 'SH Dec'
+
+def convert_where(place):
+    if place == 'Jetée':
+        return 'Pier'
+    if place == 'Mer':
+        return 'Sea'
+    if place == 'Lac':
+        return 'Pond'
+    if place == 'Rivière':
+        return 'River'
 
 class Animal():
     def __init__(self, application = None):
         self.background_color = '#FFFEFF'
         self.title_color = '#540B0E'
         self.trace_color = ['B6F7FF']
-        
+
+        self.north = True
+        self.onglet = 'POISSON'
         self.pie_chart_colors = ['#C4DDFF', '#7FB5FF', '#001D6E', '#FEE2C5']
         self.df = pd.read_csv('lmsb_animalcrossing/data/fish.csv')
         
@@ -108,6 +146,11 @@ class Animal():
                             'margin' : '0px 0px 10px 10px'
                         }
                     ),
+                daq.BooleanSwitch(
+                    id = 'north_switch',
+                    label = 'Hemisphère Nord',
+                    on = True
+                )
                 html.Br(),
                 html.Div([
                     dcc.Graph(id='fishY',
@@ -139,18 +182,21 @@ class Animal():
                         daq.BooleanSwitch(
                         id = 'rain_switch',
                         on = False,
-                        color = '#614124',
+                        label = 'Pluie',
+                        color = '#614124'
                         ),
                         style = {"width" : '200 px',
                                 'margin' : '0px 0px 0px 10px ',
                                 }
-                        )],
+                        )
+                    ],
                     style={ 'display' : 'flex',
                             'flexDirection' : 'row'}
                 ),
                 html.Br(),
-                html.Div(children='coucou', id='label-test'),
+                html.P(id='trash'),
                 html.Div([
+                    html.Div([
                     dcc.Graph(id='fish_month',
                         style={'width' : '100%',
                                 'display':'inline-block',
@@ -188,7 +234,16 @@ class Animal():
                     )],
                     style={'width' : '50%'}
                     ),
-                ])
+                    html.Div([
+                        dash_table.DataTable(id='tableau_poisson')], 
+                    style={'width'
+                        :'50%'}
+                    )
+                ],
+                style={ 'display' : 'flex',
+                            'flexDirection' : 'row'}
+                )
+            ])
 
 
         if application:
@@ -202,7 +257,10 @@ class Animal():
                 dash.dependencies.Output('fish_month', 'figure'),
                 [dash.dependencies.Input('month_dropdown', 'value'),
                     dash.dependencies.Input('rain_switch', 'on'),
-                    dash.dependencies.Input('hour_slider', 'value')]
+                    dash.dependencies.Input('bpoisson', 'n_clicks'),
+                    dash.dependencies.Input('binsecte', 'n_clicks'),
+                    dash.dependencies.Input('hour_slider', 'value'),
+                    dash.dependencies.Input('north_switch', 'on')]
                 )(self.change_month)
 
 
@@ -210,65 +268,121 @@ class Animal():
         self.app.callback(
             dash.dependencies.Output('fishY', 'figure'),
             [dash.dependencies.Input('bpoisson', 'n_clicks'),
-             dash.dependencies.Input('binsecte', 'n_clicks')],
+             dash.dependencies.Input('binsecte', 'n_clicks'),
+             dash.dependencies.Input('north_switch', 'on')],
             [dash.dependencies.State('bpoisson', 'id'),
                 dash.dependencies.State('binsecte', 'id')]
             )(self.displayGraph)
 
         self.app.callback(
-            dash.dependencies.Output('label-test', 'children'),
-            [dash.dependencies.Input('fish_month', 'clickData')]
+            dash.dependencies.Output('tableau_poisson', 'data'),
+            [dash.dependencies.Input('fish_month', 'clickData'),
+            dash.dependencies.Input('month_dropdown', 'value'),
+            dash.dependencies.Input('hour_slider', 'value'),
+            dash.dependencies.Input('rain_switch', 'on')]
                 )(self.click_on_data)
 
-    def click_on_data(self, clickData):
+    def click_on_data(self, clickData, month, hour, rain):
         point_info = clickData['points']
-        print(point_info[0]['label'])
-        return 'eheh'
-
-    
-    def displayGraph(self, btn1, btn2, id1, id2):
-        changed_id = [p['prop_id'] for p in callback_context.triggered][0]
-        if id2 + '.n_clicks' == changed_id:
-            dfg = pd.read_csv('data/insect.csv')
+        fish = self.df
+        sub = month_to_subset(month)
+        lieu = convert_where(point_info[0]['label'])
+        if rain :
+            fish = fish[fish['Where/How'].str.match(lieu)]
         else:
-            fish = pd.read_csv('lmsb_animalcrossing/data/fish.csv')
-            self.df = fish
-            fishmonth = fish.filter(regex='SH *', axis = 1)
-            fish_count = fishmonth.count()
+            fish = fish[fish['Where/How'] == lieu]
+        fish = fish[fish[sub].notnull()]
+        res = []
+        for i in int_to_time(hour):
+            res.append(fish[fish[sub] == i])
+        fish_hour = pd.concat(res).drop_duplicates()
+        for i in fish_hour.columns:
+            if i != 'Sell' and i != 'Name' and i != 'Catch Difficulty':
+                fish_hour = fish_hour.drop(columns=i)
+        fish_hour = fish_hour.sort_values(by=['Sell'], ascending=False)
+        return fish_hour.to_dict('records')
 
+
+    def displayGraph(self, btn1, btn2,north, id1, id2):
+        print(north)
+        changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+        list_month = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+        if id2 + '.n_clicks' == changed_id:
+            self.onglet = 'INSECTE'
+        if id1 + '.n_clicks' == changed_id:
+            self.onglet = 'POISSON'
+        if self.onglet == 'INSECTE':
+            insect = pd.read_csv('lmsb_animalcrossing/data/insects.csv')
+            self.df = insect
+            if north:
+                insectmonth = insect.filter(regex='NH *', axis = 1)
+            else:
+                insectmonth = insect.filter(regex='SH *', axis = 1)
+            insect_count = insectmonth.count()
             res = []
-
-            for i in fish_count:
+            for i in insect_count:
                 res.append(i)
-
-            list_month = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
- 
+            print(len(res))
             fig = dict({
                 "data": [{"type" : "bar",
                             "x" : list_month,
                             "y" : res}],
-            "layout": 
-            {
-                'colorway' : self.trace_color,
-                "title": 
+                "layout": 
                 {
-                    'font': 
+                    'colorway' : self.trace_color,
+                    "title": 
                     {
-                        'color' : self.title_color,
-                        'size' : '18px',
-                        'font-family' : 'FinkHeavy'
+                        'font': 
+                        {
+                            'color' : self.title_color,
+                            'size' : '18px',
+                            'font-family' : 'FinkHeavy'
+                        },
+                        "text": "Le nombre d'insectes disponibles en fonction du mois"
                     },
-                    "text": "Le nombre de poissons disponibles en fonction du mois"
-                },
-                'paper_bgcolor': self.background_color,
-                'plot_bgcolor': self.background_color
-            }})
-            return fig
+                    'paper_bgcolor': self.background_color,
+                    'plot_bgcolor': self.background_color
+                }
+            })
+        else:
+            self.onglet = 'POISSON'
+            fish = pd.read_csv('lmsb_animalcrossing/data/fish.csv')
+            self.df = fish
+            if north:
+                fishmonth = fish.filter(regex='NH *', axis = 1)
+            else:
+                fishmonth = fish.filter(regex='SH *', axis = 1)
+            fish_count = fishmonth.count()
+            res = []
+            for i in fish_count:
+                res.append(i)
+            fig = dict({
+                "data": [{"type" : "bar",
+                            "x" : list_month,
+                            "y" : res}],
+                "layout": 
+                {
+                    "title": 
+                    {
+                        'font': 
+                        {
+                            'color' : self.title_color,
+                            'size' : '18px',
+                            'font-family' : 'FinkHeavy'
+                        },
+                        "text": "Le nombre de poissons disponibles en fonction du mois"
+                    },
+                    'paper_bgcolor': self.background_color,
+                    'plot_bgcolor': self.background_color
+                }
+            })
+        return fig
 
 
 
-    def change_month(self, month, rain, hour):
-        sub = month_to_subset(month)
+    def change_month(self, month, rain, btn1, btn2, hour, north):
+        changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+        sub = month_to_subset(month, north)
         tmp = []
         for i in int_to_time(hour):
             tmp.append(self.df[self.df[sub] == i])
@@ -276,18 +390,28 @@ class Animal():
 
         res_hour = fish_hour.groupby(['Where/How'])
         sell_mean = res_hour.mean()['Sell']
-        if rain:
-            res = [int(sell_mean[0]), int(sell_mean[1]), int(sell_mean[2]), int(sell_mean[3]) + int(sell_mean[4])]
-        else :
-            res = [int(sell_mean[0]), int(sell_mean[1]), int(sell_mean[2]), int(sell_mean[3])]
-        x = np.arange(3)
-        lieux = ['Jetée', 'Lac', 'Rivière', 'Mer']
-        
+        changed_id = [p['prop_id'] for p in callback_context.triggered][0]
+        if self.onglet == 'POISSON':
+            if rain:
+                res = [int(sell_mean[0]), int(sell_mean[1]), int(sell_mean[2]), int(sell_mean[3]) + int(sell_mean[4])]
+            else :
+                res = [int(sell_mean[0]), int(sell_mean[1]), int(sell_mean[2]), int(sell_mean[3])]
+            x = np.arange(3)
+            lieux = ['Jetée', 'Lac', 'Rivière', 'Mer']
+        else:
+            res = []
+            for i in sell_mean:
+                res.append(int(i))
+            x = np.arange(24)
+            lieux = ['Caché sur le rivage', 'Caché sous les arbres', 'Volant', 'Volant près des fleurs bleues, violettes ou noires', 'Volant près des fleurs', 'Volant près de déchets ou de navets pourris', 'Volant près des sources de lumière', "Volant près de l'eau", "En tapant des pierres", "Sur des rochers", "Sur des fleurs", "Sur des bois feuillus ou des cèdres", "Sur des palmiers", "Sur des rivières ou des lacs", "Sur des pierres ou des buissons", "Sur des navets pourris", "Sur le sol", "Sur des souches", "Sur des arbres", "Sur des villageois", "Sur des fleurs blanches", "En train de pousser des boules de neige", "En secouant des arbres (cèdres ou feuillus", "Sous un sol en creusant"]
         fig = go.Figure(data=[go.Pie(labels=lieux, values=res, hole=.2)])
         fig.update_traces(textinfo='value', textfont_size=20,
                 marker=dict(colors= self.pie_chart_colors, line=dict(color='#000000', width=2)))
         fig.update_layout(clickmode='event+select')
+
         return fig
+
+
 
     def run(self, debug=False, port=8050):
         self.app.run_server(host="0.0.0.0", debug=debug, port=port)
