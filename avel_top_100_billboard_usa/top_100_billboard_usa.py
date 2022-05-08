@@ -108,9 +108,9 @@ class Top100BillboardUSA:
                         "American Idol », très populaire aux Etats-Unis, sont également à l'origine de ces "
                         "événements.",
                         html.Br(),
-                        "On remarque cependant que ce phénomène est apparu 3 fois plus souvent ces deux dernières années "
-                        ": constat peu étonnant compte tenu de l'hyperconsommation de notre société qui crée "
-                        "l'insatisfaction permanente où les modes y sont de plus en plus éphémères."]),
+                        "On remarque cependant que ce phénomène est apparu 3 fois plus souvent ces deux dernières "
+                        "années. Cela est un constat peu étonnant compte tenu de l'hyperconsommation de notre société "
+                        "qui crée l'insatisfaction permanente où les modes y sont de plus en plus éphémères."]),
             ]),
 
             html.Br(),
@@ -125,7 +125,7 @@ class Top100BillboardUSA:
                 * Sources:
                   * [Kaggle - Billboard "The hot 100" songs](https://www.kaggle.com/datasets/dhruvildave/billboard-the-hot-100-songs)
                   * [Fonctionnement du Billboard](https://www.billboard.com/billboard-charts-legend/)
-                * Copyright © 2022 - Aurélien Visentin - Eliot Leclair
+                * © Copyright 2022 - Aurélien Visentin - Eliot Leclair
                 '''),
             ]),
 
