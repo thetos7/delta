@@ -32,6 +32,9 @@ class APB_PARCOURSUP:
                                             "Évolution des voeux Parcoursup/APB depuis 2016"
                                         ),
                                         html.H4("Project de Python pour le Big Data"),
+                                        dcc.Markdown(
+                                            """Disponible aussi sur [https://pybd-project.herokuapp.com/](https://pybd-project.herokuapp.com/)"""
+                                        ),
                                     ],
                                 ),
                             ],
