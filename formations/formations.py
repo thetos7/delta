@@ -21,23 +21,27 @@ class Formations:
         self.years.sort()
         cursus_data = self.df.groupby(
             ["Année universitaire", "Type d'établissement", "Grande discipline"]).sum()
-        cursus_data["Proportions Femmes"] = cursus_data["Dont femmes"] / cursus_data["Nombre d\'étudiants"]
+        cursus_data["Proportion Femmes"] = cursus_data["Dont femmes"] / cursus_data["Nombre d\'étudiants"]
         cursus_data = cursus_data.reset_index([1, 2])
 
         self.main_layout = html.Div([
-            html.H4('Treemap of female proportion in formations'),
+            html.H4("Treemap de la proportion H/F par type d'établissement et par Grande discipline"),
             dcc.Graph(id="graph"),
             html.P("Year:"),
             dcc.Slider(id="year", min=0, max=len(self.years) - 1, value=0, step=1,
-                       marks=dict(enumerate(self.years)))
-        ])
+                       marks=dict(enumerate(self.years))),
+            dcc.Markdown(
+                '*Utilisez le slider pour voir la répartition H/F parmis les différentes formations au cours des années'
+                'années*')
+        ]
+        )
 
         @application.callback(
             Output("graph", "figure"),
             Input("year", "value"))
         def display_color(year):
             fig = px.treemap(cursus_data.loc[self.years[year]], path=["Type d'établissement", "Grande discipline"],
-                             values="Nombre d'étudiants", color="Proportions Femmes", title=self.years[year],
+                             values="Nombre d'étudiants", color="Proportion Femmes", title=self.years[year],
                              range_color=[0.2, 0.9])
             fig.update_layout(autosize=False,
                               width=960,
