@@ -77,7 +77,7 @@ class CovidBasics():
             html.H3(children='Covid Basics'),
             html.Div([ dcc.Graph(id='cvd-main-graph'), ], style={'width':'100%', }),
             html.Div([
-              html.Div([ html.Div('Region'), dcc.Dropdown(id='cvd-region', 
+              html.Div([ html.Div('Région'), dcc.Dropdown(id='cvd-region', 
                                       options=self.radio_options,
                                       value='Île-de-France')], style={'width': '15em', 'display': 'inline-block'}),
               html.Div([ html.Div('Y Axis'), dcc.RadioItems(id='cvd-yaxis', 
@@ -87,13 +87,17 @@ class CovidBasics():
             html.Br(),
             dcc.Markdown("""
             Le graphique est interactif. En passant la souris sur les courbes vous avez une infobulle. 
-            En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la courbe, réinitialiser.
+            En utilisant les icônes en haut à droite, on peut agrandir une zone, déplacer la courbe, réinitialiser.\n
+            Il est possible de sélectionner une région à visualiser avec le menu déroulant ci-dessus, ou alors la france entière.\n
+            Le liste à côté permet de sélectionner quelle donnée visualiser, par défaut 'pos_7j' représentant le nombre de personnes déclarées positives sur une semaine.\n
+            La légende 'Libellé Département' est également interactive et permet d'afficher/cacher les départements de la région sélectionné.
 
             Sources : https://www.data.gouv.fr/fr/datasets/synthese-des-indicateurs-de-suivi-de-lepidemie-covid-19/
             
             Notes :
-               * On observe qu'il n'y avait pas de recensement au début de l'épidémie.
+               * On observe qu'il n'y a pas de données avant le 12 Mai 2020. On pourrait supposer que c'est parce que nous ne savions pas testé pour le covid jusque là.
                * On peut notamment voir les deux pics de cas, Octobre-Novembre '2020', amenant au 2nd confinement, et Janvier 2022.
+               * Au contraire, on peut observer une baisse net du nombre de cas aux alentours de juillet 2021, correspondant au départ en vacances des français.
             """),
           html.Div([
                     html.Div([ dcc.Graph(id='cvd-slider_graph'), ], style={'width':'90%', }),
@@ -125,11 +129,11 @@ class CovidBasics():
                 }),
             html.Br(),
             dcc.Markdown("""
-            Right some shit here mr mec like how much of a bitch you are
-            Right some shit here mr mec like how much of a bitch you are
-            Right some shit here mr mec like how much of a bitch you are
-            Right some shit here mr mec like how much of a bitch you are
-            Right some shit here mr mec like how much of a bitch you are
+            La frise chronologique ci-dessus est interactive, est permet de sélectionner le mois à visualiser.\n
+            Notes :
+               * Par exemple, on peut observer que le nombre de cas en Auvergne et Rhônes-Alpes est plus beaucoup plus important en décembre, dû aux vacances de skis.
+               * Á l'inverse, les régions Occitanie et Provence-Alpes-Côte d'azur sont les deux régions les plus impactés pendant l'été.
+               * L'île de France reste la région la plus impactée toute l'année mais on peut observer une baisse des cas lors des périodes de vacances.
             """),
             html.Div([
                     html.Div([ dcc.Graph(id='cvd-2021-graph'), ], style={'width':'90%', }),
@@ -146,11 +150,7 @@ class CovidBasics():
                 }),  
           html.Br(),
             dcc.Markdown("""
-            Right some shit here mr mec like how much of a bitch you are
-            Right some shit here mr mec like how much of a bitch you are
-            Right some shit here mr mec like how much of a bitch you are
-            Right some shit here mr mec like how much of a bitch you are
-            Right some shit here mr mec like how much of a bitch you are
+            Ce graphique permet de facilement visualiser l'évolution du Covid selon les régions en France pour l'année 2021.
             """),
         ], style={
             'backgroundColor': 'white',
@@ -187,7 +187,7 @@ class CovidBasics():
           x='month',
           y=yaxis,
           color='lib_reg',
-          title='Mean results for 2021'
+          title='Résultats moyens pour 2021'
           #category_orders={'month': ['January','February','March','April','May','June','July','August','September','October','November','December']}
         )
       return fig
@@ -210,7 +210,7 @@ class CovidBasics():
           x='lib_reg',
           y=yaxis,
           color='lib_reg',
-          title='Results per month'
+          title='Résultats par mois'
         )
       fig.update_layout(showlegend=False)
       return fig
@@ -227,7 +227,7 @@ class CovidBasics():
           x='date',
           y=yaxis,
           color='lib_dep' if region != 'France' else None,
-          title='Entire results from beginning of pandemic'
+          title='Toutes les données depuis le début de la pandémie'
         )
         return fig
 
