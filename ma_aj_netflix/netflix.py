@@ -67,13 +67,7 @@ class NetflixStats():
                     html.Div([ dcc.Graph(id='ns-main-graph'), ], style={'width':'80%', }),
 
                     html.Div([
-                        html.Div('Classification d\'âge'),
-                        dcc.Checklist(
-                            id='ns-crossfilter-which-ratings',
-                            options=[{'label': i, 'value': i} for i in self.ratings.keys()],
-                            value=list(self.ratings.keys()),
-                            labelStyle={'display':'block'},
-                        ),
+                        html.Br(),
                         html.Br(),
                         html.Div('Échelle en Y'),
                         dcc.RadioItems(
@@ -96,6 +90,7 @@ class NetflixStats():
                     'display':'flex',
                     'justifyContent':'center'
                 }),
+            html.Br(),
             html.Div([
                 dcc.Markdown("""
                     **Ce qu'on appelle `popularité relative`**
@@ -105,10 +100,24 @@ class NetflixStats():
                     : plus ou moins susceptible à être censuré (par la protection familiale par exemple) : nudité, violence, opinions controversées, etc.
 
 
+                    Plus les points sont hauts, plus ils sont populaires.
+                    Plus les points sont vers la droites, plus ils sont sensibles.
+
 
                     *N.B: Les titres de popularité de 0% (qui forment 98% de nos données) ont été virés pour une meilleure visualisation.*
+                """),
+                html.Br(),
+                dcc.Markdown("""
+                    ###### Comment utiliser les paramètres du graphe et comment l'interpréter ?
+
+                    Il faut se focaliser principalement sur la légende de classification d'âge. 
+                    Pour pouvoir reproduire une "policy line" comme dans le graphe de Zuckerberg, c'est-à-dire créer une certaine restriction à des programmes sensibles (nudité, violence, substance, ...), essayez de retirer petit à petit les plus élévés (donc commençant par TV-MA, puis R, etc.).
+                    Pour le faire, il suffit de cliquer une fois sur une classification dans la légende. Cliquer deux fois permet d'isoler la classification.
+
+                    Remarquez au niveau de la restriction PG-13 (inclus), le graphe commence à ressembler à celui de Zuckerberg. Cependant, à part ce cas-là, ce n'est pas toujours évident.
                 """)
             ]),
+            html.Br(),
             html.Br(),
             html.Div([
                 html.Div('Popularité des programmes en fonction de leur degré de sensibilité regroupé par intervales (et vice-versa)', style={'font-size' : 'large'}),
@@ -128,7 +137,19 @@ class NetflixStats():
                         'borderTop': 'thin lightgrey solid',
                         'borderBottom': 'thin lightgrey solid',
                         'justifyContent':'center', }),
+                html.Br(),
+                dcc.Markdown("""
+                    La couleur rouge représente la valeur maximale, le jaune la minimale.
+
+
+                    ###### Interprétation des statistiques
+                    
+                    On peut remarquer d'une part que les sensibilités des programmes les plus populaires sont celles entre les valeurs 0.5 et 0.6.
+                    D'autre part, les programmes ayant les degrés de sensibilités les plus élevés ne sont généralement pas les plus populaires (entre 20 et 25% de popularité), néanmoins ils ont bien un engagement considérable
+                    (Attention à ne pas être induit en erreur, Les programmes qui sont plus populaires que 25% ne forment qu'environ 1.4% des titres !).
+                """)
             ]),
+            html.Br(),
             html.Br(),
             html.Div([
                 html.Div('Les 10 programmes les plus populaires', style={'font-size' : 'large'}),
@@ -139,6 +160,16 @@ class NetflixStats():
                 html.Div('Les 10 programmes les plus sensibles', style={'font-size' : 'large'}),
                 dash_table.DataTable(self.sensitivity_df.to_dict("records"), style_cell={'textAlign': 'left'}),
             ]),
+            html.Div([
+                html.Br(),
+                dcc.Markdown("""
+                    ###### Interprétation des tableaux
+
+                    Les tableaux montrent que de manière globale (donc avec accès à tous les programmes), 
+                    les gens n'ont pas nécessairement tendance à s'intéresser aux programmes les plus sensibles.
+                """)
+            ]),
+            html.Br(),
             html.Br(),
             html.Div([
                 html.Div([
@@ -175,7 +206,10 @@ class NetflixStats():
                     
                     Enfin, pour chaque programme, nous comptons les occurrences de mots sensibles parmi ses mots clés, afin de construire un indice entre 0 et 1/3.
                     Le degré de sensibilité est donné par la somme de ces deux indices.
-                    
+
+                    """),
+                    html.Br(),
+                    dcc.Markdown("""
                     #### Analyse des résultats
                     
                     Même si nous pouvons constater que les quelques programmes les plus populaires sont pour la plupart classés grand public, avec une sensibilité moyenne (0.6 pour Avengers infinity war),
@@ -186,7 +220,9 @@ class NetflixStats():
                     Mais n'oublions pas que les adultes sont surement une audience plus visée que les enfants, ce qui peut expliquer le nombre important de titres à classification d'âge élevée.
 
                     En conclusion, bien que la tendance n'est pas aussi visible qu'avec la courbe attendue, une majorité des programmes populaires de Netflix sont assez sensibles et susceptibles d'être censurés dans certains pays.
-
+                    """),
+                    html.Br(),
+                    dcc.Markdown("""
                     #### À propos
 
                     * Sources : 
@@ -210,8 +246,7 @@ class NetflixStats():
         self.app.callback(
             dash.dependencies.Output('ns-main-graph', 'figure'),
             [ dash.dependencies.Input('ns-crossfilter-yaxis-type', 'value'),
-              dash.dependencies.Input('random-type', 'value'),
-              dash.dependencies.Input('ns-crossfilter-which-ratings', 'value')])(self.update_graph)
+              dash.dependencies.Input('random-type', 'value')])(self.update_graph)
 
         self.app.callback(
             dash.dependencies.Output('ns-stats-popularity-series', 'figure'),
@@ -221,8 +256,9 @@ class NetflixStats():
             [dash.dependencies.Input('ns-crossfilter-which-stats', 'value')])(self.get_stats_of_sensitivity_per_popularity)
 
 
-    def update_graph(self, yaxis_type, random_type, ratings):
-        dfr = self.df[self.df.rating.isin(ratings)]
+    def update_graph(self, yaxis_type, random_type):
+        dfr = self.df.set_index('rating')
+        dfr = dfr.T[self.ratings.keys()].T.reset_index()
         fig = px.scatter(dfr,
                          title="Poularité des programmes Netflix en fonction de leur degré de sensibilité",
                          y = "popularity" if len(random_type) == 0 else "approximate popularity",
@@ -237,7 +273,9 @@ class NetflixStats():
                  xaxis = dict(title="Degré de sensibilité", range=(0,1)),
                  margin={'l': 40, 'b': 30, 't': 40, 'r': 0},
                  hovermode='closest',
-                 showlegend=False,
+                 legend=dict(
+                     title_text="Classification d'âge"
+                 ),
              )
         return fig
 
