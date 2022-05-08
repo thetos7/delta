@@ -43,8 +43,7 @@ class Parrainage():
                     'justifyContent':'center'
                 }),            
             html.Br(),
-            html.Div([ dcc.Graph(id='par-main-map') ], style={'width':'80%', }),
-            html.Div([dcc.RadioItems(id='par-candidat-map')]),       
+            html.Div([ dcc.Graph(id='par-main-map') ], style={'width':'100%'}),    
             dcc.Markdown("""
                 # Sources
                     * [Jeu de données parrainage des candidats pour l'élection présidentielle 2022](https://www.data.gouv.fr/fr/datasets/parrainages-des-candidats-a-lelection-presidentielle-francaise-de-2022/)
@@ -76,7 +75,7 @@ class Parrainage():
 
         self.app.callback(
             dash.dependencies.Output('par-main-map', 'figure'),
-            [dash.dependencies.Input('par-candidat-map', 'value')]
+            [dash.dependencies.Input('par-candidat', 'value')]
         )(self.display_map)
     
         
@@ -91,7 +90,7 @@ class Parrainage():
         index.name = 'date'
 
         df_count_by_date = pd.DataFrame(
-            {"Parrainages": count_by_date, "Parrainages total": count_by_date.cumsum()}, index=index)
+            {"Parrainages ce jour": count_by_date, "Parrainages total": count_by_date.cumsum()}, index=index)
 
         df_count_by_date = df_count_by_date.reset_index().melt('date', var_name="Catégorie", value_name="y")
 
@@ -107,7 +106,7 @@ class Parrainage():
 
         return fig
     
-    def display_map(self, _):
+    def display_map(self, candidat):
         fig_map = px.choropleth_mapbox(
             self.df_candidat_elected_per_departement,
             geojson=self.departements_json,
