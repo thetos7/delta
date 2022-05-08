@@ -99,6 +99,10 @@ class NetflixStats():
                     **Ce qu'on entend par `degré de sensibilité`**
                     : plus ou moins susceptible à être censuré (par la protection familiale par exemple) : nudité, violence, opinions controversées, etc.
 
+                    **Ce qu'on désigne par `epsilon aléatoire`**
+                    : plusieurs programmes pouvant avoir la même popularité et degré de sensibilité, les valeurs peuvent se confondre sur le graphique.
+                    Ainsi, afin de mieux visualiser la densité, nous proposons de faire varier aléatoirement les valeurs dans un environ proche (±0.5% pour la popularité et ±5% pour le degré de sensibilité)
+
 
                     Plus les points sont hauts, plus ils sont populaires.
                     Plus les points sont vers la droites, plus ils sont sensibles.
