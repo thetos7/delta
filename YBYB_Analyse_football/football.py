@@ -27,7 +27,7 @@ class Football():
         league_colors = {'La Liga':'gold', 'Premier League':'blue', 'SerieA':'green', 'Ligue 1':'black', 'Bundesliga':'red'}
 
         fig = px.scatter(leagues, x='Classement', y='Age Moyen', color="Ligues", hover_name="Squad", 
-                color_discrete_map=league_colors, title="Déplacez la souris sur une bulle pour avoir les détails du club.",
+                color_discrete_map=league_colors, title="Plus le diamètre de la bulle est important, plus la valeur marchande est élevée. Déplacez la souris sur une bulle pour avoir les détails du club.",
                 size = 'Valeur Marchande', 
                 size_max=60,
                 animation_frame=leagues["Saison"], animation_group="Squad", range_y=[leagues['Age Moyen'].min(), leagues['Age Moyen'].max()], range_x=[1,20])
@@ -37,14 +37,15 @@ class Football():
             html.Div([ dcc.Graph(figure=fig), ], style={'width':'100%', }),
             html.Br(), 
             dcc.Markdown("""
-            Notes: 
+            
+            #### Notes: 
             - Nous pouvons donc constater que plus la valeur marchande de l'équipe est élevée plus son classement est meilleur. 
             - Nous constatons aussi que l'equipe a un meilleur classement si la moyenne d'âge de l'équipe est entre 22 ans et 26 ans. 
              En effet une équipe trop jeune manque d'expérience et une équipe agée manque d'intensité dans le jeu. 
             - Nous remarquons qu'il peut y avoir des exceptions tel que le club Leicester City (en Premier League) qui est classé premier, dans la saison 2015-16, alors que sa valeur marchande est faible par raport aux autres club.
             Nous notons aussi que le Bayern Munich (en Bundesliga) est classé premier dans la saison 2005-06 alors que l'âge moyen de ses joueurs est d'environ 27,69 ans. 
             
-            ### A propos
+            #### A propos
             Nous nommons les top 5 ligues de la manière suivante: 
             - La Liga -> ligue espagnole
             - Premier League -> ligue anglaise 
