@@ -6,7 +6,7 @@ Le projet Bonheur Réel versus Bonheur Perçu a pour but de comparer le bonheur 
 
 ### Récupération de données
 
-La fonction `get_data()` de `get_data.py` permet de récupérer le tableau final sur lequel est basé nos graphiques. Elle rassemble toutes les bases de données retrouvées sur en ligne (pour plus de détail, merci de cliquer sur les liens dans Sources à la fin d'interface)
+La fonction `get_data()` de `get_data.py` permet de récupérer le tableau final sur lequel est basé nos graphiques. Elle rassemble toutes les bases de données retrouvées en ligne (pour plus de détail, merci de cliquer sur les liens dans Sources à la fin d'interface)
 
 Les fichiers python dont le nom commence par `clean` permettent d'extraire ces données et de les nettoyer. Pour accéder directement aux datasets sources, il suffit d'appeler la première fonction de chaque fichier `clean*data.py`.
 
