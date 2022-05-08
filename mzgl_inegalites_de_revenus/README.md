@@ -16,11 +16,16 @@ mzgl_inegalites_de_revenus/
      - GDP/
      - Population/
      - wid_data/
-     - Countries.csv
      - Democracy_indices.csv
+   - get_data.py
    - mzgl_inegalites_de_revenus.py
    - README.md
 ```
+### Concernant les fichiers de données
+Ils ont été téléchargés en amount et placés dans l'archive "data.zip", car il n'était pas possible de télécharger
+l'ensemble des données. Il y avait, de plus, beaucoup trop de fichiers inutiles.
+Les CSV n'ont pas été modifiés à la main.
+
 Sources:
 - [Population, Banque mondiale](https://data.worldbank.org/indicator/SP.POP.TOTL?name_desc=false)
 - [PIB par personnes, Banque mondiale](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD)

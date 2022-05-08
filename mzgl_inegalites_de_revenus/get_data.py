@@ -4,11 +4,13 @@ import glob
 import numpy as np
 import zipfile
 
-
+# Retrieve path of this script
 path = os.path.dirname(__file__)
-with zipfile.ZipFile(path + '/data.zip', 'r') as myzip:
+# Extract data
+with zipfile.ZipFile(path + "/data.zip", "r") as myzip:
     myzip.extractall(path)
 
+# Dictionary used to convert Country ISO code Alpha-2 and Alpha-3
 iso2_to_iso3 = {
     "AE": "ARE",
     "AF": "AFG",
@@ -263,7 +265,9 @@ def get_countries_df():
     """
     df = (
         pd.read_csv(
-            "".join([path, "/data/wid_data/WID_countries.csv"]), sep=";", index_col=False
+            "".join([path, "/data/wid_data/WID_countries.csv"]),
+            sep=";",
+            index_col=False,
         )
         .drop(["region2", "titlename"], axis=1)
         .replace(
@@ -288,6 +292,7 @@ def get_population_df():
         pd.read_csv("".join([path, "/data/Population/data.csv"]))
         .set_index(["alpha3"])
         .drop(["Country Name", "Series Name", "Series Code"], axis=1)
+        .drop([str(year) for year in range(1970, 1995)], axis=1)
         .replace("..", 0)
         .sort_index()
     )
@@ -308,4 +313,4 @@ def get_gdp_df():
     return gdp_df.loc[
         :,
         [str(year) for year in range(1995, 2021)],
-    ]
+    ].sort_index()

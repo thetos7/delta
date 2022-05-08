@@ -5,7 +5,10 @@ import plotly.graph_objects as go
 import plotly.express as px
 import mzgl_inegalites_de_revenus.get_data as gd
 
+# List all percentile to extract in the ine_df
 list_yaxis = [f"p{i}p{i+1}" for i in range(0, 100)]
+# Markers of the years slider
+str_year_slider = {str(y): str(y) for y in range(1995, 2021, 5)}
 
 
 def gini(array):
@@ -44,12 +47,15 @@ class Inegalites_de_revenus:
         self.cpi_df = gd.get_corruption_df()
         self.dem_df = gd.get_democratie_index_df()
         self.ine_df = gd.get_inegalities_df(self.countries_df)
-        self.gini_df = (
-            self.ine_df[self.ine_df.index.isin(list_yaxis, level="Percentile")]
-            .groupby(level=[0, 2])["value"]
-            .agg([gini])
-        )
-        self.ine_df = self.ine_df.join(self.gini_df, on=["alpha3", "Year"])
+        # Calculate all Gini coefficient only one time
+        self.ine_df = self.ine_df.join(
+            (
+                self.ine_df[self.ine_df.index.isin(list_yaxis, level="Percentile")]
+                .groupby(level=[0, 2])["value"]
+                .agg([gini])
+            ),
+            on=["alpha3", "Year"],
+        ).sort_index()
         self.main_layout = html.Div(
             [
                 html.Div(
@@ -67,8 +73,6 @@ class Inegalites_de_revenus:
                                 html.Center(
                                     [
                                         html.H4([], id="title-main-graph"),
-                                        html.H6([], id="def-axis1"),
-                                        html.H6([], id="def-axis2"),
                                         html.Div([dcc.Graph(id="main-graph")]),
                                         html.Br(),
                                         html.Div(
@@ -78,7 +82,7 @@ class Inegalites_de_revenus:
                                                 ),
                                                 dcc.Interval(  # fire a callback periodically
                                                     id="ine-auto-stepper",
-                                                    interval=1000,  # in milliseconds
+                                                    interval=1500,  # in milliseconds
                                                     max_intervals=-1,  # start running
                                                     n_intervals=0,
                                                 ),
@@ -114,6 +118,14 @@ class Inegalites_de_revenus:
                                 ),
                                 dcc.Markdown(
                                     """
+                                ### Informations à propos des axes:
+                                * Sur l'axe des abscisse:
+                                    * Un indice de démocratie faible indique que le pays est PEU démocratique.
+                                    * Un indice de corruption élevé indique qu'il y a PEU de corruption dans le pays.
+                                    * Le produit intérieur brut est calculé avec des US $ de 2021.
+                                * Sur l'axe des ordonée:
+                                    * Le coefficient de Gini est entre 0 et 1. Il permet de rendre compte des inégalités de répartition des revenus dans un pays. Plus ce coefficient est proche de 0, plus on se rapproche de l'égalité parfaite.
+                                    * Les percentiles permettent seulement en compte les adultes de plus de 20 ans.
                                 ### Formatage des axes:
                                 Pour l'indicateur "Produit intérieur brut par habitant", un autoscaling sur l'axe des abscisses est appliqué afin de suivre l'augmentation du PIB.
                                 #### Observations sur les résultats
@@ -239,17 +251,6 @@ class Inegalites_de_revenus:
                 dash.dependencies.State("ine-button-start-stop", "children"),
             ],
         )(self.update_year_slider)
-
-        self.app.callback(
-            [
-                dash.dependencies.Output("def-axis1", "children"),
-                dash.dependencies.Output("def-axis2", "children"),
-            ],
-            [
-                dash.dependencies.Input("select-X", "value"),
-                dash.dependencies.Input("select-Y", "value"),
-            ],
-        )(self.get_definition_xaxis)
         self.app.callback(
             dash.dependencies.Output("main-graph", "figure"),
             [
@@ -285,7 +286,6 @@ class Inegalites_de_revenus:
                 dash.dependencies.Input("select-X", "value"),
             ],
         )(self.create_right_graph)
-
         self.app.callback(
             dash.dependencies.Output("ine-button-start-stop", "children"),
             dash.dependencies.Input("ine-button-start-stop", "n_clicks"),
@@ -296,26 +296,6 @@ class Inegalites_de_revenus:
             dash.dependencies.Output("ine-auto-stepper", "max_interval"),
             [dash.dependencies.Input("ine-button-start-stop", "children")],
         )(self.run_movie)
-
-    def get_definition_xaxis(self, xaxis, yaxis):
-        """
-        Display some explanations about axes of the scatter plot
-        """
-        text = "Le coefficient de Gini est entre 0 et 1. Il permet de rendre compte des inégalités de répartition des revenus dans un pays. Plus ce coefficient est proche de 0, plus on se rapproche de l'égalité parfaite."
-        if yaxis != "G":
-            text = ""
-        if xaxis == "C":
-            return (
-                "Un indice de corruption élevé indique qu'il y a PEU de corruption dans le pays.",
-                text,
-            )
-        elif xaxis == "P":
-            return "", text
-        else:
-            return (
-                "Un indice de démocratie faible indique que le pays est PEU démocratique.",
-                text,
-            )
 
     def update_title(self, yaxis, xaxis):
         """
@@ -350,8 +330,9 @@ class Inegalites_de_revenus:
         Retrieve country name from hoverData
         """
         if hoverData is None:
-            country = self.countries_df.iloc[np.random.randint(len(self.countries_df))]
-            return country["Country_Name"]
+            return self.countries_df.iloc[np.random.randint(len(self.countries_df))][
+                "Country_Name"
+            ]
         return hoverData["points"][0]["hovertext"]
 
     def yaxis_graph(self, code, yaxis):
@@ -384,7 +365,7 @@ class Inegalites_de_revenus:
                 hovertemplate="Année: %{x}<br>Part des revenus: %{y}%<extra></extra>",
             )
         ]
-        fig = go.Figure(
+        return go.Figure(
             data=data,
             layout={
                 "title": title,
@@ -394,7 +375,6 @@ class Inegalites_de_revenus:
                 "showlegend": False,
             },
         )
-        return fig
 
     def create_left_graph(self, hoverData, year, yaxis):
         code = (
@@ -408,9 +388,9 @@ class Inegalites_de_revenus:
         tmp = tmp[tmp["Percentile"].isin(list_yaxis)]
         cumsum = list(np.cumsum(np.sort(tmp["value"].array)) * 100)
         cumsum[-1] = 100
-        data, layout = [
+        data = [
             go.Scatter(
-                x=np.arange(1, 101, 1),
+                x=[x for x in range(1, 101)],
                 y=cumsum,
                 hovertemplate="%{x}% des adultes les moins aisées se partagent %{y:.2f}% des revenues avant taxes<extra></extra>",
                 mode="lines",
@@ -422,29 +402,32 @@ class Inegalites_de_revenus:
                 mode="lines",
                 hoverinfo=["skip", "skip"],
             ),
-        ], {
-            "title": f"Indice de Gini - {year}",
-            "xaxis": {
-                "title": "Part cumulée des plus de 20 ans avec les revenus du plus faible au plus élevé",
-                "fixedrange": True,
+        ]
+        fig = go.Figure(
+            data=data,
+            layout={
+                "title": f"Indice de Gini - {year}",
+                "xaxis": {
+                    "title": "Part cumulée des plus de 20 ans avec les revenus du plus faible au plus élevé",
+                    "fixedrange": True,
+                },
+                "yaxis": {
+                    "title": f"Partage cumulé des revenus en {year}",
+                    "type": "linear",
+                    "fixedrange": True,
+                },
+                "autosize": True,
+                "showlegend": False,
+                "margin": {"l": 40, "b": 40, "r": 20, "t": 30},
             },
-            "yaxis": {
-                "title": f"Partage cumulé des revenus en {year}",
-                "type": "linear",
-                "fixedrange": True,
-            },
-            "autosize": True,
-            "showlegend": False,
-            "margin": {"l": 40, "b": 40, "r": 20, "t": 30},
-        }
-        fig = go.Figure(data=data, layout=layout)
+        )
         fig.add_annotation(
             xref="paper",
             yref="paper",
             font=dict(color="black", size=14),
             x=0.05,
             y=0.95,
-            text=f"Coefficient de Gini: {self.gini_df.loc[(code, year)].gini}",
+            text=f"Coefficient de Gini: {tmp.iloc[0].gini}",
             showarrow=False,
         )
         fig.add_annotation(
@@ -490,14 +473,10 @@ class Inegalites_de_revenus:
             ]
         elif xaxis == "P":
             x_axis_df, title, y_axis_title = (
-                self.gdp_df,
+                self.gdp_df.loc[(code)],
                 "Produit intérieur brut par habitant (en US $ de 2021)",
                 "",
             )
-            try:
-                x_axis_df = x_axis_df.loc[(code)]
-            except:
-                return None
             data = [
                 go.Scatter(
                     name="Produit intérieur brut par habitant",
@@ -518,7 +497,7 @@ class Inegalites_de_revenus:
                     hovertemplate="Année: %{x}<br>Indice de démocratie: %{y}<extra></extra>",
                 )
             ]
-        fig = go.Figure(
+        return go.Figure(
             data=data,
             layout={
                 "title": title,
@@ -528,7 +507,6 @@ class Inegalites_de_revenus:
                 "showlegend": False,
             },
         )
-        return fig
 
     def update_year_slider(self, xaxis, n_intervals, year, text):
         is_running = 0
@@ -543,13 +521,13 @@ class Inegalites_de_revenus:
                     1995,
                     2020,
                     1995,
-                    {str(y): str(y) for y in range(1995, 2021, 5)},
+                    str_year_slider,
                 )
             return (
                 1995,
                 2020,
                 year + is_running,
-                {str(y): str(y) for y in range(1995, 2021, 5)},
+                str_year_slider,
             )
         years = x_axis_df.reset_index()["Year"]
         min_year, max_year = years.min(), years.max()
@@ -568,17 +546,17 @@ class Inegalites_de_revenus:
         )
 
     def update_main_graph(self, yaxis, xaxis, year, regions):
-        x_axis_df, yaxis_title, xmax = (
+        x_axis_df, yaxis_title, xmax, tmp = (
             self.dem_df,
             "Part des revenus des 10% les plus pauvres",
             100,
+            None,
         )
-        tmp = None
         if yaxis != "G":
             tmp = self.ine_df.loc[(slice(None), yaxis, year), :]
         else:
             tmp = self.ine_df.loc[(slice(None), "p99p100", year), :]
-        tmp = tmp.reset_index().set_index(["alpha3", "Year"]).sort_index()
+        tmp = tmp.reset_index(level=1).sort_index()
         if len(regions) != 5:
             tmp = tmp[tmp["region"].isin(regions)]
         if xaxis == "C":
@@ -683,8 +661,7 @@ class Inegalites_de_revenus:
         """
         if text == self.START:
             return self.STOP
-        else:
-            return self.START
+        return self.START
 
     def run_movie(self, text):
         """
@@ -693,8 +670,7 @@ class Inegalites_de_revenus:
         """
         if text == self.START:  # then it means we are stopped
             return 0
-        else:
-            return -1
+        return -1
 
     def run(self, debug=False, port=8050):
         self.app.run_server(host="0.0.0.0", debug=debug, port=port)
