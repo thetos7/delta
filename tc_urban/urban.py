@@ -22,7 +22,7 @@ class UrbanPolutionStats():
 
         self.main_layout = html.Div(
             children = [
-                html.H3('Évolution des émissions de CO₂ vs la population en zone urbaine par pays'),
+                html.H3('Analyse graphique des émissions de CO₂ à travers les différents pays du monde'),
 
                 html.Br(),
                 html.Br(),
@@ -72,11 +72,34 @@ class UrbanPolutionStats():
                 # Maps
                 html.Div(
                     children = [
-                        dcc.Graph(id='ups-urbanpop-map', style={'width':'50%', 'display':'inline-block'}),
-                        dcc.Graph(id='ups-emission-map', style={'width':'50%', 'display':'inline-block'})
+                        html.Div(
+                            children = [
+                                html.H5('Évolution du pourcentage de population urbaine par pays'),
+                                dcc.Graph(id='ups-urbanpop-map', style={'display':'inline-block'})
+                            ],
+                            style = {
+                                'display':'flex',
+                                'flex-direction':'column',
+                                'justifyContent':'center',
+                                'width':'50%'
+                            }
+                        ),
+                        html.Div(
+                            children = [
+                                html.H5('Évolution des émissions de CO₂ par personne par pays'),
+                                dcc.Graph(id='ups-emission-map', style={'display':'inline-block'})
+                            ],
+                            style = {
+                                'display':'flex',
+                                'flex-direction':'column',
+                                'justifyContent':'center',
+                                'width':'50%'
+                            }
+                        )
                     ],
                     style = {
-                        'display':'flex', 
+                        'display':'flex',
+                        'flex-direction':'row',
                         'borderTop': 'thin lightgrey solid',
                         'borderBottom': 'thin lightgrey solid',
                         'justifyContent':'center'
@@ -85,39 +108,50 @@ class UrbanPolutionStats():
 
                 html.Br(),
 
-                html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'),
-
                 # Main graph
                 html.Div(
                     children = [
-                        html.Div(dcc.Graph(id='ups-main-graph'), style={'width':'90%'}),
+                        html.H5('Évolution des émissions de CO₂ vs la population en zone urbaine par pays'),
+                        html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'),
+                        html.Br(),
                         html.Div(
                             children = [
-                                html.Div('Region'),
-                                dcc.Checklist(
-                                    id='ups-crossfilter-which-region',
-                                    options=[{'label': self.french[i], 'value': i} for i in sorted(self.region_colors.keys())],
-                                    value=sorted(self.region_colors.keys()),
-                                    labelStyle={'display':'block'},
-                                ),
-                                html.Br(),
-                                dcc.RadioItems(
-                                    id='ups-crossfilter-xaxis-type',
-                                    options=[{'label': i, 'value': i} for i in ['Linéaire', 'Log']],
-                                    value='Linéraire',
-                                    labelStyle={'display':'none'},
-                                ),
+                                html.Div(dcc.Graph(id='ups-main-graph'), style={'width':'90%'}),
+                                html.Div(
+                                    children = [
+                                        html.Div('Region'),
+                                        dcc.Checklist(
+                                            id='ups-crossfilter-which-region',
+                                            options=[{'label': self.french[i], 'value': i} for i in sorted(self.region_colors.keys())],
+                                            value=sorted(self.region_colors.keys()),
+                                            labelStyle={'display':'block'},
+                                        ),
+                                        html.Br(),
+                                        dcc.RadioItems(
+                                            id='ups-crossfilter-xaxis-type',
+                                            options=[{'label': i, 'value': i} for i in ['Linéaire', 'Log']],
+                                            value='Linéraire',
+                                            labelStyle={'display':'none'},
+                                        ),
+                                    ],
+                                    style = {
+                                        'margin-left':'15px',
+                                        'width': '7em',
+                                        'float':'right'
+                                    }
+                                )
                             ],
                             style = {
-                                'margin-left':'15px',
-                                'width': '7em',
-                                'float':'right'
+                                'display':'flex',
+                                'flex-direction':'row',
+                                'width':'100%'
                             }
-                        ),
+                        )
                     ],
                     style={
                         'padding': '10px 50px', 
                         'display':'flex',
+                        'flex-direction':'column',
                         'justifyContent':'center'
                     }
                 ),
@@ -138,6 +172,20 @@ class UrbanPolutionStats():
                         'justifyContent':'center'
                     }
                 ),
+
+                html.Br(),
+                dcc.Markdown("""
+                    #### Analyse
+
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                    Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+                    when an unknown printer took a galley of type and scrambled it to make a type
+                    specimen book. It has survived not only five centuries, but also the leap into
+                    electronic typesetting, remaining essentially unchanged. It was popularised in
+                    the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+                    and more recently with desktop publishing software like Aldus PageMaker including
+                    versions of Lorem Ipsum.
+                """),
                       
                 html.Br(),
                 dcc.Markdown("""
