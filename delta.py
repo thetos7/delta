@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from PostBacStudies import postbac
+from postbac import postbac
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
