@@ -12,12 +12,12 @@ import plotly.graph_objs as go
 import plotly.express as px
 import dateutil as du
 from os.path import exists
-from spotify.data.get_data import get_data
+from TA_MG_SpotifyMusicPopularity.data.get_data import get_data
 
 class Spotify():
 
     def init_characteristics(self):
-        df = pd.read_csv('spotify/data/SpotifyFeatures.csv')
+        df = pd.read_csv('TA_MG_SpotifyMusicPopularity/data/SpotifyFeatures.csv')
         df = df.rename(columns={'artist_name':'artist', 'track_name':'title'})
         df = df.drop(columns=['Unnamed: 0'])
         self.musics = df
@@ -41,7 +41,7 @@ class Spotify():
         self.count = count
 
     def __init__(self, application = None):
-        if not(exists("./spotify/data/SpotifyFeatures.csv") and exists("./spotify/data/charts.csv")):
+        if not(exists("./TA_MG_SpotifyMusicPopularity/data/SpotifyFeatures.csv") and exists("./TA_MG_SpotifyMusicPopularity/data/charts.csv")):
             get_data()
         
         self.french = {'popularity':'popularité', 'acousticness':'acousticité', 'danceability':'dansabilité', 'duration_ms':'durée en ms',
