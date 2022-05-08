@@ -1,9 +1,8 @@
 import dash
-from dash import Dash, dcc, html, Input, Output
 import pandas as pd
-import numpy as np
-import plotly.graph_objs as go
 import plotly.express as px
+import plotly.graph_objs as go
+from dash import dcc, html
 
 
 class Presidentielles():
@@ -41,6 +40,8 @@ class Presidentielles():
             go.Scatter(x=df_lepen["date_enquete"], y=df_lepen["erreur_inf"], name="Erreur Inf : Marine Le Pen",
                        line=dict(color='royalblue', width=2, dash='dot')))
 
+
+        df_macron["res"] = 58.5
         fig_sond_t2.add_trace(go.Scatter(x=df_macron["date_enquete"], y=df_macron["intentions"], name="Emmanuel Macron",
                                          line=dict(color='firebrick', width=2)))
         fig_sond_t2.add_trace(
@@ -49,6 +50,13 @@ class Presidentielles():
         fig_sond_t2.add_trace(
             go.Scatter(x=df_macron["date_enquete"], y=df_macron["erreur_inf"], name="Erreur Inf : Emmanuel Macron",
                        line=dict(color='firebrick', width=2, dash='dot')))
+        fig_sond_t2.add_trace(
+            go.Scatter(x=df_macron["date_enquete"], y=df_macron["res"], name="Res : Emmanuel Macron",
+                       line=dict(color='green', width=1, dash='dot')))
+        df_lepen["res"] = 41.45
+        fig_sond_t2.add_trace(
+            go.Scatter(x=df_lepen["date_enquete"], y=df_lepen["res"], name="Res : Marine Le Pen",
+                       line=dict(color='red', width=1, dash='dot')))
 
         fig_sond_t2.update_layout(title='Sondages présidentiels du second tour avec prise en compte de l\'erreur',
                                   xaxis_title='Temps',
@@ -60,8 +68,6 @@ class Presidentielles():
 
         # Lecture du dataset
         df_tdp = pd.read_csv('./presidentielle/data/temps_de_parole_presidentielles_2022.csv')
-        print(pd.unique(df_tdp['Candidat']))
-        print(pd.unique(df_tdp['Période']))
 
         # Figure tour 1
         df_tdp = pd.read_csv('./presidentielle/data/temps_de_parole_presidentielles_2022.csv')
@@ -72,9 +78,19 @@ class Presidentielles():
                             color='Chaîne', barmode="group", labels={
                 "Période": "Temps en jours",
                 "Somme": "Temps de parole en minutes",
-                "Chaîne": "Chaîne",
+                "Chaîne": "Chaînes",
                 "Candidat": "Candidats"
             }, title="Temps de parole pour chaque candidats en fonction des médias")
+
+        fig_tdp_cum = px.bar(df_tdp[df_tdp['Période'].isin(['2022-03-27', '2022-04-03', '2022-04-08'])], x='Candidat',
+                             y="Somme",
+                             color='Chaîne', labels={
+                "Période": "Temps en jours",
+                "Somme": "Temps de parole en minutes",
+                "Chaîne": "Chaînes",
+                "Candidat": "Candidats"
+            },
+                             title="Temps de parole cumulés sur tous les médias pour chaque candidat. Durant la période officiele de campagne")
 
         self.main_layout = html.Div(children=[
             html.H2(children='Sondages présidentiels et temps de parole dans les médias'),
@@ -108,6 +124,14 @@ class Presidentielles():
             - Plus on se rapproche du vote plus les médias essayent de données un temps de parole
             équitable aux candidats
             """),
+            html.Div(
+                [dcc.Graph(id='sond_t1_cum', figure=fig_tdp_cum)], style={'width': '100%', }),
+            dcc.Markdown("""
+                     ##### Notes :
+                     - Les candidats n'ont pas un temps de parole équitable
+                     - Des candidats sont sur représenté par rapport à leur score final et d'autres sont sous représentés 
+                     par rapport à leur score final
+                    """),
             html.H3(children='Second tour'),
             html.Div(
                 [dcc.Graph(id='sond_t2', figure=fig_sond_t2)], style={'width': '100%', }),
@@ -123,7 +147,7 @@ class Presidentielles():
                 [dcc.Graph(id='dtp_t2', figure=fig_tdp_t2)], style={'width': '100%'}),
             dcc.Markdown("""
              ##### Notes :
-             - Les deux candidats du second tour n'ont pas été représentés équitablement durant la période de l'entre-deux tours.
+             - Les deux candidats du second tour n'ont pas été représentés équitablement durant la période de l'entre-deux tours
              - Certains médias représentent plus M. Macron et d'autres Mme. Le Pen
             """),
             html.Br(),
@@ -158,7 +182,7 @@ class Presidentielles():
                      labels={
                          "Période": "Temps en jours",
                          "Somme": "Temps de parole en minutes",
-                         "Chaîne": "Chaîne",
+                         "Chaîne": "Chaînes",
                          "Candidat": "Candidats"
                      }, title="Temps de parole pour chaque candidats en fonction des médias")
 
