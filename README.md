@@ -10,7 +10,7 @@ Néanmoins, vous pouvez aussi le visionner en utilisant la commande "make" du pr
 
 https://dash-pybd-jules-dorbeau.herokuapp.com/
 
-Le code source est le même que dans le dossier dans lequel se site notre projet (mis a part le message d'avertissement concernant la pagination que nous avons ajouté en haut de la page), le résultat sera donc le même mais cette fois ci avec le rendu que nous souhaité avoir.
+Le code source est le même que dans le dossier dans lequel se situe notre projet (mis a part le message d'avertissement concernant la pagination que nous avons ajouté en haut de la page), le résultat sera donc le même mais cette fois ci avec le rendu que nous souhaité avoir.
 
 Bon visionnage !
 

@@ -243,6 +243,7 @@ def save_influences_csv(save_file=True) :
     res.index.name = "Date"
     if (save_file) : 
         res.to_csv(path_or_buf = "data/monthly_influences.csv", sep = ';')
+        res.to_csv(path_or_buf = "../data/monthly_influences.csv", sep = ';')
     return res
 
 # Function used to make daily average for our data
@@ -288,6 +289,7 @@ def create_and_save_df_average_days(save_file = True) :
         res = res.append(df_day_average)
     if save_file : 
         res.to_csv(path_or_buf = "data/monthly_day_average.csv", sep = ';')
+        res.to_csv(path_or_buf = "../data/monthly_day_average.csv", sep = ';')
     return res
 
 # Function used to make hourly average for our data
@@ -333,6 +335,7 @@ def create_and_save_df_average_hours(save_file = True) :
         res = res.append(df_hour_average)
     if save_file : 
         res.to_csv(path_or_buf = "data/monthly_hour_average.csv", sep = ';')
+        res.to_csv(path_or_buf = "../data/monthly_hour_average.csv", sep = ';')
     return res
 
 # Function used to unzip our data
@@ -366,6 +369,13 @@ def clean_files() :
             os.remove("data/monthly_hour_average.csv")
         if "monthly_influences.csv" in os.listdir("data") : 
             os.remove("data/monthly_influences.csv")
+    # Remove from source data for delta project
+    if "monthly_day_average.csv" in os.listdir("../data") : 
+        os.remove("../data/monthly_day_average.csv")
+    if "monthly_hour_average.csv" in os.listdir("../data") : 
+        os.remove("../data/monthly_hour_average.csv")
+    if "monthly_influences.csv" in os.listdir("../data") : 
+        os.remove("../data/monthly_influences.csv")
 
 # Function to delete the files that we don't use anymore
 def delete_raw_and_temporary_files() :
