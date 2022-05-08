@@ -17,6 +17,7 @@ class Parrainage():
     def __init__(self, application = None):
         fetch_data()
         self.df = pd.read_csv("parrainage/data/parrainagestotal.csv", sep=";")
+        self.df['Date de publication'] = pd.to_datetime(self.df['Date de publication'], format='%d/%m/%Y')
         self.candidats_occurences = self.df['Candidat'].value_counts()
         self.candidats_list = self.candidats_occurences[self.candidats_occurences > 500].keys()
 
@@ -87,12 +88,14 @@ class Parrainage():
         parrainages = self.df[self.df['Candidat'] == candidat]
 
         count_by_date = parrainages.groupby(["Date de publication"]).size()
+        count_by_date = count_by_date.to_frame(name="size").reset_index().sort_values(by="Date de publication").set_index("Date de publication")
 
         index = count_by_date.index
         index.name = 'date'
 
+
         df_count_by_date = pd.DataFrame(
-            {"Parrainages ce jour": count_by_date, "Parrainages total": count_by_date.cumsum()}, index=index)
+            {"Parrainages ce jour": count_by_date["size"], "Parrainages total": count_by_date["size"].cumsum()}, index=index)
 
         df_count_by_date = df_count_by_date.reset_index().melt('date', var_name="Catégorie", value_name="y")
 
@@ -100,12 +103,11 @@ class Parrainage():
         fig.update_traces(hovertemplate='%{y} parrainages le %{x:%d/%m/%y}')
         fig.update_layout(hovermode="x unified", title="Évolution du nombre de parrainages par candidat à la présidentielle")
         fig.update_layout(
-            xaxis = dict(title="Date de publication"),
+            xaxis = dict(title="Date de publication", tickformat="%d-%m-%Y"),
             yaxis = dict(title="Nombre parrainages"), 
             height=450,
             showlegend=True,
         )
-
         return fig
     
     def display_map(self, candidat):
