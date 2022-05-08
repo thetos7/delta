@@ -7,11 +7,12 @@ Dans ce projet montrons l'évolution du salaire moyen ainsi que de son influence
 ## Prérequis
 Voir requirement.txt
 ## Le projet
-Pour lancer le projet juste lancer le fichier python main.py
-    python3 main.py
+Pour lancer le projet juste lancer le fichier python income.py
+    python3 income.py
 
-
-
+## Nettoyage des données
+Lancer le fichier get_data.py pour nettoyer les données et les stocker dans des fichier pkl
+    python3 get_data.py
 
 Sources :
 PIB : https://data.oecd.org/gdp/gross-domestic-product-gdp.htm
