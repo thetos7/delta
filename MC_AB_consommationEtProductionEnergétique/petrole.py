@@ -254,10 +254,12 @@ class Petrole():
         df = df[df.TIME_PERIOD == year].groupby("partner")["OBS_VALUE"].sum()
         df = df.reset_index()
         df = df[df.OBS_VALUE != 0]
-        df.sort_values(by=['OBS_VALUE'], inplace=True, ascending=False)
+        df.sort_values(by=['OBS_VALUE'], inplace=True,
+        ascending=False)
+        df = df.nlargest(n = 10, columns = ['OBS_VALUE'])
 
         df['partner'] = df['partner'].apply(lambda x: country_code[x])
-        fig = px.scatter(df, x="partner", y="OBS_VALUE")
+        fig = px.bar(df, x="partner", y="OBS_VALUE")
 
         return fig
 
@@ -268,8 +270,9 @@ class Petrole():
         df = df.reset_index()
         df = df[df.OBS_VALUE != 0]
         df.sort_values(by=['OBS_VALUE'], inplace=True, ascending=False)
+        df = df.nlargest(n = 10, columns = ['OBS_VALUE'])
         df['partner'] = df['partner'].apply(lambda x: country_code[x])
-        fig = px.scatter(df, x="partner", y="OBS_VALUE")
+        fig = px.bar(df, x="partner", y="OBS_VALUE")
 
         return fig
 

@@ -2,12 +2,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tarfile
 
-def get_data():
-
+def extract_data():
     my_tar = tarfile.open('MC_AB_consommationEtProductionEnergétique/data/data.tar.gz')
     my_tar.extractall('./MC_AB_consommationEtProductionEnergétique/') # specify which folder to extract to
     my_tar.close()
 
+def get_data():
+
+    extract_data()
     usecols = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE', 'nrg_bal']
     usecols_import_export = ['siec', 'unit', 'geo', 'TIME_PERIOD', 'OBS_VALUE', 'partner']
     prod_cons = pd.read_csv('MC_AB_consommationEtProductionEnergétique/data/conso_production_petrole.csv', usecols=usecols)
@@ -314,11 +316,12 @@ country_code = {"AF":"Afghanistan",
 
 
 if __name__ == '__main__':
-    data = get_data()
-    FR = get_by_country(data, "FR")
-    FR_RA000 = get_by_energy(FR, "RA000")
-    unit = FR_RA000['unit'].unique()[0]
-    print(str(sum_energies(FR_RA000)) + " " + str(unit))
-    FR_cleaned = clear_unique_values(FR_RA000)
-    FR_cleaned.reset_index(drop=True, inplace=True)
-    plot_evolution(FR_cleaned)
+    """
+    Our data where taken at the following sources:
+    https://ec.europa.eu/eurostat/databrowser/view/nrg_cb_oil/default/table?lang=fr
+    https://ec.europa.eu/eurostat/databrowser/view/NRG_TE_OIL__custom_2309667/default/table?lang=fr
+    https://ec.europa.eu/eurostat/databrowser/view/nrg_ti_oil/default/table?lang=fr
+    Since they are custom data set there is no way of downloading them directly
+    from the code
+    """
+    extract_data()
