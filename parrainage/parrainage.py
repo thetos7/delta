@@ -9,16 +9,18 @@ import plotly.graph_objs as go
 import plotly.express as px
 import json
 
+from parrainage.get_data import fetch_data
+
 class Parrainage():
 
     def __init__(self, application = None):
+        fetch_data()
         self.df = pd.read_csv("parrainage/data/parrainagestotal.csv", sep=";")
         self.candidats_occurences = self.df['Candidat'].value_counts()
         self.candidats_list = self.candidats_occurences[self.candidats_occurences > 500].keys()
 
         with open("parrainage/data/departements.geojson") as f:
             self.departements_json = json.load(f)
-        self.df_candidat_elected_per_departement = self.df.groupby(["Département"])["Candidat"].value_counts().groupby(level=0, group_keys=False).head(1).to_frame(name="Score").reset_index()
         
         self.main_layout = html.Div(children=[
             html.H3(children='Évolution du nombre de parrainages par candidat à la présidentielle'),
@@ -107,15 +109,20 @@ class Parrainage():
         return fig
     
     def display_map(self, candidat):
+        
+        candidat_df = self.df[self.df['Candidat'] == candidat]
+        department_candidat_df = candidat_df.groupby("Département")
+        candidat_repertition_per_departement = department_candidat_df["Département"].count().to_frame(name="Score").reset_index()
+
         fig_map = px.choropleth_mapbox(
-            self.df_candidat_elected_per_departement,
+            candidat_repertition_per_departement,
             geojson=self.departements_json,
             locations='Département',
             featureidkey="properties.nom",
             mapbox_style='carto-positron',
-            color="Candidat",
-            # color_discrete_sequence=[1],
-            hover_data={'Candidat': True, 'Score': True},
+            color="Score",
+            color_discrete_sequence=[1],
+            hover_data={'Score': True},
             zoom=3.8,
             center={'lat': 47, 'lon': 2},
             opacity=1.0,
@@ -123,7 +130,7 @@ class Parrainage():
 
         fig_map.update_layout(
             title={
-                'text': f"Candidat parrainé par département",
+                'text': f'Parrainage de "{candidat}" par département',
                 'y':0.95,
                 'x':0.5,
                 'xanchor': 'center',
