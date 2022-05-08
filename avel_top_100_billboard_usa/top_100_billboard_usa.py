@@ -95,13 +95,13 @@ class Top100BillboardUSA:
                 dcc.Graph(id="meteoric-entries-graph", figure=self.get_meteoric_entries_fig()),
                 html.P("Bien qu'il ait été officiellement lancé en 1958, le Billboard n'a vu une entrée « fulgurante "
                        "» pour la première fois qu'en 1995. En effet, des données plus modernes sur la diffusion "
-                       "et les ventes ont commencées à être utilisées à partir de 1991. Cela a ainsi permit des "
+                       "et les ventes ont commencé à être utilisées à partir de 1991. Cela a ainsi permis des "
                        "calculs plus rapides et des classements plus précis"),
                 html.P(["Qui d'autre que Mickael Jackson pour réaliser cet exploit en premier avec « You Are Not "
                         "Alone » ? ",
                         html.Br(),
                         "Il est amusant de constater que dans la même année, Whitney Houston et Mariah "
-                        "Carey deux fois ont également réussi ce tour de force."]),
+                        "Carey ont également réussi ce tour de force par deux fois."]),
                 html.P(["Si cela semble être un évènement assez exceptionnel, souvent lié à une sortie de film comme "
                         "« Où sont les hommes ? », « Titanic » ou « Armageddon », mais aussi à des chanteurs "
                         "découverts  du jour au lendemain grâce à des émissions telles que « American Idol », "
