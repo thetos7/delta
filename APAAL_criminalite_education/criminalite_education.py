@@ -13,20 +13,18 @@ class Criminalite_Education:
     def __init__(self, application=None):
 
         education_df = pd.read_csv("APAAL_criminalite_education/data/education.csv")
-        attendance_zip = education_df.groupby("zip", as_index=False).mean()
+        attendance_ward = education_df.groupby("ward", as_index=False).mean()
 
-        zip_codes = json.load(
-            open("APAAL_criminalite_education/data/zip_codes.geojson")
-        )
+        wards = json.load(open("data/wards.geojson"))
 
         fig = go.Figure(
             px.choropleth_mapbox(
-                attendance_zip,
-                geojson=zip_codes,
-                locations="zip",
-                featureidkey="properties.zip",
-                color="attendance",
-                color_continuous_scale=["red", "green"],
+                attendance_ward,
+                geojson=wards,
+                locations="ward",
+                featureidkey="properties.ward",
+                color="suspension",
+                color_continuous_scale=["green", "yellow", "red"],
                 mapbox_style="carto-positron",
                 zoom=9,
                 center={
@@ -34,7 +32,7 @@ class Criminalite_Education:
                     "lon": -87.5440,
                 },  # Chicago : 41° 52′ 55″ N, 87° 34′ 40″ O
                 opacity=0.5,
-                labels={"attendance": "Student average attendance (%)"},
+                labels={"suspension": "Student average suspension (%)"},
             )
         )
 
