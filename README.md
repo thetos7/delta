@@ -6,7 +6,7 @@ Afin de pouvoir voir notre rendu, il vous suffit de vous rendre dans le dossier 
     
     cd JD_NJ_Etude_de_la_pollution
     
-Néanmoins, vous pouvez aussi le visionner en utilisant la commande "make" du projet Delta. Nous avons cependant tenu à prévenir que lors du rattachement de notre page au projet, nous avons eu des soucis de pagination et de css que nous n'avons pu résoudres avant le rendu final. Nous vous prions donc, pour plus de simplicité et un meilleur rendu de notre projet, de vous rendre sur la page suivant : 
+Néanmoins, vous pouvez aussi le visionner en utilisant la commande "make" du projet Delta. Nous avons cependant tenu à prévenir que lors du rattachement de notre page au projet, nous avons eu des soucis de pagination et de css que nous avons pu résoudres en rendant les figures plus petites. Si vous le souhaitez donc, pour plus de simplicité et un meilleur rendu de notre projet, vous pouvez vous rendre sur la page suivante : 
 
 https://dash-pybd-jules-dorbeau.herokuapp.com/
 

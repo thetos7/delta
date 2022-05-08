@@ -89,7 +89,7 @@ class PollutionFrancaise():
                                 H5("Rendu du devoir pour le projet de PYBD dans le cadre du cursus de SCIA à EPITA par Noé Jenn-Treyer et Jules Dorbeau.",
                                    style={"margin-top": "0px"}),
                                 html.
-                                H5("Suite au ratachement sur le projet delta, nous avons eu des problèmes de css et disposition voici donc un lien ou avoir notre projet avec les bonnes dispositions et css :",
+                                H5("Suite au ratachement sur le projet delta, nous avons eu des problèmes de styles voci un lien ou se situe notre projet avant les fixs (figures plus grandes):",
                                    style={"margin-top": "0px"}),
                                 dcc.Markdown("https://dash-pybd-jules-dorbeau.herokuapp.com/",
                                    style={"margin-top": "0px"}),
@@ -161,12 +161,12 @@ class PollutionFrancaise():
                         style={"margin-right": "30px"},
                         className="pretty_container three columns",
                     ),
-                    # Div for our multi lines plot
+                    # Div for our map plot
                     html.Div(
                         [
                             dcc.Graph(id='map-plot-graph'),
                         ],
-                        className="pretty_container nine columns",
+                        className="pretty_container eight columns",
                     ),
                 ], ),
 
@@ -239,7 +239,7 @@ class PollutionFrancaise():
                         [
                             dcc.Graph(id='multi-lines-plot-graph'),
                         ],
-                        className="pretty_container nine columns",
+                        className="pretty_container eight columns",
                     ),
                 ], ),
 
@@ -324,7 +324,7 @@ class PollutionFrancaise():
                         [
                             dcc.Graph(id='histo-plot-graph'),
                         ],
-                        className="pretty_container nine columns",
+                        className="pretty_container eight columns",
                     ),
                 ], ),
 
