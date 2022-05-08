@@ -16,6 +16,7 @@ class FilmSuccess():
 
     def __init__(self, application = None):
         df = extract_data()
+        df.rename(columns={"total_score": "user_rating"}, inplace=True)
         
         self.app = dash.Dash(__name__)
     
@@ -38,22 +39,24 @@ class FilmSuccess():
         fig2_df = fig2_df.reset_index()
 
         self.main_layout = html.Div(children = [
-                                          html.H3('Films Stats'),
-                                          html.Div("Move your mouse over the graph and click onto any of the representation to have additionnal informations. You can click on the gender's legend on the right to mask few ones"),
+                                          html.H3('Succès des films américains par genre'),
+                                          html.Div("Déplacez votre souris sur le graphique et cliquez sur un point de la courbe pour obtenir des informations additionnels dans le second graphique. Vous pouvez aussi masquer des genres en cliquant dessus dans la légende. N'hésitez pas à zoomer pour voir le graphique plus en détail. Vous pouvez choisir sur la gauche les donnée représentées en ordonné."),
 
                                           html.Div(children = [
                                             html.Div([dcc.RadioItems(
                                                 id='y_axis',
-                                                options=[{'label': i, 'value': i} for i in fig2_df[["profit", "total_score", "votes"]].columns],
-                                                value=fig2_df[["profit", "total_score", "votes"]].columns[0],
+                                                options=[{'label': i, 'value': i} for i in fig2_df[["profit", "user_rating", "votes"]].columns],
+                                                value=fig2_df[["profit", "user_rating", "votes"]].columns[0],
                                                 labelStyle={'display':'block'}
                                               )], style={'display':'flex', 'align-items':'center', 'width':'10%'}),
                                             html.Div([dcc.Graph(id="fig2")], style={'width':'90%'})
                                           ], style={'display':'flex'}),
                                           
-                                          html.Div("Move your mouse over bubble for additionnal information about the film. The graph below is selecting the films with the highest and lowest profit to see which films impacted the gender's success or failure during the year"),
+                                          html.Div("Déplacez votre souris sur les bulles pour obtenir des informations additionnels. Le graphique ci-dessous affiche les 5 films avec le plus haut profit pour l'année et le genre sélectionné ainsi que les 5 films avec le profit le plus faible afin de voir quels films ont eut le plus d'impact durant l'année. La taille des bulles correspond aux notes des spectateurs."),
 
-                                          html.Div([dcc.Graph(id="fig3")])
+                                          html.Div([dcc.Graph(id="fig3")]),
+                                          html.H3('A propos'),
+                                          html.Div("Ces graphiques ont été crée grâce aux données obtenu en scrappant Imdb et Rotten Tomatoes. Le scrapper est disponible dans les fichiers sources. Un notebook est aussi trouvable dans le code source avec davantage de graphiques et analyses.")
                                         ])
                                         
         if application:
@@ -86,7 +89,7 @@ class FilmSuccess():
           fig3_df = fig3_df.sort_values(by='profit')
           fig3_df = pd.concat([fig3_df.head(5), fig3_df.tail(5)])
 
-          return px.scatter(fig3_df, x="name", y="profit", title="{} {}".format(year, genre), color="genre", color_discrete_map=colors, size=np.exp(fig3_df.total_score), size_max=60, hover_data={"total_score": True})
+          return px.scatter(fig3_df, x="name", y="profit", title="{} {}".format(year, genre), color="genre", color_discrete_map=colors, size=np.exp(fig3_df.user_rating), size_max=60, hover_data={"user_rating": True, "votes": True})
 
 
     def run(self, debug=False, port=8050):
