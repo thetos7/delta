@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from JD_NJ_Etude_de_la_pollution import dash_app_pollution
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+pol = dash_app_pollution.PollutionFrancaise(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -25,6 +27,8 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
+                              html.Br(),
+                              dcc.Link(html.Button('Etude de la pollution en France', style={'width':"100%"}), href='/pollution'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -66,6 +70,8 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == "/pollution" :
+        return pol.main_layout
     else:
         return home_page
 
