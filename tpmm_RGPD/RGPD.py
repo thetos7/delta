@@ -189,14 +189,16 @@ class RGPD():
 
             dcc.Markdown("""
             #### À propos
-
-            * Sources : 
-            Nomenclature de l'INSEE : https://www.insee.fr/fr/metadonnees/nafr2/section/A?champRecherche=false
-            DPO et Notifications : https://www.data.gouv.fr/fr/datasets/organismes-ayant-designe-un-e-delegue-e-a-la-protection-des-donnees-dpd-dpo/
-            Budget de la CNIL et montant des sanctions : https://www.data.gouv.fr/fr/datasets/budget-de-la-cnil-1/
-            Actions de la CNIL : https://www.data.gouv.fr/fr/datasets/controles-realises-par-la-cnil/
-                https://www.data.gouv.fr/fr/datasets/mises-en-demeure-prononcees-par-la-cnil/
-            * (c) 2022 Théo Perinet et Marc Monteil
+            Sources : 
+            * [Nomenclature de l'INSEE](https://www.insee.fr/fr/metadonnees/nafr2/section/A?champRecherche=false) sur insee.fr
+            * [Liste des DPO](https://www.data.gouv.fr/fr/datasets/organismes-ayant-designe-un-e-delegue-e-a-la-protection-des-donnees-dpd-dpo/) sur data.gouv.fr
+            * [Liste des Notifications](https://www.data.gouv.fr/fr/datasets/notifications-a-la-cnil-de-violations-de-donnees-a-caractere-personnel/) sur data.gouv.fr
+            * [Budget de la CNIL](https://www.data.gouv.fr/fr/datasets/budget-de-la-cnil-1/) sur data.gouv.fr
+            * [Montant des sanctions](https://www.cnil.fr/fr/les-sanctions-prononcees-par-la-cnil) sur cnil.fr
+            * [Controles de la CNIL](https://www.data.gouv.fr/fr/datasets/controles-realises-par-la-cnil/) sur data.gouv.fr
+            * [Mise en demeure de la CNIL](https://www.data.gouv.fr/fr/datasets/mises-en-demeure-prononcees-par-la-cnil/) sur data.gouv.fr
+            * [Sanctions de la CNIL](https://www.data.gouv.fr/fr/datasets/sanctions-prononcees-par-la-cnil/) sur data.gouv.fr
+            (c) 2022 Théo Perinet et Marc Monteil
             """)
         ], style={
             'backgroundColor': 'white',
