@@ -11,13 +11,15 @@ import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
 import dateutil as du
+from os.path import exists
+from spotify.data.get_data import get_data
 
 class Spotify():
 
     def init_characteristics(self):
         df = pd.read_csv('spotify/data/SpotifyFeatures.csv')
         df = df.rename(columns={'artist_name':'artist', 'track_name':'title'})
-        df.loc[df.genre == 'Children’s Music', 'genre'] = 'Children\'s Music'
+        df = df.drop(columns=['Unnamed: 0'])
         self.musics = df
 
         dfmean = df.drop(columns=['artist', 'title', 'track_id', 'key', 'mode', 'time_signature'])
@@ -39,6 +41,9 @@ class Spotify():
         self.count = count
 
     def __init__(self, application = None):
+        if not(exists("./spotify/data/SpotifyFeatures.csv") and exists("./spotify/data/charts.csv")):
+            get_data()
+        
         self.french = {'popularity':'popularité', 'acousticness':'acousticité', 'danceability':'dansabilité', 'duration_ms':'durée en ms',
         'energy':'énergie', 'instrumentalness':'instrumentalité', 'liveness':'vivacité', 'loudness':'intensité sonore', 'speechiness':'quantité de paroles',
         'tempo':'tempo', 'valence':'valence'}
