@@ -36,6 +36,9 @@ class Formations:
             Output("graph", "figure"),
             Input("year", "value"))
         def display_color(year):
-            fig = px.sunburst(cursus_data.loc[self.years[year]], path=["Type d'établissement", "Grande discipline"],
+            fig = px.treemap(cursus_data.loc[self.years[year]], path=["Type d'établissement", "Grande discipline"],
                               values="Nombre d'étudiants", color="Proportions Femmes")
+            fig.update_layout(autosize=False,
+                          width=960,
+                          height=960)
             return fig
