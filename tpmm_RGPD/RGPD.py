@@ -45,8 +45,27 @@ class RGPD():
             html.Br(),
             html.Br(),
 
+            dcc.Markdown("""Le règlement général sur la protection des données (RGPD, ou encore GDPR en anglais), est un règlement de l'Union européenne qui constitue le texte de référence en matière de protection des données à caractère personnel. 
+            Il renforce et unifie la protection des données pour les individus au sein de l'Union européenne.
+            Ce règlement a été définitivement adopté par le Parlement européen le 27 avril 2016. 
+            Ses dispositions sont directement applicables dans l'ensemble des 27 États membres de l'Union européenne à compter du 25 mai 2018. 
+            Source : https://fr.wikipedia.org/wiki/R%C3%A8glement_g%C3%A9n%C3%A9ral_sur_la_protection_des_donn%C3%A9"""),
+            html.Br(),
+            
+            dcc.Markdown("""Dans ce projet, nous allons voir dans quel mesure le RGPD a été appliqué en France depuis que la loi a été votée à travers la variation du nombre de DPO (Data Protection Officer) dans les entreprises,
+            ainsi que le nombre de notification que ceux ci ont envoyés à la CNIL (Commission Nationale de l'Informatique et de Libertés), qui s'occupe des contrôle relatifs au RGPD.
+            Nous allons également étudier l'évolution de la CNIL, de son budget et de ses actions."""),
+            html.Br(),
+            
             html.H4(children="Évolution du nombre de notifications et DPOs"),
+            dcc.Markdown("""Le data frame suivant montre la correspondance entre la nomenclature de l'INSEE et le secteur d'activité.
+            Les nomenclatures d'activités ont été élaborées principalement en vue de faciliter l'organisation de l'information économique et sociale. 
+            Leur finalité est donc essentiellement statistique et d'ailleurs les critères d'ordre juridique ou institutionnel sont écartés en tant que tels dans leur construction.
+            Source : https://www.insee.fr/fr/metadonnees/nafr2/sousClasse/01.12Z?champRecherche=false"""),
             html.Div([ dcc.Graph(figure=self.update_1_insee())], style={'width':'100%', }),
+            html.Br(),
+            html.Br(),
+
             html.Div([ dcc.Graph(id='rgpd-1-donnees'), ], style={'width':'100%', }),
             html.Div([
                 html.Div([ html.Div('Type d\'informations'),
@@ -70,8 +89,37 @@ class RGPD():
                             'flexDirection':'row',
                             'justifyContent':'flex-start',
                         }),
-
+            dcc.Markdown("""Somme cumulée du nombre de DPO au cours du temps.
+            On peut noter deux tendances : 
+                - Pré novembre 2019 : un niveau de croissance rapide et un pic de recrutement en novembre,
+                - Post novembre 2019 : un recrutement moins intense.
+            On peut donc supposer que la plupart des entreprises se sont soumises aux règles et que les nouveaux recrutements sont plus dues aux créations de nouvelles entités."""),
+            
+            dcc.Markdown("""Nombre brut de DPO embauchés par mois.
+            Remarques générales :
+                - Un certain nombre d'entreprises ont commencées à recruter des DPO dès 2018, donc avant le début de l'application de la loi (l'ensemble des DPO enregistrés avant la date d'application sont inscrit durant le premier mois).
+                - A partir de 2020 le nombre de DPO enregistrés diminue avec le temps.
+            Autres remarques :
+                - Certains secteurs d'activité ont été plus enclins à embaucher des DPO dès le départ (secteur financier et et télécommunications, certainement au vue de la criticité de ces services).
+                - Il y a un gros pic de recrutement en novembre 2019 dans le secteur de la restauration.
+                - Les administrations publiques ont réparties leur recrutement sur 3 ans, ce ne sont pas ces secteurs qui ont été les plus rapides à se mettre au pas."""),
+            
+            dcc.Markdown("""Somme cumulée du nombre de notifications au cours du temps.
+                - La somme des notifications suit globalement une fonction exponentielle, il y a de plus en plus de notifications envoyées par les DPO."""),
+            
+            dcc.Markdown("""Nombre brut de notifications par mois.
+                - L'activité est globalement homogène avec une tendance à la hausse.
+                - Le premier mois est vide car les notifications prennent du temps à  être traitées par la CNIL, et seront contées dans le deuxième mois.
+                - Il y 2 gros pics de notifications dans 3 secteurs biens précis qui sont : hébergement et restauration, santé humaine et action sociale, activité spécialisées, scientifiques et techniques."""),
+            html.Br(),
+            
             html.Div([ dcc.Graph(figure=self.update_1_vs()) ], style={'width':'100%', }),
+            dcc.Markdown("""Nombre de notifications par rapport au nombre de DPO.
+                - Il y a une grande croissance du nombre de notifications par DPO en 2018.
+                - La tendance est globalement linéaire et à la hausse.
+            Remarque : On pourrait penser que le DPO produisent plus de notifications avec le temps parce qu'ils prennent mieux en charge leur métier. 
+            Il s'agit probablement d'une fausse interprétation. En effet dans la mesure où les recrutement des DPO sont déclarés instantanément, contrairement aux notifications qui doivent d'abord être prises en charge par la CNIL, 
+            il ne faut pas en déduire que les DPO sont 6 fois plus productifs qu'en début 2018. On peut toutefois noter une légère hausse."""),
 
             html.Br(),
             html.Br(),
@@ -92,13 +140,29 @@ class RGPD():
                             'flexDirection':'row',
                             'justifyContent':'flex-start',
                         }),
-
+            dcc.Mardown("""Budget de la CNIL et Montant des sanctions.
+                - Le budget de la CNIL est quasiment constant sur la période 2012-2021.
+                - Avant 2018, le montant des sanctions est bas par rapport à celui de la CNIL.
+                - Après la mise en application de la loi de 2018, les sanctions sont plus importantes. On peut justifier cette variation par l'augmentation du nombre global de sanctions ainsi que les sommes de ces sanctions. 
+                  En effet certaines amendes sur de grands groupes sont très importantes (Facebook 60 000 000€ en 2020)."""),
             html.Br(),
             html.Br(),
 
             html.H4(children="Les actions de la CNIL"),
             html.Div([ dcc.Graph(figure=self.update_3_data()) ], style={'width':'100%', }),
+            dcc.Markdown("""Evolution du nombre d'actions de la CNIL.
+                - Le nombre d'actions qu'effectue la CNIL est assez homogène, voir en baisse en ce qui concerne les contrôles.
+                - Ce constat est étonnant en vue du graphique précédent sur les sanctions."""),
+            html.Br(),
+            
             html.Div([ dcc.Graph(figure=self.update_3_vs()) ], style={'width':'100%', }),
+            dcc.Markdown("""Fréquence du nombre d'actions par rapport au nombre de contrôles.
+                - On remarque que les avertissements sont peu plébiscités par la CNIL comme les sanctions, bien qu'étant en hausse dernièrement. 
+                - De manière générale, la CNIL sanctionne peu par rapport au nombre de contrôles.
+                - Le nombre de mise en demeure est assez élevé.
+            Mise en demeure : Injonction formelle qui informe une personne que le délai pour remplir une obligation arrive à son terme ou est dépassée. Cette interpellation met en place un nouveau délai qui, s'il n'est pas respecté, oblige la personne à se rendre dans un tribunal.
+            Source : https://www.linternaute.fr/dictionnaire/fr/definition/mise-en-demeure/"""),
+            html.Br(),
 
             dcc.Markdown("""
             #### À propos
