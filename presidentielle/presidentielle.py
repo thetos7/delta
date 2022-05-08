@@ -68,7 +68,8 @@ class Presidentielles():
                 "Chaîne": "Chaîne"
             }, title="Temps de parole pour fache candidats en fonction des médias")
 
-        fig_tdp_t2 = px.bar(df_tdp[(df_tdp['Période'] == '2022-04-08') & ((df_tdp['Candidat'] == 'Macron') | (df_tdp['Candidat'] == 'Lepen')) ], x='Candidat', y="Somme",
+        fig_tdp_t2 = px.bar(df_tdp[(df_tdp['Période'] == '2022-04-08') & (
+                (df_tdp['Candidat'] == 'Macron') | (df_tdp['Candidat'] == 'Lepen'))], x='Candidat', y="Somme",
                             color='Chaîne', barmode="group", labels={
                 "Période": "Temps en jours",
                 "Somme": "Temps de parole en minutes",
@@ -80,22 +81,46 @@ class Presidentielles():
             html.H3(children='Premier tour'),
             html.Div(
                 [dcc.Graph(id='sond_t1', figure=fig_sond_t1)], style={'width': '100%', }),
+            dcc.Markdown("""
+             ##### Notes :
+             - L'arrivée de certains candidats fait perdre des voix à certains qu'ils ne regagneront jamais même 
+             si le candidat n'est se retire de la présidentielle (Mme Taubira et M. Jadot)
+             - Mme Le Pen et M. Mélenchon sont monté dans les sondages sur les 2 dernières semaines et ont fait 
+             perdre des voix aux autres candidats
+            """),
             html.Div(
                 [dcc.Graph(id='dtp_t1', figure=fig_tdp_t1)], style={'width': '100%', }),
-
+            dcc.Markdown(""" 
+            ##### Notes :
+            - Certains médias parlent beaucoup plus des élections présidentielles que d'autres
+            - Le temps de parole totale des candidats dans les médias ne reflète pas leur passage ou non au second tour 
+            (Mme Le Pen a passé beaucoup moins de temps dans les médias que Mme Pecresse et a pourtant accédé au second tour)
+            - 
+            """),
             html.H3(children='Second tour'),
             html.Div(
                 [dcc.Graph(id='sond_t2', figure=fig_sond_t2)], style={'width': '100%', }),
-
+            dcc.Markdown("""
+             ##### Notes :
+             - Les sondages datant d'avant le second tour sont les sondages qui représentent les 
+             intentions de vote opposants Mme Le Pen et M. Macron
+             - Mme Le Pen et M. Macron ont toujours été très proches au niveau des sondages
+             - Sur la période du second tour et en prenant en comptent les erreurs de sondages 
+             Mme Le Pen est passé devant M. Macron plusieurs fois
+            """),
             html.Div(
-                [dcc.Graph(id='dtp_t2', figure=fig_tdp_t2)], style={'width': '100%', }),
-
+                [dcc.Graph(id='dtp_t2', figure=fig_tdp_t2)], style={'width': '100%'}),
+            dcc.Markdown("""
+             ##### Notes :
+             - Les deux candidats du second tour n'ont pas été représentés équitablement durant la période de l'entre-deux tours.
+             - Certains médias représentent plus M. Macron et d'autres Mme. Le Pen
+            """),
             html.Br(),
             html.H3(children='À propos'),
             dcc.Markdown(""" 
                         * Données sondage: [Nsppolls](https://github.com/nsppolls/nsppolls/blob/master/presidentielle.csv)
                         * Données temps de parole : [CSA](https://www.csa.fr/Proteger/Garantie-des-droits-et-libertes/Proteger-le-pluralisme-politique/La-presidentielle-2022)
-                        * (c) 2022 Guillaume LARUE et Enguerrand de Gentile Duquesne
+                        * (c) 2022 Guillaume Larue et Enguerrand de Gentile Duquesne
                         """),
         ], style={
             'backgroundColor': 'white',
