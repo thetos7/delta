@@ -5,7 +5,7 @@ import json
 
 class RiotAccess:
 
-    RIOT_API_KEY = "RGAPI-6429337a-6e9c-4429-b7c7-c1cbca7c6089"
+    RIOT_API_KEY = ""
     EU_RIOT_MATCH_ENDPOINT = "https://europe.api.riotgames.com/lol/match/v5/matches/"
     ASIA_RIOT_MATCH_ENDPOINT="https://asia.api.riotgames.com/lol/match/v5/matches/"
     NA_RIOT_MATCH_ENDPOINT="https://americas.api.riotgames.com/lol/match/v5/matches/"
@@ -27,7 +27,9 @@ class RiotAccess:
 
     REQUEST_SLEEP_TIME = 1.2
 
-    def __init__(self):
+    def __init__(self, API_KEY=None):
+        if API_KEY is not None:
+            self.RIOT_API_KEY = API_KEY
         self.headers = {"X-Riot-Token": self.RIOT_API_KEY}
 
     def update_api_key(self, newkey):
