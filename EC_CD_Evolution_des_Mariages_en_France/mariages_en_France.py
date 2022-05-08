@@ -199,7 +199,7 @@ class Mariage():
         # Display the number of mariages and their type (HH, FF ou HF) by month for a department during the year
         df = self.table[self.table['AMAR'] == self.year]
         df = df[df['DEPMAR'] == self.dep]
-      
+        
         HH = df[(df['SEXE1'] == 'M') & (df['SEXE2'] == 'M')]
         graph = pd.DataFrame(HH.groupby('MMAR').size(), columns = ['HH'])
         FF = df[(df['SEXE1'] == 'F') & (df['SEXE2'] == 'F')]
@@ -211,6 +211,8 @@ class Mariage():
         graph = self.check_months(graph)
         graph = graph.sort_values(by=['MMAR'])
         graph['MMAR'] =  graph['MMAR'].apply(self.update_month)
+        # Eliminate all NaN of the Table
+        graph = graph.fillna(0)
         
         self.fig_histo = px.histogram(graph, x = 'MMAR', y = ['HH', 'FF', 'HF'], barmode='group')
         
