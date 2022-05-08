@@ -21,15 +21,17 @@ Un sous-diagramme polaire permet de résumer le genre séléctionné dans le dia
 
 ### Ce que l'on peut en déduire :
 - On observe grâce à ces diagrammes que certainnes caractéristiques sont importantes pour qu'une musique soit populaire : la dansabilité, l'énergie et la valence. On peut prendre l'exemple du Rap ou de la Pop.
-- On observe aussi que certains genre sont des genres de "niches" qui se base souvent sur une carctéristiques. On peut prendre l'exemple de l'Opéra ou des musiques de films.
-- Les restes des caractéristiques influent moins sur la popularité mais permettent de déterminer le type d'une musique. On peut prendre l'exemple de la quantitté de parole.
+- On observe aussi que certains genre sont des genres de "niche" qui se base souvent sur une carctéristique. On peut prendre l'exemple de l'Opéra ou des musiques de films.
+- Les restes des caractéristiques influent moins sur la popularité mais permettent de déterminer le type d'une musique. On peut prendre l'exemple de la quantité de parole.
 
 ### Structure :
 ```sh
 spotify/
     - data/
         - charts.csv
-        - SpotifyFeatures.scv
+        - SpotifyFeatures.csv
+        - data.tar.gz
+        - get_data.py
     - Popularité des musiques.ipynb
     - spotify.py
     - README.md
