@@ -4,27 +4,25 @@ import plotly.express as px
 import dash
 from dash import Dash, html, dcc
 
-def get_data(filename):
-    data = pd.read_csv(filename)
+def get_data() : 
+    data = pd.read_csv("aa_sc_metacritic/data/vgcritics.csv")
     data = data.loc[(data.critics > 5) & (data.genre != "No info")]
-    data['r-date'] = pd.to_datetime(data['r-date'], format='%B %d, %Y')
     data = data.loc[data['user score'] != 'tbd']
+    data['r-date'] = pd.to_datetime(data['r-date'], format='%B %d, %Y')
     
     data_sales = pd.read_csv("aa_sc_metacritic/data/vgsales.csv")
     
     # Same name easier merged between both data base  
-    name_corres = [("XOne", "XboxOne"), ("X360", "Xbox360"), ("XB", "Xbox"), ("PS4", "PlayStation4"), ("PS3", "PlayStation3"), ("PS2", "PlayStation2"), ("PS", "PlayStation"), ("GC", "GameCube"), ("GBA", "GameBoyAdvance"), ("N64", "Nintendo64"), ("PSV", "Playstation")]
+    name_corres = [("Xone", "XboxOne"), ("X360", "Xbox360"), ("XB", "Xbox"), ("PS4", "PlayStation4"), ("PS3", "PlayStation3"), ("PS2", "PlayStation2"), ("PS", "PlayStation"), ("GC", "GameCube"), ("GBA", "GameBoyAdvance"), ("N64", "Nintendo64"), ("PSV", "Playstation")]
     data_sales.rename(columns = {"Name": "name", "Platform": "platform"}, inplace = True)
     for pair in name_corres : 
         data_sales.loc[data_sales['platform'] == pair[0], 'platform'] = pair[1]
-    
-    data_merged = pd.merge(data, data_sales, on=["name", "platform"])
-
-    return data, data_sales, data_merged
+        
+    return data, data_sales
 
 class Metacritic():
     def __init__(self, application=None): 
-        self.data, self.data_sales, self.data_merged = get_data("aa_sc_metacritic/data/vgcritics.csv")
+        self.data, self.data_sales = get_data()
         
         genre_list = ["Action", "Adventure", "Arcade", "Sports", "Fighting", "Open-World", "Role-Playing", "RPG", "Platformer", "Fantasy", "Shooter", "Simulation", "Racing", "Survival"]
         fig_plat = self.update_graph_plateforme(2007)
@@ -272,7 +270,7 @@ class Metacritic():
         data_mean = data_platform.groupby(data_platform['Year']).sum()
 
         evolution_per_year = data_mean
-        fig = px.line(evolution_per_year, y="Global_Sales", title="Evolution des ventes cumulés des jeux sorties pendant une année sur " + platform, labels={
+        fig = px.bar(evolution_per_year, y="Global_Sales", title="Ventes cumulés des jeux sorties pendant une année sur " + platform, labels={
                          "Global_Sales": "Ventes mondiales (en millions)",
                          "Year": "Année",
                      },)
@@ -297,7 +295,7 @@ class Metacritic():
         data_platform['user score'] = data_platform['user score'].astype(float)
         data_diff_scores = data_platform.groupby(self.data['r-date'].dt.year).mean()
         data_diff_scores['diff'] = data_diff_scores['score'] - (data_diff_scores['user score'] * 10)
-        fig = px.line(data_diff_scores, y="diff", title="Evolution des différences entre critiques et joueurs pour des jeux sorties sur " + platform, labels={
+        fig = px.bar(data_diff_scores, y="diff", title="Différences entre critiques et joueurs pour des jeux sorties sur " + platform, labels={
                                 "diff": "Différence entre notes des critiques et des joueurs",
                                 "r-date": "Année",
                             },)
