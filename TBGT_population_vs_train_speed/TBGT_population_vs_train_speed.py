@@ -18,6 +18,15 @@ pd.options.plotting.backend = "plotly"
 class TBGT:
     FRANCE_CENTER = (46.7110, 1.7191)
     RELATION_DEFAULT = "TOUTES LES LIGNES"
+    COMMENT = """Sur le graphique de l'évolution du temps de trajet moyen des grandes lignes, nous pouvons observer 3 éléments interessants:
+- La partie croissante et linéaire entre 1939 et 1950 est due au manque de données durant la seconde guerre mondiale et à la destruction d'une partie du réseau ferroviaire due à cette dernière
+- La partie fluctuante vers la fin des années 50 est due à l'apparition de nombreuses nouvelles grandes lignes qui viennent chambouler la moyenne
+- La forte décroissance à partir des années 80 peut être attribuée au déploiment du réseau TGV qui a fortement accéléré les trajets
+
+
+Sur le graphique comparant la croissance démographique de Paris et des autres grandes villes, on peut observer que les deux courbes ont une forte corrélation inversement proportionnnelle. Par exemple, vers la fin des années 50, lorsque Paris souffrait d'une forte décroissance démographique, on observe l'effet inverse dans autres grandes villes de France. La création de nombreuses grandes lignes vers la fin des années 50 a sans doute faciliter l'émigration de nombreux parisiens, expliquant ainsi partiellement ce phénomène.
+
+Regardons plus en détail la ligne `Paris - Montpellier` par exemple. On s'appercoit que dans les années 60, un développement significatif de cette ligne a permis de faire gagner à ses usagers 1h de temps de transports. Sur le plan démographique, la ville de Montpellier a dans les années qui ont suivi profiter d'une croissance importante. Cette corrélation semble assez forte et vaudrait le coup d'être étudier plus en détail pour mettre en évidence un potentiel lien de cause à effet."""
 
     def _get_relations_radio(self) -> dcc.RadioItems:
         relations = np.insert(pd.unique(self.train_df["Relations"]), 0, self.RELATION_DEFAULT)
@@ -161,7 +170,8 @@ class TBGT:
                                  "position": "relative", "vertical-align": "top",
                                  "height": "900px"}),
                 self._get_statistics_graph()
-            ])
+            ]),
+            dcc.Markdown(self.COMMENT)
         ], style={
             "backgroundColor": "white",
             "padding": "10px 50px 0px 0px",
