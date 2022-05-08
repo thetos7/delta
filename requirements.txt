@@ -14,6 +14,7 @@ dash
 gunicorn
 flask
 scipy
+statsmodels
 glob2
 regex
 requests
