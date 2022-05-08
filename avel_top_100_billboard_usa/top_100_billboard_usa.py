@@ -109,7 +109,7 @@ class Top100BillboardUSA:
                         "évènement.",
                         html.Br(),
                         "On remarque cependant que les années 2020 et 2021 voient ce phénomène apparaître 3 fois plus "
-                        "souvent : constat peu étonnant compte tenu de l'hyperconsommation de notre société qui crée "
+                        "souvent. Cela est un constat peu étonnant compte tenu de l'hyperconsommation de notre société qui crée "
                         "l'insatisfaction permanente où les modes y sont de plus en plus éphémères."]),
             ]),
 
