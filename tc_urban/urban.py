@@ -177,14 +177,23 @@ class UrbanPolutionStats():
                 dcc.Markdown("""
                     #### Analyse
 
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                    Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                    when an unknown printer took a galley of type and scrambled it to make a type
-                    specimen book. It has survived not only five centuries, but also the leap into
-                    electronic typesetting, remaining essentially unchanged. It was popularised in
-                    the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
-                    and more recently with desktop publishing software like Aldus PageMaker including
-                    versions of Lorem Ipsum.
+                    D'après les deux premiers graphes, on peut remarquer que plus la population urbaine est grande,
+                    plus elle émet de CO₂ par personne. Par exemple, le continent africain regroupe une faible
+                    population urbaine et elle émet peu de CO₂ par habitant ; les Etats-unis, en revanche,
+                    regroupent une forte population urbaine avec une grande émission de CO₂ par habitant.
+
+                    Dans le 3ème graphique, on peut remarquer que la Chine et l'Inde sont les deux pays les plus
+                    peuplés au monde et elles émettent peu d'émission de CO₂ par habitant en zone urbaine. Néanmoins,
+                    l'émission totale de CO₂ de ces deux pays est énorme.
+
+
+                    ###### Bilan
+                    
+                    Après l'analyse de ce jeu de données, on peut remarquer que plus un pays a de populations
+                    urbaines, plus l'émission de CO₂ par personne va être grande.  De plus, comme nous l'avons
+                    vu dans l'exemple de la Chine et de l'Inde, un pays peut avoir une émission de CO₂
+                    totale très élevée malgré le fait que l'émission de CO₂ par habitant soit moindre du au fait que
+                    la population totale soit très élevée.
                 """),
                       
                 html.Br(),
