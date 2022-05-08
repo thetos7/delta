@@ -10,6 +10,15 @@ Ce dépôt GitHub propose des pages Jupyter et des service Dash pour analyser de
 
 * [Natalité / revenus](https://github.com/oricou/delta/tree/main/population) : exemple classique qui montre la chute de natalité à travers le monde et la croissance des revenus
 * [Prix de l'énergie](https://github.com/oricou/delta/tree/main/energies) : compare le prix grand public de différentes énergies en France
+* [Sondages présidentiels et temps de parole dans les médias](https://github.com/nsppolls/nsppolls/blob/master/presidentielle.csv) : compare le temps de parole des candidats dans les médias et dans les intentions de vote données grâce aux différents sondages.
+
+### Get Data
+Le fichier `get_data.py` permet de récupérer les données depuis un lien et de les transformer pour notre utilisation. 
+Exécuter ce fichier mettra à jour les données.
+
+### Auteurs
+- Enguerrand de Gentile Duquesne
+- Guillaume Larue
 
 Note : le choix du français est volontaire, il s'agit de promouvoir l'usage
        des données ouvertes auprès du grand public en France. Cela étant il
