@@ -27,18 +27,18 @@ class Accidents():
             html.H3(children=['Contextualisation des accidents de la route']),
             html.Div([dcc.Graph(id='main-graph')], style={'width':'100%'}),
             html.Div([
-                    dcc.RadioItems(id='line-to-histo',
-                        options= [
-                            {'label' : "Histogramme", 'value':1},
-                            {'label' : "Lignes", 'value':0} ],
-                        value=1,
-                        style={'display':'inline-block', 'width':'50%'}),
-                    dcc.Dropdown(id='cat-changer',
-                        options = list(self.categories),
-                        value="Catégorie de route",
-                        searchable = False,
-                        style={'display':'inline-block', 'width': '50%'})
-                    ]),
+                dcc.RadioItems(id='line-to-histo',
+                    options= [
+                        {'label' : "Histogramme", 'value':1},
+                        {'label' : "Lignes", 'value':0} ],
+                    value=1,
+                    style={'display':'inline-block', 'width':'50%'}),
+                dcc.Dropdown(id='cat-changer',
+                    options = list(self.categories),
+                    value="Catégorie de route",
+                    searchable = False,
+                    style={'display':'inline-block', 'width': '50%'})
+                ]),
             html.Br(),
             dcc.Markdown("""
             Le graphe ci-dessus est interactif :
@@ -48,15 +48,36 @@ class Accidents():
 
             Toutes les données portent sur les années 2015 à 2020, en France.
 
-            #### Notes
+            #### Observations
 
-            * En ce qui concerne la déclivité, la surface, les conditions atmosphériques, les intersections et le tracé de la route, on observe une vaste majorité d'accidents dans une 'normale'. On peut expliquer cela statistiquement par la fréquence d'apparition des phénomènes (e.g : la distance couverte par des routes hors intersection est très, de manière évidente,largement supérieure aux autres).
+            * En ce qui concerne la déclivité, la surface, les conditions atmosphériques, les intersections et le tracé de la route, on observe une vaste majorité d'accidents dans une "normale" (route droite, plate, sèche, etc.).
             * On observe cependant sans surprise que le nombre d'accidents en intersection reste proportionellement bien plus élevé que sur route droite.
             * Les routes communales et départementales semblent statistiquement plus mortifères que les autres (moins entretenues, moins de vigilance,..).
             * Les accidents sont prévalents le jour car les routes sont bien plus fréquentées. Cependant, on observe en moyenne autant d'accidents la nuit pour une fréquentation inférieure (manque de luminosité fatiguant plus vite, fatigue entraînant une baisse de vigilance).
 
 
             * Les mois de mars et surtout d'avril 2020 sont marqués par une drastique baisse des accidents en toute catégories, facilement corrélable avec la période de confinement, entrainant une baisse radicale de la frequentation des routes.
+
+
+            """),
+            html.Div([dcc.Graph(id='correl-graph')]),
+            html.Div([
+                dcc.Dropdown(id='column1',
+                    options = list(self.categories),
+                    value="Tracé de la route",
+                    style={'display':'inline-block', 'width':'50%'}),
+                dcc.Dropdown(id='column2',
+                    options = list(self.categories),
+                    value="Type d'intersection de la voie",
+                    searchable = False,
+                    style={'display':'inline-block', 'width': '50%'})
+                ]),
+            html.Br(),
+            dcc.Markdown("""
+            Ce graphe corrèle des paramètres deux à deux, choisissez les paramètres.
+
+            * On observe encore une grande majorité de valeurs dans la "normale", quels que soient les paramètres que l'on corrèle.
+            * On peut expliquer ce phénomène par la prévalence de cette "normalité" dans les différents facteurs. La majorité des routes sont plates et droite, par exemple.
 
 
             ####  A propos
@@ -66,11 +87,11 @@ class Accidents():
             * (c) 2022 Hugo Boux & Stephane Mabille
 
 
-                        """
-                        )], style = {
-                            'backgroundColor' : 'white',
-                            'padding': '10px 50px 10px 50px'
-                            })
+                        """),
+            ], style = {
+                'backgroundColor' : 'white',
+                'padding': '10px 50px 10px 50px'
+                })
 
         if application:
             self.app = application
@@ -80,17 +101,59 @@ class Accidents():
 
         self.app.callback(
                 dependencies.Output('main-graph', 'figure'),
-                dependencies.Input('cat-changer', 'value'),
-                dependencies.Input('line-to-histo', 'value'))(self.switch_graph_bar_line)
+                [ dependencies.Input('line-to-histo', 'value'),
+                    dependencies.Input('cat-changer', 'value'),
+                    ])(self.histo_line_callback)
+        self.app.callback(
+                dependencies.Output('correl-graph', 'figure'),
+                [ dependencies.Input('column1', 'value'),
+                    dependencies.Input('column2', 'value')
+                    ])(self.correl_callback)
 
-    def switch_graph_bar_line(self, cat, value):
-        category = self.categories[cat]
+    def histo_line_callback(self, histo , strg):
+        strg = self.categories[strg]
         data = self.df
-        if (value == True):
-            return get_count_value_param_bar(category, data)
+        add = []
+        tmp_param_name = switch_categorie(strg)
+        for annee in range(2015, 2021):
+            tmp_annee = data[data["an"] == annee]
+            for mois in range(1, 13):
+                tmp = tmp_annee[tmp_annee["mois"] == mois]
+                month_convert = pd.to_datetime(str(mois) + str(annee), format='%m%Y').strftime("%Y-%m")
+                tmp_count = tmp[strg].value_counts()
+                for i in range(0, len(tmp_count)):
+                    add.append([month_convert, tmp_param_name[tmp_count.index[i]-1], tmp_count.values[i]])
+            df = pd.DataFrame(add, columns=["Date", strg, "Count_" + str(strg)])
+        if (histo):
+            fig = px.bar(labels= {'x': 'Date', 'y': "Nombre d'accident"}, title=switch_titre(strg))
         else:
-            return get_count_value_param_line(category, data)
+            fig = px.line(labels= {'x': 'Date', 'y': "Nombre d'accident"}, title=switch_titre(strg))
+        fig_test = df.groupby(strg)['Count_' + strg].sum().sort_values(ascending=False)
+        for param in range(0, len(fig_test.index)):
+            tmp_df = df[(switcher_categorie(strg,df) == fig_test.index[param])]
+            if (histo):
+                fig.add_bar(x=tmp_df["Date"], y=tmp_df["Count_" + str(strg)], name=fig_test.index[param] + " = " + str(fig_test.values[param]))
+            else:
+                fig.add_scatter(x=tmp_df["Date"], y=tmp_df["Count_" + str(strg)], name=fig_test.index[param] + " = " + str(fig_test.values[param]))
+        return fig
 
+    def correl_callback(self, column1, column2):
+        data = self.df
+        column1 = self.categories[column1]
+        column2 = self.categories[column2]
+        fig = px.histogram(data, x = data[column1].astype('int64').apply(lambda i: switch_categorie(column1)[i-1]),
+                color = data[column2].astype('int64').apply(lambda i: switch_categorie(column2)[i-1]),
+                color_discrete_sequence=color_list_test,
+                labels = {'x':switch_legende(column1), "color":switch_legende(column2)},
+                )
+        fig.update_layout(legend=dict( orientation = "h",
+            yanchor = "bottom", y = 1.05,
+            xanchor = "right", x = 1 ),
+            autosize=True)
+        fig.update_yaxes(automargin=True)
+        return fig
+
+### END OF CLASS ###
 
 def switch_categorie(strg):
     switcher = {
@@ -136,46 +199,25 @@ def switcher_categorie(strg, df_test):
     else:
         return df_test.prof
 
-def get_count_value_param_bar(strg, data):
-    add = []
-    #an = str(data.iloc[0]['an'])
-    tmp_param_name = switch_categorie(strg)
-    for annee in range(2015, 2021):
-        tmp_annee = data[data["an"] == annee]
-        for mois in range(1, 13):
-            tmp = tmp_annee[tmp_annee["mois"] == mois]
-            month_convert = pd.to_datetime(str(mois) + str(annee), format='%m%Y').strftime("%Y-%m")
-            tmp_count = tmp[strg].value_counts()
-            for i in range(0, len(tmp_count)):
-                add.append([month_convert, tmp_param_name[tmp_count.index[i]-1], tmp_count.values[i]]) #faire qqlchose pour la liste
-        df_test = pd.DataFrame(add, columns=["Date", strg, "Count_" + str(strg)])
-    fig_line = px.bar(labels= {'x': 'Date', 'y': "Nombre d'accident"}, title=switch_titre(strg)) #faire un switch pour les noms des charts
-    fig_test = df_test.groupby(strg)['Count_' + strg].sum().sort_values(ascending=False)###
-    for param in range(0, len(fig_test.index)):
-        tmp_df = df_test[(switcher_categorie(strg,df_test) == fig_test.index[param])]
-        fig_line.add_bar(x=tmp_df["Date"], y=tmp_df["Count_" + str(strg)], name=fig_test.index[param] + " = " + str(fig_test.values[param]))
-    return fig_line
+
+#return switch_line_bar(Trufal, strg, df_test)
+
+def switch_legende(strg):
+    switcher = {
+            "catr": "categorie de la route",
+            "plan": "tracé en plan de la route",
+            "surf": "état de la surface de la route",
+            "prof": "déclivité de la route",
+            "lum": "éclairage de la route",
+            "atm": "conditions atmosphériques",
+            "col": "type de collision",
+            "int": "intersection de la voie" 
+            }
+    return switcher.get(strg)
+
+color_list_test=["#7ad151","#9FBDFC","#43bf71","#95A6FB", "#21918d", "#8C8CF9", "#2a788e", "#D161EC","#482575"]
 
 
-def get_count_value_param_line(strg, data):
-    add = []
-    #an = str(data.iloc[0]['an'])
-    tmp_param_name = switch_categorie(strg)
-    for annee in range(2015, 2021):
-        tmp_annee = data[data["an"] == annee]
-        for mois in range(1, 13):
-            tmp = tmp_annee[tmp_annee["mois"] == mois]
-            month_convert = pd.to_datetime(str(mois) + str(annee), format='%m%Y').strftime("%Y-%m")
-            tmp_count = tmp[strg].value_counts()
-            for i in range(0, len(tmp_count)):
-                add.append([month_convert, tmp_param_name[tmp_count.index[i]-1], tmp_count.values[i]]) #faire qqlchose pour la liste
-        df_test = pd.DataFrame(add, columns=["Date", strg, "Count_" + str(strg)])
-    fig_line = px.line(labels= {'x': 'Date', 'y': "Nombre d'accident"}, title=switch_titre(strg)) #faire un switch pour les noms des charts
-    fig_test = df_test.groupby(strg)['Count_' + strg].sum().sort_values(ascending=False)###
-    for param in range(0, len(fig_test.index)):
-        tmp_df = df_test[(switcher_categorie(strg,df_test) == fig_test.index[param])]
-        fig_line.add_scatter(x=tmp_df["Date"], y=tmp_df["Count_" + str(strg)], name=fig_test.index[param] + " = " + str(fig_test.values[param]))
-    return fig_line
 
 if __name__ == '__main__':
     SMBH = Accidents()
