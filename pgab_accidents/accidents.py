@@ -1,41 +1,107 @@
-from typing import Union
 import glob
 import dash
 from dash import html
 import dash_core_components as dcc
-import os
 import pandas as pd
-import matplotlib.pyplot as plt
 import plotly.express as px
+import plotly.graph_objects as go
+import plotly.io as pio
+import calendar as cal
 
-# TODO create layout
 class Accidents:
     START = 'Start'
     STOP  = 'Stop'
 
     def __init__(self, application = None):
-        self.df = pd.concat([pd.read_pickle(f) for f in glob.glob('data/acc_caracs_grav-*')]).sort_values('year')
+        self.df = pd.concat([pd.read_pickle(f) for f in glob.glob('data/acc_caracs_grav-*')]).sort_values(['year', 'grav'],
+               ascending = [True, False])
+        self.df.rename(columns = {'grav':'Gravité', 'year':'Année', 'mois':'Mois'}, inplace = True)
+        bar_fig = px.histogram(self.df, x="Année", color="Gravité")
+        self.zoom=4
+        self.center=dict(lat=46.7111, lon=1.7191)
+        
+        pio.templates["missing"] = go.layout.Template(
+            layout_annotations=[
+                dict(
+                    name="missing data watermark",
+                    text="MISSING DATA",
+                    textangle=-20,
+                    opacity=.4,
+                    font=dict(color="black", size=100),
+                    xref="paper",
+                    yref="paper",
+                    x=0.5,
+                    y=0.5,
+                    showarrow=False,
+                )
+            ]
+        )
 
         self.main_layout = html.Div(children=[
             html.H3(children='Répartition des accidents de la route en France métropolitaine entre 2005 et 2020'),
-            html.Div([ dcc.Graph(id='acc-main-graph'), ], style={'width':'100%', }),
-            html.Div([ dcc.RadioItems(id='acc-type', 
-                                     options=[{'label':'Heatmap', 'value':0},
-                                              {'label':'Emplacements exacts', 'value':1}], 
-                                     value=0,
-                                     labelStyle={'display':'block'}) ,
-                                     ]),
+            html.Div([
+                html.Div([ dcc.Graph(id='acc-main-graph'), ], style={'width':'100%', }),
+                html.Div([ dcc.RadioItems(id='acc-type', 
+                                         options=[{'label':'Heatmap', 'value':0},
+                                                  {'label':'Emplacements exacts', 'value':1}], 
+                                         value=0,
+                                         labelStyle={'display':'block'}),
+                           html.Div(html.Button(self.START, id='button-start-stop', style={'display':'inline-block'}), style={'margin-right':'15px', 'width': '7em', 'float':'right'}),
+                         ]),
+                     ]),
+            html.Div([
+                html.Br(),
+                html.Div(
+                    dcc.Slider(
+                            id='year-slider',
+                            min=2005,
+                            max=2020,
+                            step = 1,
+                            value=2005,
+                            marks={str(year): str(year) for year in range(2005, 2021)},
+                    ),
+                    style={'display':'inline-block', 'width':"90%"}
+                ),
+                dcc.Interval(
+                    id='auto-stepper',
+                    interval=1500,
+                    max_intervals = -1,
+                    n_intervals = 0
+                ),
+                ], style={
+                    'padding': '0px 50px', 
+                    'width':'100%'
+                }),
+            html.Div([ dcc.Graph(id='acc-month-bar-graph'), ], style={'width':'100%', }),
             dcc.Markdown("""
-            Carte intéractive des accidents de la route entre 2016 et 2020. Utilisez le slider afin de sélectionner l'année.
+            Carte interactive des accidents de la route recensés entre 2005 et 2020.
+            
+            Utilisez le slider afin de sélectionner l'année.
+            
+            L'année 2009 reste manquante (fichier invalide), et avant 2015 la plupart des régions ne donnent pas de coordonnées GPS, les données mises à disposition sont incomplètes.
+            
             La carte comporte plusieurs calques:
-            * Heatmap des accidents
-            * Emplacements exacts
+            * **Heatmap** des accidents
+            * **Emplacements exacts** des accidents
+            
+            __Information complémentaire__, la gravité d'un accident correspond à:
+            * **1** | Indemne
+            * **2** | Blessures légères
+            * **3** | Blessures graves
+            * **4** | Blessures mortelles
+            """, style={'margin-top': '3rem'}),
+            
+            html.Div([ dcc.Graph(id='acc-bar-graph', figure=bar_fig), ], style={'width':'100%', }),
+            dcc.Markdown("""
+            Histogramme des accidents de la route recensés entre 2005 et 2020.
+            
+            L'année 2009 reste manquante, les données mises à disposition sont incomplètes.
 
             #### À propos
             * Données: [data.gouv.fr](https://www.data.gouv.fr/fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2020/)
 
             &copy; 2022 Paul Galand & Ancelin Bouchet
-            """, style={'margin-top': '3rem'})
+            """, style={'margin-top': '3rem'}),
         ], style={
             'backgroundColor': 'white',
             'padding': '10px 50px 10px 50px',
@@ -50,28 +116,79 @@ class Accidents:
             self.app.layout = self.main_layout
 
         self.app.callback(
-                    dash.dependencies.Output('acc-main-graph', 'figure'),
-                    dash.dependencies.Input('acc-type', 'value'))(self.update_graph)
+            dash.dependencies.Output('acc-month-bar-graph', 'figure'),
+            dash.dependencies.Input('year-slider', 'value'))(self.update_month_bar_graph)
+        self.app.callback(
+            dash.dependencies.Output('acc-main-graph', 'figure'),
+            [ dash.dependencies.Input('acc-type', 'value'),
+              dash.dependencies.Input('year-slider', 'value')])(self.update_main_graph)
+        self.app.callback(
+            dash.dependencies.Output('button-start-stop', 'children'),
+            dash.dependencies.Input('button-start-stop', 'n_clicks'),
+            dash.dependencies.State('button-start-stop', 'children'))(self.button_on_click)
+        self.app.callback(
+            dash.dependencies.Output('auto-stepper', 'max_interval'),
+            [dash.dependencies.Input('button-start-stop', 'children')])(self.run_movie)
+        self.app.callback(
+            dash.dependencies.Output('year-slider', 'value'),
+            dash.dependencies.Input('auto-stepper', 'n_intervals'),
+            [dash.dependencies.State('year-slider', 'value'),
+             dash.dependencies.State('button-start-stop', 'children')])(self.on_interval)
 
-    def update_graph(self, acc_type):
-        if acc_type:
-            fig=px.scatter_mapbox(self.df, lat='lat', animation_frame="year",
-                                  lon='long', color='grav', mapbox_style='carto-positron',
-                                  zoom=4, center=dict(lat=46.7111, lon=1.7191))
+    def update_month_bar_graph(self, year):
+        dfg = self.df
+        dfg = dfg[dfg['Année'] == str(year)]
+        if dfg.empty:
+            pio.templates.default = "missing"
         else:
-            fig=px.density_mapbox(self.df, z=None, lat='lat', animation_frame="year",
-                                  lon='long', radius=5, opacity=.6, mapbox_style='carto-positron',
-                                  zoom=4, center=dict(lat=46.7111, lon=1.7191),
-                                  color_continuous_scale=px.colors.diverging.Picnic)
-            fig.update_layout(coloraxis_showscale=False)
-        fig.update_traces(hovertemplate="Date: %{jour} %{mois} %{year}\nGravité: %{grav}", name="year")
+            pio.templates.default = None
+        return px.histogram(dfg, x="Mois", color="Gravité")
 
+    def update_main_graph(self, acc_type, year):
+        dfg = self.df
+        dfg = dfg[dfg['Année'] == str(year)]
+        if dfg.empty:
+            pio.templates.default = "missing"
+        else:
+            pio.templates.default = None
+        if acc_type:
+            fig=px.scatter_mapbox(dfg, lat='lat', lon='long',
+                                  color='Gravité', mapbox_style='carto-positron',
+                                  zoom=self.zoom, center=self.center,
+                                  color_continuous_scale=px.colors.sequential.Bluered,
+                                  custom_data=['jour', 'Mois', 'Année', 'Gravité'])
+            fig.update_layout(height=800)
+        else:
+            fig=px.density_mapbox(dfg, z=None, lat='lat', lon='long',
+                                  radius=5, opacity=.6, mapbox_style='carto-positron',
+                                  zoom=self.zoom, center=self.center,
+                                  color_continuous_scale=px.colors.diverging.Picnic,
+                                  custom_data=['jour', 'Mois', 'Année', 'Gravité'])
+            fig.update_layout(coloraxis_showscale=False, height=800)
+        fig.update_traces(hovertemplate="Date: %{customdata[0]}/%{customdata[1]}/%{customdata[2]} | Gravité: %{customdata[3]}")
+        fig.update_layout(uirevision='constant')
         return fig
-#         if mean == 1:
-#             reg = stats.linregress(np.arange(len(self.df)), self.df.morts)
-#             fig.add_scatter(x=[self.df.index[0], self.df.index[-1]], y=[reg.intercept, reg.intercept + reg.slope * (len(self.df)-1)], mode='lines', marker={'color':'red'})
-#         elif mean == 2:
-#             fig.add_scatter(x=self.df.index, y=self.day_mean, mode='lines', marker={'color':'red'})
+    
+    def button_on_click(self, n_clicks, text):
+        if text == self.START:
+            return self.STOP
+        else:
+            return self.START
+
+    def run_movie(self, text):
+        if text == self.START:
+            return 0 
+        else:
+            return -1
+        
+    def on_interval(self, n_intervals, year, text):
+        if text == self.STOP:
+            if year == 2020:
+                return 2005
+            if year == 2008:
+                return 2010
+            return year + 1
+        return year
         
     def run(self, debug=False, port=8050):
         self.app.run_server(host="0.0.0.0", debug=debug, port=port)
