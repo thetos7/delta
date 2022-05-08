@@ -22,19 +22,19 @@ class Formations:
         self.years.sort()
 
         self.main_layout = html.Div([
-            html.H4("Treemap & Sunburst de la proportion H/F par type d'établissement et par Grande discipline"),
-            html.Div([dcc.Graph(id="treemap")]),
-            html.Div([dcc.Graph(id="sunburst")]),
-            html.P("Année scolaire:"),
+            html.H4("Treemap & Sunburst de la parité H/F par type d'établissement et par Grande discipline"),
             dcc.Slider(id="year", min=0, max=len(self.years) - 1, value=0, step=1,
                        marks=dict(enumerate(self.years))),
+            html.P("Année scolaire:"),
             dcc.Markdown(
                 '*Utilisez le slider pour voir la répartition H/F parmis les différentes formations au cours des années'
                 '*'),
-            html.H4("Évolution de la parité en fonction de différents niveaux académiques au cours du temps"),
-            dcc.Graph(id="scatter"),
+            html.Div([dcc.Graph(id="treemap")]),
+            html.Div([dcc.Graph(id="sunburst")]),
+            html.H4("Évolution de la parité H/F en fonction de différents niveaux académiques au cours du temps"),
             dcc.Dropdown(self.scatter_levels, self.scatter_levels[0], id='level_selection'),
             dcc.Markdown("*Utilisez le slider Pour choisir parmis les différents niveaux académiques*"),
+            dcc.Graph(id="scatter"),
             dcc.Markdown("Quelques courbes partent de 0 dans les premières années. C'est dû à une absence de "
                          "données dans le jeu de donnée original, qui finit par être rattrapé d'une année à l'autre")
         ]
@@ -75,7 +75,7 @@ class Formations:
             cursus_data = cursus_data.reset_index([1, 2])
             fig = px.treemap(cursus_data.loc[self.years[year]],
                              path=[px.Constant("Formations"), "Type d'établissement", "Grande discipline"],
-                             values="Nombre d'étudiants", color="Proportion Femmes", title=self.years[year],
+                             values="Nombre d'étudiants", color="Proportion Femmes",
                              range_color=[0.2, 0.9])
             return fig
 
@@ -90,7 +90,7 @@ class Formations:
             cursus_data = cursus_data.reset_index([1, 2])
             fig = px.sunburst(cursus_data.loc[self.years[year]],
                               path=[px.Constant("Formations"), "Type d'établissement", "Grande discipline"],
-                              values="Nombre d'étudiants", color="Proportion Femmes", title=self.years[year],
+                              values="Nombre d'étudiants", color="Proportion Femmes",
                               range_color=[0.2, 0.9])
             fig.update_layout(autosize=False,
                               width=960,
