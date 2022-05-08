@@ -3,6 +3,7 @@ import dash
 import flask
 from dash import dcc
 from dash import html
+from matplotlib.pyplot import title
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
@@ -23,8 +24,7 @@ class Parrainage():
             self.departements_json = json.load(f)
         
         self.main_layout = html.Div(children=[
-            html.H3(children='Évolution du nombre de parrainages par candidat à la présidentielle'),
-
+            html.H3(children='Parrainages des candidats à la présidentielle 2022'),
             html.Div([
                     html.Div([ dcc.Graph(id='par-main-graph'), ], style={'width':'80%', }),
                     html.Div([
@@ -98,7 +98,7 @@ class Parrainage():
 
         fig = px.line(df_count_by_date, template='plotly_white', x='date', y='y', color='Catégorie')
         fig.update_traces(hovertemplate='%{y} parrainages le %{x:%d/%m/%y}')
-        fig.update_layout(hovermode="x unified")
+        fig.update_layout(hovermode="x unified", title="Évolution du nombre de parrainages par candidat à la présidentielle")
         fig.update_layout(
             xaxis = dict(title="Date de publication"),
             yaxis = dict(title="Nombre parrainages"), 
