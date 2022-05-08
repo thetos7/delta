@@ -18,7 +18,7 @@ class Formations:
         self.df = pd.read_csv(os.getcwd() + "/formations/data/formations.csv", low_memory=False)
 
         self.years = self.df["Année universitaire"].unique().tolist()
-        self.levels = ["Niveau dans le diplôme", "Grande discipline", "Secteur disciplinaire"]
+        self.levels = ["Niveau dans le diplôme", "Grande discipline", "Regroupement de diplômes"]
         self.years.sort()
         self.cursus_data = self.df.groupby(
             ["Année universitaire", "Type d'établissement", "Grande discipline"]).sum()
@@ -29,14 +29,18 @@ class Formations:
         self.main_layout = html.Div([
             html.H4("Treemap de la proportion H/F par type d'établissement et par Grande discipline"),
             dcc.Graph(id="treemap"),
-            html.P("Year:"),
+            html.P("Année scolaire:"),
             dcc.Slider(id="year", min=0, max=len(self.years) - 1, value=0, step=1,
                        marks=dict(enumerate(self.years))),
             dcc.Markdown(
                 '*Utilisez le slider pour voir la répartition H/F parmis les différentes formations au cours des années'
-                'années*'),
+                '*'),
+            html.H4("Évolution de la parité en fonction de différents niveaux académiques au cours du temps"),
+            dcc.Graph(id="scatter"),
             dcc.Dropdown(self.levels, self.levels[0], id='level_selection'),
-            dcc.Graph(id="scatter")
+            dcc.Markdown("*Utilisez le slider Pour choisir parmis les différents niveaux académiques*"),
+            dcc.Markdown("Quelques courbes partent de 0 dans les premières années. C'est dû à une absence de "
+                         "données dans le jeu de donnée original, qui finit par être rattrapé d'une année à l'autre")
         ]
         )
 
