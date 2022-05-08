@@ -53,10 +53,17 @@ class FilmSuccess():
                                           ], style={'display':'flex'}),
                                           
                                           html.Div("Déplacez votre souris sur les bulles pour obtenir des informations additionnels. Le graphique ci-dessous affiche les 5 films avec le plus haut profit pour l'année et le genre sélectionné ainsi que les 5 films avec le profit le plus faible afin de voir quels films ont eut le plus d'impact durant l'année. La taille des bulles correspond aux notes des spectateurs."),
-
                                           html.Div([dcc.Graph(id="fig3")]),
-                                          html.H3('A propos'),
-                                          html.Div("Ces graphiques ont été crée grâce aux données obtenu en scrappant Imdb et Rotten Tomatoes. Le scrapper est disponible dans les fichiers sources. Un notebook est aussi trouvable dans le code source avec davantage de graphiques et analyses.")
+                                          dcc.Markdown("""
+                        #### À propos
+                        
+                        Le scrapper est disponible dans les fichiers sources. Un notebook est aussi trouvable dans le code source avec davantage de graphiques et analyses.
+                        
+                        * Sources : 
+                           * [Imdb](https://www.imdb.com/)
+                           * [RottenTomatoes](https://www.rottentomatoes.com/)
+                        * (c) 2022 Louis Prenleloup - Axel Ribon
+                        """)
                                         ])
                                         
         if application:
