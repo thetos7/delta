@@ -82,8 +82,8 @@ class Top100BillboardUSA:
                 html.P("Si l'on regarde le graphe ci-dessus, on remarque deux pics aberrants: un premier, "
                        "très extrême, à la 20e semaine, et un second, plus modéré, à la 52e semaine. "),
                 html.P("Il s'avère qu'à la fin de l'année 1991, le Billboard a institué une « règle de récurrence »."
-                       "stipulant que les chansons qui ont figuré au classement pendant 20 semaines sont retirées si "
-                       "elles se classent en dessous de la 50e place et de même pour les chansons au classement "
+                       "Elle stipule que les chansons qui ont figuré au classement pendant 20 semaines sont retirées "
+                       "si elles se classent en dessous de la 50e place et de même pour les chansons au classement "
                        "depuis 1 an, si elles se trouvent en dessous de la 25e position."),
             ]),
 
@@ -94,7 +94,7 @@ class Top100BillboardUSA:
                        "beaucoup plus difficile pour une chanson de débuter en première position..."),
                 dcc.Graph(id="meteoric-entries-graph", figure=self.get_meteoric_entries_fig()),
                 html.P("Bien qu'il ait été officiellement lancé en 1958, le Billboard n'a vu une entrée « fulgurante "
-                       "» pour la première fois qu'en 1995. En effet, des des données plus modernes sur la diffusion "
+                       "» pour la première fois qu'en 1995. En effet, des données plus modernes sur la diffusion "
                        "et les ventes ont commencées à être utilisées à partir de 1991. Cela a ainsi permit des "
                        "calculs plus rapides et des classements plus précis"),
                 html.P(["Qui d'autre que Mickael Jackson pour réaliser cet exploit en premier avec « You Are Not "
