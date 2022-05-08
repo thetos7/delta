@@ -1,18 +1,9 @@
-import sys
-import glob
 import dash
-import flask
-from dash import dcc
-from dash import html
+from dash import Dash, dcc, html, Input, Output
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
-import dateutil as du
-from scipy import stats
-from scipy import fft
-import datetime
-import os
 
 
 class Presidentielles():
@@ -73,14 +64,8 @@ class Presidentielles():
         print(pd.unique(df_tdp['Période']))
 
         # Figure tour 1
-        fig_tdp_t1 = px.bar(df_tdp[df_tdp['Période'] == '2022-03-27'], x='Candidat', y="Somme",
-                            color='Chaîne', barmode="group", labels={
-                "Période": "Temps en jours",
-                "Somme": "Temps de parole en minutes",
-                "Chaîne": "Chaîne",
-                "Candidat": "Candidats"
-            }, title="Temps de parole pour chaque candidats en fonction des médias")
-
+        df_tdp = pd.read_csv('./presidentielle/data/temps_de_parole_presidentielles_2022.csv')
+        self.df_tdp = df_tdp
         # Figure tour 2
         fig_tdp_t2 = px.bar(df_tdp[(df_tdp['Période'] == '2022-04-08') & (
                 (df_tdp['Candidat'] == 'Macron') | (df_tdp['Candidat'] == 'Lepen'))], x='Candidat', y="Somme",
@@ -104,12 +89,24 @@ class Presidentielles():
              perdre des voix aux autres candidats
             """),
             html.Div(
-                [dcc.Graph(id='dtp_t1', figure=fig_tdp_t1)], style={'width': '100%', }),
+                [dcc.Graph(id='bar-with-slider'),
+                 dcc.Slider(id='bar_slider', step=None,
+                            marks={
+                                0: '2022-03-13',
+                                1: '2022-03-20',
+                                2: '2022-03-27',
+                                3: '2022-04-03',
+                                4: '2022-04-08',
+                            },
+                            value=0),
+                 ], style={'width': '100%', }),
             dcc.Markdown(""" 
             ##### Notes :
             - Certains médias parlent beaucoup plus des élections présidentielles que d'autres
             - Le temps de parole totale des candidats dans les médias ne reflète pas leur passage ou non au second tour 
             (Mme Le Pen a passé beaucoup moins de temps dans les médias que Mme Pecresse et a pourtant accédé au second tour)
+            - Plus on se rapproche du vote plus les médias essayent de données un temps de parole
+            équitable aux candidats
             """),
             html.H3(children='Second tour'),
             html.Div(
@@ -132,7 +129,7 @@ class Presidentielles():
             html.Br(),
             html.H3(children='À propos'),
             dcc.Markdown(""" 
-                        * Données sondage: [Nsppolls](https://github.com/nsppolls/nsppolls/blob/master/presidentielle.csv)
+                        * Données sondages : [Nsppolls](https://github.com/nsppolls/nsppolls/blob/master/presidentielle.csv)
                         * Données temps de parole : [CSA](https://www.csa.fr/Proteger/Garantie-des-droits-et-libertes/Proteger-le-pluralisme-politique/La-presidentielle-2022)
                         * (c) 2022 Guillaume Larue et Enguerrand de Gentile Duquesne
                         """),
@@ -144,33 +141,28 @@ class Presidentielles():
 
         if application:
             self.app = application
-            # application should have its own layout and use self.main_layout as a page or in a component
         else:
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
-        """
-        self.app.callback(
-            dash.dependencies.Output('mpj-main-graph', 'figure'),
-            dash.dependencies.Input('mpj-mean', 'value'))(self.update_graph)
-        """
 
-    def update_graph(self, mean):
-        fig = px.line(self.df, template='plotly_white')
-        fig.update_traces(hovertemplate='%{y} décès le %{x:%d/%m/%y}', name='')
-        fig.update_layout(
-            # title = 'Évolution des prix de différentes énergies',
-            xaxis=dict(title=""),  # , range=['2010', '2021']),
-            yaxis=dict(title="Sondage présidentiels"),
-            height=450,
-            showlegend=False,
-        )
-        if mean == 1:
-            reg = stats.linregress(np.arange(len(self.df)), self.df.morts)
-            fig.add_scatter(x=[self.df.index[0], self.df.index[-1]],
-                            y=[reg.intercept, reg.intercept + reg.slope * (len(self.df) - 1)], mode='lines',
-                            marker={'color': 'red'})
-        elif mean == 2:
-            fig.add_scatter(x=self.df.index, y=self.day_mean, mode='lines', marker={'color': 'red'})
+        self.app.callback(
+            dash.dependencies.Output('bar-with-slider', 'figure'),
+            dash.dependencies.Input('bar_slider', 'value'))(self.update_graph)
+
+    def update_graph(self, selected_date):
+        date_tmp = ['2022-03-13', '2022-03-20', '2022-03-27', '2022-04-03', '2022-04-08']
+        filtered_df = self.df_tdp[self.df_tdp['Période'] == date_tmp[selected_date]]
+
+        fig = px.bar(filtered_df, x='Candidat', y="Somme",
+                     color='Chaîne', barmode="group",
+                     labels={
+                         "Période": "Temps en jours",
+                         "Somme": "Temps de parole en minutes",
+                         "Chaîne": "Chaîne",
+                         "Candidat": "Candidats"
+                     }, title="Temps de parole pour chaque candidats en fonction des médias")
+
+        fig.update_layout(transition_duration=500)
 
         return fig
 
