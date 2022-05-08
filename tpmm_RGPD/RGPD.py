@@ -57,7 +57,7 @@ class RGPD():
             dcc.Markdown("""
             Dans ce projet, nous allons voir dans quelle mesure le RGPD a été appliqué en France depuis que la loi a été votée, à travers la variation du nombre de DPOs (Data Protection Officer) dans les entreprises,
             ainsi que le nombre de notifications que ceux-ci ont envoyé à la CNIL (Commission Nationale de l'Informatique et de Libertés, organisme s'occupant des contrôles relatifs au RGPD).  
-            Nous allons également étudier l'évolution budgétaire de la CNIL et des actions entreprises par celle ci.
+            Nous allons également étudier l'évolution budgétaire de la CNIL et des actions entreprises par celle-ci.
             """),
             html.Br(),
             
@@ -104,22 +104,25 @@ class RGPD():
             * Post septembre 2019 : un recrutement moins intense.  
             On peut donc en déduire que la plupart des entreprises se sont soumises aux règlement rapidement.  
             """),
+            html.Br(),
             
             dcc.Markdown("""
             **Pour le nombre brut de DPO embauchés par mois.**  
             Remarques générales :  
-            * Un certain nombre d'entreprises ont commencées à recruter des DPO dès mai 2018, donc avant le début de l'application de la loi (l'ensemble des DPO enregistrés avant la date d'application sont inscrits durant le premier mois).  
+            * Certaines d'entreprises ont commencées à recruter des DPO dès mai 2018, donc avant le début de l'application de la loi (l'ensemble des DPO enregistrés avant la date d'application sont inscrits durant le premier mois).  
             * A partir de 2020 le nombre de DPO enregistrés diminue avec le temps.  
             Autres remarques :  
             * Certains secteurs d'activité ont été plus enclins à embaucher des DPO dès le départ (secteur financier et et télécommunications, certainement au vue de la criticité de ces services).  
             * Il y a un gros pic de recrutement en septembre 2019 dans le secteur de d'activités spécialisées, scientifiques et techniques.  
             * Les administrations publiques ont réparties leur recrutement sur 3 ans, ce ne sont pas ces secteurs qui ont été les plus rapides à se mettre au pas.  
             """),
+            html.Br(),
             
             dcc.Markdown("""
             **Pour la somme cumulée du nombre de notifications au cours du temps.**  
             * La somme des notifications suit globalement une fonction exponentielle, il y a de plus en plus de notifications envoyées par les DPO.  
             """),
+            html.Br(),
             
             dcc.Markdown("""
             ** Pour le nombre brut de notifications par mois.**  
@@ -128,6 +131,7 @@ class RGPD():
             * Il y 3 gros pics de notifications dans 3 secteurs d'activité biens précis qui sont : "hébergement et restauration", "santé humaine et action sociale" et "activités spécialisées, scientifiques et techniques".  
             """),
             html.Br(),
+            html.Br(),
             
             html.Div([ dcc.Graph(figure=self.update_1_vs()) ], style={'width':'100%', }),
             dcc.Markdown("""
@@ -135,7 +139,7 @@ class RGPD():
             On voit que:
             * Il y a une grande croissance du nombre de notifications par DPO durant les mois de juin, juillet et août 2018 vu que les premières notifications sont envoyées.  
             * La tendance est globalement linéaire et à la hausse.  
-            Remarque : On pourrait penser qu'en moyenne les DPOs sont de plus en plus actifs avec le temps en produisant plus de notifications. Cepandant, il s'agit d'une fausse interprétation.  
+            Remarque : On pourrait penser qu'en moyenne les DPOs sont de plus en plus actifs avec le temps en produisant plus de notifications. Cependant, il s'agit d'une fausse interprétation.  
             En effet, dans la mesure où les DPOs sont déclarés instantanément dès leur recrutement et les notifications sont déclarés lors d'un incident,
             cela créé une période de battement entre ces deux évenements, ce qui explique l'allure de la courbe.  
             Il ne faut donc pas en déduire que les DPOs sont 6 fois plus productifs en fin 2021 qu'en début 2018.  
@@ -178,6 +182,7 @@ class RGPD():
             * Le nombre d'actions qu'effectue la CNIL est assez homogène, voir en baisse en ce qui concerne les contrôles.  
             """),
             html.Br(),
+            html.Br(),
             
             html.Div([ dcc.Graph(figure=self.update_3_vs()) ], style={'width':'100%', }),
             dcc.Markdown("""
@@ -186,6 +191,7 @@ class RGPD():
             * De manière générale, la CNIL sanctionne peu par rapport au nombre de contrôles.  
             * Le nombre de mise en demeure est assez élevé.  
             """),
+            html.Br(),
             html.Br(),
 
             dcc.Markdown("""
