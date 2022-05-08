@@ -168,8 +168,11 @@ class RGPD():
             #### À propos
 
             * Sources : 
-                * [base Pégase](http://developpement-durable.bsocom.fr/Statistiques/) du ministère du développement durable
-                * [tarifs réglementés de l'électricité](https://www.data.gouv.fr/en/datasets/historique-des-tarifs-reglementes-de-vente-delectricite-pour-les-consommateurs-residentiels/) sur data.gouv.fr
+            Nomenclature de l'INSEE : https://www.insee.fr/fr/metadonnees/nafr2/section/A?champRecherche=false
+            DPO et Notifications : https://www.data.gouv.fr/fr/datasets/organismes-ayant-designe-un-e-delegue-e-a-la-protection-des-donnees-dpd-dpo/
+            Budget de la CNIL et montant des sanctions : https://www.data.gouv.fr/fr/datasets/budget-de-la-cnil-1/
+            Actions de la CNIL : https://www.data.gouv.fr/fr/datasets/controles-realises-par-la-cnil/
+                https://www.data.gouv.fr/fr/datasets/mises-en-demeure-prononcees-par-la-cnil/
             * (c) 2022 Théo Perinet et Marc Monteil
             """)
         ], style={
