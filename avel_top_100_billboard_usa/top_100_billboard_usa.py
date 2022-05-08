@@ -135,6 +135,7 @@ class Top100BillboardUSA:
     def callbacks(self) -> None:
         """
         Adds callbacks to the Dash application.
+
         :return: None
         """
 
@@ -166,7 +167,15 @@ class Top100BillboardUSA:
         df["date"] = pd.to_datetime(df["date"])
         return df
 
-    def get_music_of_artist_fig(self, artist, df=None, height=850):
+    def get_music_of_artist_fig(self, artist, df=None, height=850) -> go.Figure:
+        """
+        Gets a plot of all the musics of an artist and their ranking.
+
+        :param artist: the artist to select in the dataframe
+        :param df: the dataframe to use (if None, self.df is used)
+        :param height: the height of the plot
+        :return: plotly.graph_objs.Figure
+        """
         df = self.df if df is None else df
         df_selected_artist = df[df["artist"] == artist]
         fig = go.Figure()
@@ -202,8 +211,11 @@ class Top100BillboardUSA:
 
     def get_max_weeks_on_board_count(self, df=None, reindex=True) -> pd.Series:
         """
-        Returns the distribution of weeks on board
-        :return: pd.Series
+        Returns the distribution of weeks on board.
+
+        :param df: the dataframe to use (if `None`, self.df is used)
+        :param reindex: If the result needs to be reindexed using Pandas reindex function
+        :return: pandas.Series
         """
         if df is None:
             df = self.df
@@ -217,7 +229,9 @@ class Top100BillboardUSA:
 
     def get_weeks_on_board_fig(self, height=600) -> go.Figure:
         """
-        Returns a plotly figure of the number of weeks on the billboard.
+        Returns a plotly figure of the count of the max value of weeks-on-board for each song.
+
+        :param height:
         :return: plotly.graph_objs.Figure
         """
         # Creating the figure
@@ -234,7 +248,11 @@ class Top100BillboardUSA:
         return fig
 
     def get_weeks_on_board_fig_year(self, height=600) -> go.Figure:
+        """
+        Returns a plotly figure of the count of the max value of weeks-on-board for each song and year.
 
+        :return: plotly.graph_objs.Figure
+        """
         tmp_year_list = []
         for year in sorted(self.df.date.dt.year.unique(), reverse=False):
             df_tmp = self.df[self.df["date"].dt.year == year]
@@ -268,6 +286,7 @@ class Top100BillboardUSA:
     def get_new_artist_on_board_fig(self) -> go.Figure:
         """
         Returns a plotly figure of the number of weeks on the billboard.
+
         :return: plotly.graph_objs.Figure
         """
 
@@ -287,6 +306,13 @@ class Top100BillboardUSA:
         )
 
     def get_meteoric_entries_fig(self, height=600) -> go.Figure:
+        """
+        Return a plotly figure of the meteoric entries.
+
+        :param height:
+        :return: plotly.graph_objs.Figure
+        """
+
         new_entry = self.df.loc[
             np.where(
                 (self.df["last-week"]).isna()
