@@ -54,13 +54,12 @@ class EuropeEnergyGeneration():
     START = 'Start'
     STOP = 'Stop'
 
-    def __init__(self):
+    def __init__(self, app = None):
         self.colorscales = colorscales
         self.dropdown_options = dropdown_options
         self.data_per_year = data_per_year
         self.energy_per_area = energy_per_area
         self.df = data
-        self.app = dash.Dash()
         self.years = [i for i in range(2000, 2021)]
         self.y_axis = y_axis
         self.is_autoslider_activated = False
@@ -79,7 +78,7 @@ class EuropeEnergyGeneration():
         #
         # ========================================================================================
 
-        self.app.layout = html.Div(children=[
+        self.main_layout = html.Div(children=[
             html.H1(children='Energy generation in the European Union from 2000 to 2020',
                     style={
                         'textAlign': 'center'
@@ -183,12 +182,12 @@ class EuropeEnergyGeneration():
                 html.Div(children=[
                     html.Button(
                         self.STOP,
-                        id='wps-button-start-stop',
+                        id='button-start-stop',
                         style={'display': 'inline-block'}
                     ),
                     html.Div(
                         dcc.Slider(
-                            id='wps-crossfilter-year-slider',
+                            id='crossfilter-year-slider',
                             min=self.years[0],
                             max=self.years[-1],
                             step=1,
@@ -203,7 +202,7 @@ class EuropeEnergyGeneration():
                                }
                     ),
                     dcc.Interval(            # fire a callback periodically
-                        id='wps-auto-stepper',
+                        id='auto-stepper',
                         disabled=self.is_autoslider_activated,
                         interval=1000,       # in milliseconds
                         max_intervals=-1,  # start running
@@ -244,6 +243,14 @@ class EuropeEnergyGeneration():
             'backgroundColor': self.colors['background'],
             'color': self.colors['text']})
 
+        if app:
+            self.app = app
+            # application should have its own layout and use self.main_layout as a page or in a component
+        else:
+            self.app = dash.Dash(__name__)
+            self.app.layout = self.main_layout
+
+
         # ========================================================================================
         #
         #
@@ -253,7 +260,7 @@ class EuropeEnergyGeneration():
         # ========================================================================================
         self.app.callback(
             dash.dependencies.Output('Europe-Map', 'figure'),
-            dash.dependencies.Input('wps-crossfilter-year-slider', 'value'),
+            dash.dependencies.Input('crossfilter-year-slider', 'value'),
             dash.dependencies.Input('y-axis', 'value'),
             dash.dependencies.Input('selected-areas-for-map', 'value'),
             dash.dependencies.Input('scale', 'value')
@@ -262,12 +269,12 @@ class EuropeEnergyGeneration():
         self.app.callback(
             dash.dependencies.Output('country-sunburst', 'figure'),
             dash.dependencies.Input('Europe-Map', 'clickData'),
-            dash.dependencies.Input('wps-crossfilter-year-slider', 'value')
+            dash.dependencies.Input('crossfilter-year-slider', 'value')
         )(self.update_sunburst_country)
 
         self.app.callback(
             dash.dependencies.Output('europe27+1-sunburst', 'figure'),
-            dash.dependencies.Input('wps-crossfilter-year-slider', 'value')
+            dash.dependencies.Input('crossfilter-year-slider', 'value')
         )(self.update_sunburst_europe)
 
         self.app.callback(
@@ -277,21 +284,21 @@ class EuropeEnergyGeneration():
         )(self.update_line_plot)
 
         self.app.callback(
-            dash.dependencies.Output('wps-crossfilter-year-slider', 'value'),
-            dash.dependencies.Input('wps-auto-stepper', 'n_intervals'),
-            [dash.dependencies.State('wps-crossfilter-year-slider', 'value'),
-             dash.dependencies.State('wps-button-start-stop', 'children')]
+            dash.dependencies.Output('crossfilter-year-slider', 'value'),
+            dash.dependencies.Input('auto-stepper', 'n_intervals'),
+            [dash.dependencies.State('crossfilter-year-slider', 'value'),
+             dash.dependencies.State('button-start-stop', 'children')]
         )(self.on_interval)
 
         self.app.callback(
-            dash.dependencies.Output('wps-button-start-stop', 'children'),
-            dash.dependencies.Input('wps-button-start-stop', 'n_clicks'),
-            dash.dependencies.State('wps-button-start-stop', 'children')
+            dash.dependencies.Output('button-start-stop', 'children'),
+            dash.dependencies.Input('button-start-stop', 'n_clicks'),
+            dash.dependencies.State('button-start-stop', 'children')
         )(self.button_on_click)
 
         self.app.callback(
-            dash.dependencies.Output('wps-auto-stepper', 'max_interval'),
-            [dash.dependencies.Input('wps-button-start-stop', 'children')]
+            dash.dependencies.Output('auto-stepper', 'max_interval'),
+            [dash.dependencies.Input('button-start-stop', 'children')]
         )(self.run_movie)
 
         self.app.callback(
