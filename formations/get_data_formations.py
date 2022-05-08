@@ -30,4 +30,4 @@ data = data.rename(columns={
 )
 
 # save
-data.to_csv(os.getcwd() + "/data/formations.csv")
+data.to_csv(os.getcwd() + "/data/formations.csv", index=False)

@@ -1,33 +1,41 @@
-import pandas as pd
-from dash import dcc, html, Input, Output, dash
+import pandas as pd  # DataFrame
+from dash import dcc, html, Input, Output, dash  # App
 import plotly.express as px
-
-
-def update_bar_chart(dims):
-    df = px.data.iris()  # replace with your own data source
-    fig = px.scatter_matrix(
-        df, dimensions=dims, color="species")
-    return fig
+import os  # Path management
 
 
 class Formations:
 
     def __init__(self, application=None):
-        self.main_layout = None
-        df = px.data.gapminder().query("year == 2007")
-        fig = px.treemap(df, path=[px.Constant('world'), 'continent', 'country'], values='pop',
-                         color='lifeExp', hover_data=['iso_alpha'])
-        self.main_layout = html.Div([
-            dcc.Graph(figure=fig)
-        ])
 
+        self.main_layout = None
         if application:
             self.app = application
             # application should have its own layout and use self.main_layout as a page or in a component
         else:
             self.app = dash.Dash(__name__)
             self.app.layout = self.main_layout
+        self.df = pd.read_csv(os.getcwd() + "/formations/data/formations.csv", low_memory=False)
 
-        self.app.callback(
+        self.years = self.df["Année universitaire"].unique().tolist()
+
+        cursus_data = self.df.groupby(
+            ["Année universitaire", "Type d'établissement", "Grande discipline"]).sum()
+        cursus_data["Proportions Femmes"] = cursus_data["Dont femmes"] / cursus_data["Nombre d\'étudiants"]
+        cursus_data = cursus_data.reset_index([1, 2])
+
+        self.main_layout = html.Div([
+            html.H4('Treemap of female proportion in formations'),
+            dcc.Graph(id="graph"),
+            html.P("Year:"),
+            dcc.Slider(id="year", min=0, max=len(self.years), value=0, step=1,
+                       marks={i: key for i, key in enumerate(self.years)})
+        ])
+
+        @application.callback(
             Output("graph", "figure"),
-            Input("dropdown", "value"))(update_bar_chart)
+            Input("year", "value"))
+        def display_color(year):
+            fig = px.sunburst(cursus_data.loc[self.years[year]], path=["Type d'établissement", "Grande discipline"],
+                              values="Nombre d'étudiants", color="Proportions Femmes")
+            return fig
