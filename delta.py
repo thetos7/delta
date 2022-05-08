@@ -4,6 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
+from __LeagueOfLegendsChampionsStats import champs_win_rate
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -12,6 +13,7 @@ server = app.server
 pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
+lol = champs_win_rate.ChampWinRate(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -26,7 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
-                              html.Br(),
+                              dcc.Link(html.Button('League Of Legends Statistics', style={'width': "100%"}), href='/lol'),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
                           ]),
@@ -66,6 +68,8 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
+    elif pathname == '/lol':
+        return lol.main_layout
     else:
         return home_page
 
