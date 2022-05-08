@@ -105,7 +105,7 @@ def compute_cumulative(inflation, wages):
     countries = inflation.country.unique()
     for country in countries:
         min_year = inflation[inflation.country == country].iloc[0,1] if wages[wages.country == country].empty else max(inflation[inflation.country == country].iloc[0,1], wages[wages.country == country].iloc[0,3])
-        inflation.loc[(inflation.country == country) & (inflation.year >= min_year),'cumulative_sum'] = get_country_cumulative(inflation, min_year, country)
+        inflation.loc[(inflation.country == country) & (inflation.year >= min_year),'cumulative_prod'] = get_country_cumulative(inflation, min_year, country)
     return inflation
 
 def merge_dataframes(inflation, wages):

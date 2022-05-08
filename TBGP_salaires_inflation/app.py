@@ -28,6 +28,10 @@ class SalaryInflation():
 
                         Les couleurs vers le rouge indiquent donc une perte de pouvoir d'achat, tandis que les couleurs vers le bleu
                         indiquent une hausse et le jaune indique un maintien.
+
+                        L'année de référence et l'année à comparer peuvent être changés avec la barre ci-dessous.
+
+                        Si les données de l'année de référence ou l'année à comparer n'existent pas pour un pays, il ne sera pas affiché sur la carte.
                         """),
 
                     html.Div(id='tbgp-si-year', style={'textAlign': 'center'})], style={'display': 'inline', 'justifyContent': 'center', 'width': '80%'}),
@@ -64,7 +68,8 @@ class SalaryInflation():
                                 ], value='TOTAL', labelStyle={'display': 'block'}),
                             ], style={'width': '15%', 'display': 'block', 'padding-left': '1%' }),
                         ], style={'display': 'flex', 'justifyContent': 'center', }),
-                    html.Div('* Salaire attendu si on prend uniquement l\'évolution de l\'inflation en compte')
+                    html.Div('* Salaire attendu si on prend uniquement l\'évolution de l\'inflation en compte'),
+                    html.Br()
                     ]),
                 dcc.Markdown("""
                     Ce projet montre l'évolution du salaire médian en Europe par rapport
@@ -84,8 +89,8 @@ class SalaryInflation():
                     Vous pouvez également isoler les statistiques selon l'âge et le
                     sexe.
 
-                    Enfin, un slider est à votre disposition afin de changer l'année de référence
-                    pour l'inflation et l'année à comparer.
+                    Enfin, changer l'année de référence pour l'inflation et l'année à comparer avec le slider
+                    change également le graphique.
 
                     Observations :
                     * Les courbes sont toujours similaires selon les sexes, nous
@@ -93,6 +98,8 @@ class SalaryInflation():
                     * Il faut faire attention au fait que les plus de 65 ans en 2020 ne
                     sont pas les mêmes qu'en 1995. Ce biais doit être pris en compte
                     avant de tirer des conclusions de ces courbes.
+                    * La crise de 2008 ne semble pas avoir trop affecté le rapport entre salaire médian et
+                    l'inflation en Union Européenne, sauf au Royaume-Uni.
 
                     ### A propos
 
@@ -143,19 +150,22 @@ class SalaryInflation():
         return hover['points'][0]['location'] if hover['points'][0]['location'] != 'UK' else 'GB'
 
     def update_map(self, years):
-        data = self.df[(self.df.year == np.datetime64(int(years[1]) - 1970, 'Y')) & (self.df.age == 'TOTAL') & (
-            self.df.sex == 'T')][['country', 'cumulative_sum', 'wages_value']]
-        data = data.set_index('country')
+        dt0, dt1 = np.datetime64(int(years[0]) - 1970, 'Y'), np.datetime64(int(years[1]) - 1970, 'Y')
 
-        base_values = self.df[(self.df.age == 'TOTAL') & (self.df.sex == 'T') & (self.df.year >= np.datetime64(int(years[0]) - 1970, 'Y'))].groupby('country').first()
-        base_values = base_values[base_values.year <= np.datetime64(int(years[1]) - 1970, 'Y')]['wages_value']
+        data = self.df[(self.df.year == dt1) & (self.df.age == 'TOTAL') & (
+            self.df.sex == 'T')][['country', 'cumulative_prod', 'wages_value']].set_index('country')
+
+        # Wages within the time period
+        base_values = self.df[(self.df.age == 'TOTAL') & (self.df.sex == 'T') & (self.df.year >= dt0) & (self.df.year <= dt1)].groupby('country').first()['wages_value']
         
-        base_inflation = self.df[(self.df.year == np.datetime64(int(years[0]) - 1970, 'Y')) & (self.df.age == 'TOTAL') & (
-            self.df.sex == 'T')][['country', 'cumulative_sum']].set_index('country').rename(columns={'cumulative_sum' : 'base_inflation'})
+        # Cumulative inflation of the reference year
+        base_inflation = self.df[(self.df.year == dt0) & (self.df.age == 'TOTAL') & (
+            self.df.sex == 'T')][['country', 'cumulative_prod']].set_index('country').rename(columns={'cumulative_prod' : 'base_inflation'})
         
         data = base_inflation.join(data, how='inner')
 
-        data['Ratio'] = np.round(data['wages_value'] / (data['cumulative_sum'] / data['base_inflation'] * base_values), 2)
+        # Ratio between the median wages of the compared year and the predicted median wages using the inflation
+        data['Ratio'] = np.round(data['wages_value'] / (base_values * (data['cumulative_prod'] / data['base_inflation'])), 2)
 
         fig = px.choropleth_mapbox(data, geojson=self.geodata,
                                    locations=data.index, featureidkey='properties.ISO2',  # join keys
@@ -171,6 +181,7 @@ class SalaryInflation():
             hovermode='closest',
             showlegend=False,
         )
+
         return fig
 
     def update_graph(self, hover, sex, age, years):
@@ -180,17 +191,21 @@ class SalaryInflation():
                              (self.df.age == age) &
                              (self.df.year >= np.datetime64(int(years[0]) - 1970, 'Y'))]
         
+        # Compute the boundaries
         min_year = np.datetime64(country_df.year.iloc[0]).astype('datetime64[Y]').astype(int) + 1970
         max_year = max(min_year + 1, years[1])
         
+        # Keep only values within the time period
         country_df = country_df[country_df.year <= np.datetime64(int(max_year) - 1970, 'Y')]
 
-        w = country_df.wages_value.iloc[0]
-        base = country_df.cumulative_sum.iloc[0]
+        # The wages of the reference year
+        wages = country_df.wages_value.iloc[0]
+        # The cumulative inflation of the reference year
+        base_inflation = country_df.cumulative_prod.iloc[0]
 
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=country_df.year, y=np.round(country_df.wages_value, 0), mode='lines', name='Salaire réel'))
-        fig.add_trace(go.Scatter(x=country_df.year, y=np.round(country_df.cumulative_sum / base * w, 0), mode='lines', name='Inflation*'))
+        fig.add_trace(go.Scatter(x=country_df.year, y=np.round(country_df.cumulative_prod / base_inflation * wages, 0), mode='lines', name='Inflation*'))
         fig.update_layout(
             title = 'Évolution du salaire médian comparé à l\'inflation depuis ' + f'{min_year}' + '.<br>Lieu : ' + country_name[country],
             title_xanchor = 'auto',
