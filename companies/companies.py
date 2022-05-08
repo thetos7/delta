@@ -54,6 +54,7 @@ class FrenchCompaniesStats:
         pass
 
     def __init__(self, application=None):
+
         # downloading and extracting the data
         FrenchCompaniesStats.prepare_data()
 
@@ -216,5 +217,6 @@ class FrenchCompaniesStats:
 
 
 if __name__ == '__main__':
+    data_path = 'data/'
     nrg = FrenchCompaniesStats()
     nrg.app.run_server(debug=True, port=8052)
