@@ -808,7 +808,7 @@ def get_temps_de_parole():
     df_poutou['Candidat'] = "Poutou"
     df_roussel['Candidat'] = "Roussel"
     df_zemmour['Candidat'] = "Zemmour"
-    # df_['Candidat'] = "Arthaud"
+
     df_result = pd.concat([df_arthaud, df_dupont, df_hidalgo, df_jadot,
                            df_lassalle, df_lepen, df_macron, df_melenchon,
                            df_pecresse, df_poutou, df_roussel, df_zemmour], axis=0)

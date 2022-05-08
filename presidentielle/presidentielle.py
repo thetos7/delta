@@ -66,14 +66,14 @@ class Presidentielles():
                 "Période": "Temps en jours",
                 "Somme": "Temps de parole en minutes",
                 "Chaîne": "Chaîne"
-            }, title="Zemmour : Évolution du temps de parole en fonction du temps")
+            }, title="Temps de parole pour fache candidats en fonction des médias")
 
         fig_tdp_t2 = px.bar(df_tdp[(df_tdp['Période'] == '2022-04-08') & ((df_tdp['Candidat'] == 'Macron') | (df_tdp['Candidat'] == 'Lepen')) ], x='Candidat', y="Somme",
                             color='Chaîne', barmode="group", labels={
                 "Période": "Temps en jours",
                 "Somme": "Temps de parole en minutes",
                 "Chaîne": "Chaîne"
-            }, title="Zemmour : Évolution du temps de parole en fonction du temps")
+            }, title="Temps de parole pour fache candidats en fonction des médias")
 
         self.main_layout = html.Div(children=[
             html.H2(children='Sondages présidentiels et temps de parole dans les médias'),
@@ -82,15 +82,7 @@ class Presidentielles():
                 [dcc.Graph(id='sond_t1', figure=fig_sond_t1)], style={'width': '100%', }),
             html.Div(
                 [dcc.Graph(id='dtp_t1', figure=fig_tdp_t1)], style={'width': '100%', }),
-            html.Div([dcc.RadioItems(id='mpj-mean',
-                                     options=[{'label': 'Courbe seule', 'value': 0},
-                                              {'label': 'Courbe + Tendence générale', 'value': 1},
-                                              {
-                                                  'label': 'Courbe + Moyenne journalière (les décalages au 1er janv. indique la tendence)',
-                                                  'value': 2}],
-                                     value=2,
-                                     labelStyle={'display': 'block'}),
-                      ]),
+
             html.H3(children='Second tour'),
             html.Div(
                 [dcc.Graph(id='sond_t2', figure=fig_sond_t2)], style={'width': '100%', }),
