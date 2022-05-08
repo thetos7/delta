@@ -18,17 +18,13 @@ class Formations:
         self.df = pd.read_csv(os.getcwd() + "/formations/data/formations.csv", low_memory=False)
 
         self.years = self.df["Année universitaire"].unique().tolist()
-        self.levels = ["Niveau dans le diplôme", "Grande discipline", "Regroupement de diplômes"]
+        self.scatter_levels = ["Niveau dans le diplôme", "Grande discipline", "Regroupement de diplômes"]
         self.years.sort()
-        self.cursus_data = self.df.groupby(
-            ["Année universitaire", "Type d'établissement", "Grande discipline"]).sum()
-        self.cursus_data["Proportion Femmes"] = self.cursus_data["Dont femmes"] / self.cursus_data[
-            "Nombre d\'étudiants"]
-        self.cursus_data = self.cursus_data.reset_index([1, 2])
 
         self.main_layout = html.Div([
-            html.H4("Treemap de la proportion H/F par type d'établissement et par Grande discipline"),
-            dcc.Graph(id="treemap"),
+            html.H4("Treemap & Sunburst de la proportion H/F par type d'établissement et par Grande discipline"),
+            html.Div([dcc.Graph(id="treemap")]),
+            html.Div([dcc.Graph(id="sunburst")]),
             html.P("Année scolaire:"),
             dcc.Slider(id="year", min=0, max=len(self.years) - 1, value=0, step=1,
                        marks=dict(enumerate(self.years))),
@@ -37,13 +33,14 @@ class Formations:
                 '*'),
             html.H4("Évolution de la parité en fonction de différents niveaux académiques au cours du temps"),
             dcc.Graph(id="scatter"),
-            dcc.Dropdown(self.levels, self.levels[0], id='level_selection'),
+            dcc.Dropdown(self.scatter_levels, self.scatter_levels[0], id='level_selection'),
             dcc.Markdown("*Utilisez le slider Pour choisir parmis les différents niveaux académiques*"),
             dcc.Markdown("Quelques courbes partent de 0 dans les premières années. C'est dû à une absence de "
                          "données dans le jeu de donnée original, qui finit par être rattrapé d'une année à l'autre")
         ]
         )
 
+        # Callback for the scatter
         @application.callback(
             Output('scatter', 'figure'),
             Input('level_selection', 'value')
@@ -67,13 +64,34 @@ class Formations:
             fig.update_traces(showlegend=True)  # trendlines have showlegend=False by default
             return fig
 
+        # Callback for treemap
         @application.callback(
             Output("treemap", "figure"),
             Input("year", "value"))
-        def display_color(year):
-            fig = px.treemap(self.cursus_data.loc[self.years[year]], path=["Type d'établissement", "Grande discipline"],
+        def update_treemap(year):
+            cursus_data = self.df.groupby(["Année universitaire", "Type d'établissement", "Grande discipline"]).sum()
+            cursus_data["Proportion Femmes"] = cursus_data["Dont femmes"] / cursus_data[
+                "Nombre d\'étudiants"]
+            cursus_data = cursus_data.reset_index([1, 2])
+            fig = px.treemap(cursus_data.loc[self.years[year]],
+                             path=[px.Constant("Formations"), "Type d'établissement", "Grande discipline"],
                              values="Nombre d'étudiants", color="Proportion Femmes", title=self.years[year],
                              range_color=[0.2, 0.9])
+            return fig
+
+        # Callback for the scatter
+        @application.callback(
+            Output("sunburst", "figure"),
+            Input("year", "value"))
+        def update_sunburst(year):
+            cursus_data = self.df.groupby(["Année universitaire", "Type d'établissement", "Grande discipline"]).sum()
+            cursus_data["Proportion Femmes"] = cursus_data["Dont femmes"] / cursus_data[
+                "Nombre d\'étudiants"]
+            cursus_data = cursus_data.reset_index([1, 2])
+            fig = px.sunburst(cursus_data.loc[self.years[year]],
+                              path=[px.Constant("Formations"), "Type d'établissement", "Grande discipline"],
+                              values="Nombre d'étudiants", color="Proportion Femmes", title=self.years[year],
+                              range_color=[0.2, 0.9])
             fig.update_layout(autosize=False,
                               width=960,
                               height=960)
