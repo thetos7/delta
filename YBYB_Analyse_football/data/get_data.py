@@ -1,6 +1,9 @@
 import pandas as pd
 from difflib import SequenceMatcher
 
+# A la base nous avons code les fonctions suivantes dans les fichiers .ipynb mais comme les consignes demandait de creer un fichier get_data.py, 
+# nous avons recopie toutes les cellules des fichiers.ipynb dans ce fichier. 
+
 def Avg_Age():
 
     #Nous allons lire la donnée de l'age des joueurs de la Premier League en 2004 et créer un nouveau fichier csv contenant deux collones:
@@ -864,11 +867,11 @@ def Age():
 
 def concat_leagues():
 
-    liga = pd.read_csv('data/concat_years_age/liga.csv')
-    PL = pd.read_csv('data/concat_years_age/PL.csv')
-    serieA= pd.read_csv('data/concat_years_age/serieA.csv')
-    ligue1 = pd.read_csv('data/concat_years_age/ligue1.csv')
-    bundesliga = pd.read_csv('data/concat_years_age/bundesliga.csv')
+    liga = pd.read_csv('concat_years_age/liga.csv')
+    PL = pd.read_csv('concat_years_age/PL.csv')
+    serieA= pd.read_csv('concat_years_age/serieA.csv')
+    ligue1 = pd.read_csv('concat_years_age/ligue1.csv')
+    bundesliga = pd.read_csv('concat_years_age/bundesliga.csv')
 
     leagues = pd.concat([liga, PL, serieA, ligue1, bundesliga], axis=0)
     #leagues_clean = leagues.drop(["Unnamed: 14","xG","xGA","xGD","xGD/90","Pts/G"], axis=1)
@@ -889,5 +892,7 @@ def concat_leagues():
     leagues = leagues.astype({'Market Value':'float'})
     #leagues['Market Value'] = leagues['Market Value'].astype(float)
 
-    leagues.to_csv("data/concat_leagues/league.csv")
+    leagues.to_csv("concat_leagues/league.csv")
     #leagues_clean.drop(["Unnamed: 0"], axis=1).to_csv("data/concat_leagues/leagues.csv")
+
+concat_leagues()
