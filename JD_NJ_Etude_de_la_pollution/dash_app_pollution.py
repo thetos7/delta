@@ -88,6 +88,11 @@ class PollutionFrancaise():
                                 html.
                                 H5("Rendu du devoir pour le projet de PYBD dans le cadre du cursus de SCIA à EPITA par Noé Jenn-Treyer et Jules Dorbeau.",
                                    style={"margin-top": "0px"}),
+                                html.
+                                H5("Suite au ratachement sur le projet delta, nous avons eu des problèmes de css et disposition voici donc un lien ou avoir notre projet avec les bonnes dispositions et css :",
+                                   style={"margin-top": "0px"}),
+                                dcc.Markdown("https://dash-pybd-jules-dorbeau.herokuapp.com/",
+                                   style={"margin-top": "0px"}),
                             ])
                         ],
                         className="three column",
