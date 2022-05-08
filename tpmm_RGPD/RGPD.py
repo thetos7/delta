@@ -55,14 +55,15 @@ class RGPD():
             html.Br(),
             
             dcc.Markdown("""
-            Dans ce projet, nous allons voir dans quel mesure le RGPD a été appliqué en France depuis que la loi a été votée, à travers la variation du nombre de DPO (Data Protection Officer) dans les entreprises,
-            ainsi que le nombre de notification que ceux ci ont envoyés à la CNIL (Commission Nationale de l'Informatique et de Libertés, organisme s'occupant des contrôles relatifs au RGPD).  
-            Nous allons également étudier l'évolution budgetaire de la CNIL et des actions entreprisent par celle ci.
+            Dans ce projet, nous allons voir dans quelle mesure le RGPD a été appliqué en France depuis que la loi a été votée, à travers la variation du nombre de DPOs (Data Protection Officer) dans les entreprises,
+            ainsi que le nombre de notifications que ceux-ci ont envoyé à la CNIL (Commission Nationale de l'Informatique et de Libertés, organisme s'occupant des contrôles relatifs au RGPD).  
+            Nous allons également étudier l'évolution budgétaire de la CNIL et des actions entreprises par celle ci.
             """),
             html.Br(),
             
             html.H4(children="Évolution du nombre de notifications et DPOs"),
-            dcc.Markdown("""Le data frame suivant montre la correspondance entre la nomenclature de l'INSEE et le secteur d'activité.  
+            dcc.Markdown("""
+            Le data frame suivant montre la correspondance entre la nomenclature de l'INSEE et le secteur d'activité.  
             Les nomenclatures d'activités ont été élaborées principalement en vue de faciliter l'organisation de l'information économique et sociale.  
             Source: https://www.insee.fr/fr/metadonnees/nafr2/sousClasse/01.12Z?champRecherche=false  
             Cette nomenclature est utilisée dans les graphiques suivants.  
@@ -107,7 +108,7 @@ class RGPD():
             dcc.Markdown("""
             **Pour le nombre brut de DPO embauchés par mois.**  
             Remarques générales :  
-            * Un certain nombre d'entreprises ont commencées à recruter des DPO dès mai 2018, donc avant le début de l'application de la loi (l'ensemble des DPO enregistrés avant la date d'application sont inscrit durant le premier mois).  
+            * Un certain nombre d'entreprises ont commencées à recruter des DPO dès mai 2018, donc avant le début de l'application de la loi (l'ensemble des DPO enregistrés avant la date d'application sont inscrits durant le premier mois).  
             * A partir de 2020 le nombre de DPO enregistrés diminue avec le temps.  
             Autres remarques :  
             * Certains secteurs d'activité ont été plus enclins à embaucher des DPO dès le départ (secteur financier et et télécommunications, certainement au vue de la criticité de ces services).  
@@ -123,7 +124,7 @@ class RGPD():
             dcc.Markdown("""
             ** Pour le nombre brut de notifications par mois.**  
             * L'activité est globalement homogène avec une tendance à la hausse.  
-            * Le premier mois est vide car les notifications prennent un peu de temps pour être traitées par la CNIL, et seront conptées dans le deuxième mois.  
+            * Le premier mois est vide car les notifications prennent un peu de temps pour être traitées par la CNIL, et seront comptées dans le deuxième mois.  
             * Il y 3 gros pics de notifications dans 3 secteurs d'activité biens précis qui sont : "hébergement et restauration", "santé humaine et action sociale" et "activités spécialisées, scientifiques et techniques".  
             """),
             html.Br(),
@@ -132,12 +133,12 @@ class RGPD():
             dcc.Markdown("""
             ** Nombre de notifications par rapport au nombre de DPOs.**  
             On voit que:
-            * Il y a une grande croissance du nombre de notifications par DPO durant les mois de juin, juillet et aout 2018 vu que les premières notifications sont envoyées.  
+            * Il y a une grande croissance du nombre de notifications par DPO durant les mois de juin, juillet et août 2018 vu que les premières notifications sont envoyées.  
             * La tendance est globalement linéaire et à la hausse.  
-            Remarque : On pourrait penser qu'en moyenne les DPOs sont de plus en plus actif avec le temps en produisant plus de notifications. Cepandant, il s'agit d'une fausse interprétation.  
-            En effet, dans la mesure où les DPO sont déclarés instantanément dès leur recrutement et les notifications sont déclarés lors d'un incident,
-            cella créé une periode de battement entre ces deux évenements, ce qui explique l'allure de la courbe.  
-            Il ne faut donc pas en déduire que les DPO sont 6 fois plus productifs en fin 2021 qu'en début 2018.  
+            Remarque : On pourrait penser qu'en moyenne les DPOs sont de plus en plus actifs avec le temps en produisant plus de notifications. Cepandant, il s'agit d'une fausse interprétation.  
+            En effet, dans la mesure où les DPOs sont déclarés instantanément dès leur recrutement et les notifications sont déclarés lors d'un incident,
+            cela créé une période de battement entre ces deux évenements, ce qui explique l'allure de la courbe.  
+            Il ne faut donc pas en déduire que les DPOs sont 6 fois plus productifs en fin 2021 qu'en début 2018.  
             """),
 
             html.Br(),
@@ -163,8 +164,8 @@ class RGPD():
             ** Le budget de la CNIL comparé au montant des sanctions.**  
             * Le budget de la CNIL est quasiment constant sur la période 2012-2021.  
             * Avant 2018, le montant des sanctions est bas par rapport à celui de la CNIL.  
-            * Après la mise en application de la loi en 2018, le cumul du montant des sanctions sont bien plus importantes.
-            On peut justifier cette variation non pas par l'augmentation du nombre global de sanctions mais par rapport à l'augmentation des sommes de ces sanctions qui ont été augmenté grâce au lois relatives au RGPD.
+            * Après la mise en application de la loi en 2018, le cumul du montant des sanctions sont bien plus importants.
+            On peut justifier cette variation non pas par l'augmentation du nombre global de sanctions mais par rapport à l'augmentation des sommes de ces sanctions qui ont été augmentées grâce aux lois relatives au RGPD.
             En effet certaines amendes sur de grands groupes sont très importantes (Facebook 60 000 000€ en 2020).  
             """),
             html.Br(),
@@ -181,7 +182,7 @@ class RGPD():
             html.Div([ dcc.Graph(figure=self.update_3_vs()) ], style={'width':'100%', }),
             dcc.Markdown("""
             **Fréquence du nombre d'actions par rapport au nombre de contrôles.**  
-            * On remarque que les avertissements et sanctions sont peu plébiscités par la CNIL .  
+            * On remarque que les avertissements et sanctions sont peu plébiscités par la CNIL.  
             * De manière générale, la CNIL sanctionne peu par rapport au nombre de contrôles.  
             * Le nombre de mise en demeure est assez élevé.  
             """),
@@ -191,7 +192,7 @@ class RGPD():
             #### À propos
             Sources :  
             * [Nomenclature de l'INSEE](https://www.insee.fr/fr/metadonnees/nafr2/section/A?champRecherche=false) sur insee.fr  
-            * [Liste des DPO](https://www.data.gouv.fr/fr/datasets/organismes-ayant-designe-un-e-delegue-e-a-la-protection-des-donnees-dpd-dpo/) sur data.gouv.fr  
+            * [Liste des DPOs](https://www.data.gouv.fr/fr/datasets/organismes-ayant-designe-un-e-delegue-e-a-la-protection-des-donnees-dpd-dpo/) sur data.gouv.fr  
             * [Liste des Notifications](https://www.data.gouv.fr/fr/datasets/notifications-a-la-cnil-de-violations-de-donnees-a-caractere-personnel/) sur data.gouv.fr  
             * [Budget de la CNIL](https://www.data.gouv.fr/fr/datasets/budget-de-la-cnil-1/) sur data.gouv.fr  
             * [Montant des sanctions](https://www.cnil.fr/fr/les-sanctions-prononcees-par-la-cnil) sur cnil.fr  
