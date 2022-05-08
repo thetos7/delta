@@ -20,16 +20,28 @@ class Pbmc():
         self.df = dp.loadData()
         self.main_layout = html.Div([
             html.H3("Accident routiers en France"),
-            html.Div(dcc.Graph(id='pbmc-hist'), style={'width':'100%'}),
-            html.Div(dcc.RadioItems(
-                id='hist-opts', 
-                value=2,
-                labelStyle={'display':'block'})),
-            html.Div(dcc.Graph(id='pbmc-scatter'), style={'width':'100%'}),
-            html.Div(dcc.RadioItems(
-                id='scatter-opts', 
-                value=2,
-                labelStyle={'display':'block'})),
+            html.Div([
+                html.Div(dcc.Graph(id='pbmc-hist'), style={'width':'100%'}),
+                html.Div(dcc.RadioItems(
+                    id='hist-opts', 
+                    value=2,
+                    labelStyle={'display':'block'})),
+                html.Div([
+                    html.Div("Nous pouvons constater que la majorité des accidents sont causés par les véhicules de tourisme d'après les 3 graphes ci-dessus."),
+                    html.Div("Ceci peut être du au fait que les véhicules de tourisme sont les plus communs en circulation parmi tout les autres véhicules.")
+                    ], style={"text-align":"center"}),
+                ], style={"margin-bottom": "10px"}),
+            html.Div([
+                html.Div(dcc.Graph(id='pbmc-scatter'), style={'width':'100%'}),
+                html.Div(dcc.RadioItems(
+                    id='scatter-opts', 
+                    value=2,
+                    labelStyle={'display':'block'})),
+                html.Div([
+                    html.Div("En observant le graphe 3D, nous pouvons aussi remarquer que des véhicules entre l'age de 0 et 20 ans sont à l'origine de la plupart des accidents."),
+                    html.Div("Nous pouvons assumer que la raison pour cela est du au fait que les conducteurs à l'origine de la plupart des accidents ont besoin de changer de véhicules plus fréquemment que des conducteurs attentifs.")
+                ], style={"text-align":"center"})
+            ], style={"margin-bottom": "10px"}),
             html.H4('A propos'),
             html.Div([
                 html.Div(['Source des données:'], style={'margin-right': '5px'}),
