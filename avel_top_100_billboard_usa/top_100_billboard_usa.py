@@ -121,9 +121,9 @@ class Top100BillboardUSA:
             html.Div([
                 html.H3('À propos'),
                 dcc.Markdown('''
-                Source:
-                * [Kaggle - Billboard "The hot 100" songs](https://www.kaggle.com/datasets/dhruvildave/billboard-the-hot-100-songs)
-                * [Fonctionnement du Billboard](https://www.billboard.com/billboard-charts-legend/)
+                * Sources:
+                  * [Kaggle - Billboard "The hot 100" songs](https://www.kaggle.com/datasets/dhruvildave/billboard-the-hot-100-songs)
+                  * [Fonctionnement du Billboard](https://www.billboard.com/billboard-charts-legend/)
                 * Copyright © 2022 - Aurélien Visentin - Eliot Leclair
                 '''),
             ]),
@@ -172,7 +172,7 @@ class Top100BillboardUSA:
 
         fig.update_yaxes(range=[100, 0])
         fig.update_layout(
-            title=f"Songs ranking by {artist}",
+            title=f"Songs ranking for {artist}",
             xaxis_title="Date",
             yaxis_title="Classement",
             height=height,
