@@ -1,16 +1,27 @@
-# Δelta δata
+Sujet: Evolution des voeux post bac entre 2016 et 2021
 
-### Analyse de données ouvertes
+Graphique 1: 
+Nombre d'admis en fonction des années
 
-L'exercice consiste à prendre des données ouvertes et à les mettre en forme pour aider à l'analyse. Cela peut se faire sous forme d'articles avec des graphiques (voir les feuilles Jupyter dans le dépôt) ou de graphiques interactifs (voir  https://delta.lrde.epita.fr/).
+Un histogramme permettant de visualiser le nombre d'admis dans des filières postbac en fonction des années 
 
-### Code source
+Graphique 2: 
+Pourcentage de candidats n'ayant reçu aucune affectation en fonction des années
 
-Ce dépôt GitHub propose des pages Jupyter et des service Dash pour analyser des données ouvertes. Les sous-dépôts sont :
+Un graphique en ligne montrant le pourcentage de candidats n'ayant reçu aucune affectation en fonction des années
 
-* [Natalité / revenus](https://github.com/oricou/delta/tree/main/population) : exemple classique qui montre la chute de natalité à travers le monde et la croissance des revenus
-* [Prix de l'énergie](https://github.com/oricou/delta/tree/main/energies) : compare le prix grand public de différentes énergies en France
+Graphique 3:
+Pourcentage d'hommes et de femmes par filière
 
-Note : le choix du français est volontaire, il s'agit de promouvoir l'usage
-       des données ouvertes auprès du grand public en France. Cela étant il
-       est possible d'en faire une version dans une autre langue.
+6 graphiques de type "pie" montrant l'évolution du pourcentage d'hommes et de femmes chaque année dans une filière donnée.
+Il est possible de changer de filière avec un dropdown.
+
+Graphique 4:
+Pourcentage de boursier par filière
+
+Un histogramme montrant le pourcentage de boursier par fillière. Il est possible de changer les années grace à une scrollbar 
+
+
+Source: https://data.enseignementsup-recherche.gouv.fr/pages/explorer/?q=&sort=modified&refine.keyword=orientation
+
+Auteurs: Thomas Chivet & Antoine Vergnaud
