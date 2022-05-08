@@ -7,19 +7,25 @@ import plotly.graph_objs as go
 import plotly.express as px
 from ma_aj_netflix.data.get_data import get_data
 
-class NetflixStats():
+def bound(rate, mx=1):
+    if rate < 0:
+        return 0
+    if rate > mx:
+        return mx
+    return rate
 
+class NetflixStats():
     def __init__(self, application = None):
         self.df, self.popularity_df, self.sensitivity_df = get_data('ma_aj_netflix/data/netflix_final_data.csv')
 
         new_sensitivity = []
         for sensitivity in self.df["sensitivity"]:
-            new_sensitivity.append(sensitivity + 0.1 - np.random.random() * 0.2)
+            new_sensitivity.append(bound(sensitivity + 0.05 - np.random.random() * 0.1))
         self.df["approximate sensitivity"] = new_sensitivity
 
         new_popularity = []
         for popularity in self.df["popularity"]:
-            new_popularity.append(popularity + 1 - np.random.random() * 2)
+            new_popularity.append(bound(popularity + 0.5 - np.random.random(), 100))
         self.df["approximate popularity"] = new_popularity
 
         self.ratings = {'TV-Y':'deepskyblue', 'TV-Y7':'mediumaquamarine', 'TV-G':'limegreen', 'TV-PG':'lawngreen', 'PG':'yellow', 'PG-13':'gold', 'TV-14':'orange', 'R':'orangered', 'TV-MA':'firebrick'}
@@ -80,7 +86,7 @@ class NetflixStats():
                         dcc.Checklist(
                             id='random-type',
                             options=[
-                                {'label': 'Add random epsilon', 'value': True},
+                                {'label': 'Epsilon aléatoire', 'value': True},
                             ],
                             value=[True]
                         ),
@@ -105,6 +111,7 @@ class NetflixStats():
             ]),
             html.Br(),
             html.Div([
+                html.Div('Popularité des programmes en fonction de leur degré de sensibilité regroupé par intervales (et vice-versa)', style={'font-size' : 'large'}),
                 html.Div([
                     dcc.Graph(id='ns-stats-popularity-series', 
                             style={'width':'45%', 'display':'inline-block'}),
@@ -172,10 +179,20 @@ class NetflixStats():
                     #### Analyse des résultats
                     
                     Même si nous pouvons constater que les quelques programmes les plus populaires sont pour la plupart classés grand public, avec une sensibilité moyenne (0.6 pour Avengers infinity war),
-                    le nuage de points tend à montrer que les programmes sensibles occupent une bonne partie de l'espace des programmes populaires.
-                    En effet, les programmes les moins sensibles, souvent réservés à un public très jeune, sont assez peu populaires, ainsi, les programmes à sensibilité moyenne et forte se partagent les programmes populaires.
+                    le nuage de points tend à montrer que les programmes sensibles occupent une bonne partie de l'espace des programmes populaires. En effet, en retirant les sensibilités les plus élévées, comme pourrait le faire un control parental,
+                    l'on créé une ligne de "censure" comme dans le graphe de Zuckerberg.
+
+                    De plus, les programmes les moins sensibles, souvent réservés à un public très jeune, sont assez peu populaires, ainsi, les programmes à sensibilité moyenne et forte se partagent les programmes populaires.
+                    Mais n'oublions pas que les adultes sont surement une audience plus visée que les enfants, ce qui peut expliquer le nombre important de titres à classification d'âge élevée.
 
                     En conclusion, bien que la tendance n'est pas aussi visible qu'avec la courbe attendue, une majorité des programmes populaires de Netflix sont assez sensibles et susceptibles d'être censurés dans certains pays.
+
+                    #### À propos
+
+                    * Sources : 
+                        * [Dataset des contenus Netflix](https://www.kaggle.com/shivamb/netflix-shows ) sur Kaggle
+                        * [Internet Movie Database](https://www.imdb.com/)
+                    * 2022 Mirabelle Abdulmassih, Alexandre James
                     """)
                 ]),
             ]),      
@@ -207,6 +224,7 @@ class NetflixStats():
     def update_graph(self, yaxis_type, random_type, ratings):
         dfr = self.df[self.df.rating.isin(ratings)]
         fig = px.scatter(dfr,
+                         title="Poularité des programmes Netflix en fonction de leur degré de sensibilité",
                          y = "popularity" if len(random_type) == 0 else "approximate popularity",
                          x = "sensitivity" if len(random_type) == 0 else "approximate sensitivity", 
                          hover_name="title", log_y=True, color="rating", color_discrete_map = self.ratings)
@@ -216,8 +234,8 @@ class NetflixStats():
                               range=(0,100) if yaxis_type == 'Linéaire' 
                                               else (np.log10(1), np.log10(100)) 
                              ),
-                 xaxis = dict(title="Degré de sensitivité", range=(0,1)),
-                 margin={'l': 40, 'b': 30, 't': 10, 'r': 0},
+                 xaxis = dict(title="Degré de sensibilité", range=(0,1)),
+                 margin={'l': 40, 'b': 30, 't': 40, 'r': 0},
                  hovermode='closest',
                  showlegend=False,
              )
@@ -244,24 +262,24 @@ class NetflixStats():
         ranges = [i/10 for i in range(0, 11)]
         sensitivity_in_ranges = self.get_data_in_ranges('sensitivity', ranges)
         popularity_stats = self.get_stats_of_ranges(sensitivity_in_ranges, ranges=ranges, stats_of='popularity')
-        return self.create_stats_graph(popularity_stats, f"popularity {stats}", f"popularity {stats}")
+        return self.create_stats_graph(popularity_stats, f"popularity {stats}", "Degré de sensibilité", f"Popularité ({stats})")
 
     def get_stats_of_sensitivity_per_popularity(self, stats):
         ranges = [i for i in range(0, 101, 5)]
         popularity_in_ranges = self.get_data_in_ranges('popularity', ranges)
         sensitivity_stats = self.get_stats_of_ranges(popularity_in_ranges, ranges=ranges, stats_of='sensitivity')
-        return self.create_stats_graph(sensitivity_stats, f"sensitivity {stats}", f"sensitivity {stats}")
+        return self.create_stats_graph(sensitivity_stats, f"sensitivity {stats}", "Pourcentage de popularité", f"Sensibilité ({stats})")
 
-    def create_stats_graph(self, df, what, title):
+    def create_stats_graph(self, df, what, xtitle, ytitle):
         def SetColor(y):
             if(y == df[what].min()):
                 if(y == df[what].max()):
-                    return "yellow"
-                return "red"
+                    return "gold"
+                return "yellow"
             elif(y == df[what].max()):
-                return "green"
+                return "red"
             else:
-                return "blue"
+                return "orange"
         return {
             'data': [
             go.Bar(
@@ -275,8 +293,8 @@ class NetflixStats():
             'layout': {
                 'height': 225,
                 'margin': {'l': 50, 'b': 80, 'r': 10, 't': 20},
-                'yaxis': {'title':title},
-                'xaxis': {'showgrid': False}
+                'yaxis': {'title':ytitle},
+                'xaxis': {'title':xtitle, 'showgrid': False}
             }
         }
 
