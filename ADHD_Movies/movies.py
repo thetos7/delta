@@ -35,7 +35,8 @@ class MoviesStats():
                 html.Div([ dcc.Graph(id='mvs-main-graph'), ], style={'width':'90%', }),
 
                 html.Div([
-                    html.Div('Genres :'),
+                    html
+                        .Div('Genres :'),
                     dcc.Checklist(
                         id='mvs-which-genre',
                         options=[{'label': self.french[i], 'value': i} for i in sorted(self.genres_colors.keys())],
@@ -86,6 +87,15 @@ class MoviesStats():
                 'width':'100%'
             }),
 
+            html.Br(),
+            dcc.Markdown("""
+            Les données choisies pour l'étude sont les films populaires à la date du 28/04/2022. 
+            (popularité : selon https://developers.themoviedb.org/3/getting-started/popularity) 
+            
+            Certaines données sont incomplètes et à ne pas prendre littéralement :
+            * Les films début 1900, sûrement dû aux manques d'informations transmises depuis l'époque.
+            * Les films vers 2022, souvent annoncés mais pas encore sortis.
+            """),
             html.Br(),
             html.Br(),
             dcc.Markdown("""
