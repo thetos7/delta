@@ -4,7 +4,7 @@ from dash import html
 from energies import energies
 from population import population
 from deces import deces
-from velib import velib
+from EVHB_velib import velib
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -28,7 +28,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
-                              dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/velib'),
+                              dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/EVHB_velib'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -70,7 +70,7 @@ def display_page(pathname):
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
-    elif pathname == '/velib':
+    elif pathname == '/EVHB_velib':
         return vel.main_layout
     else:
         return home_page

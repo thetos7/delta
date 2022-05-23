@@ -17,7 +17,7 @@ class Velib:
     STOP = "Stop"
 
     def left_axis(self):
-        csv_day_usage = pd.read_csv("velib/data/velib/col_sum_velib.csv", sep=";")
+        csv_day_usage = pd.read_csv("data/EVHB_velib/col_sum_velib.csv", sep=";")
 
         def convert_date(x: str):
             _, a, b = x.split("_")
@@ -33,7 +33,7 @@ class Velib:
         return fig_day_usage
 
     def right_axis(self):
-        csv_diff = pd.read_csv("velib/data/velib/col_diff_velib.csv", sep=";")
+        csv_diff = pd.read_csv("data/EVHB_velib/col_diff_velib.csv", sep=";")
 
         def convert_date(x: str):
             _, a, b = x.split("_")
@@ -77,12 +77,12 @@ class Velib:
             return self.START
 
     def __init__(self, application=None):
-        with open("velib/data/communes.json") as f:
+        with open("data/EVHB_velib/communes.json") as f:
             communes = json.load(f)
 
         key = "ratio_avail"
         sorted_files = sorted(
-            glob.glob("velib/data/velib/data_2022_03_11_*[05]_velib.csv")
+            glob.glob("data/EVHB_velib/data_2022_03_11_*[05]_velib.csv")
         )
         map_df = [pd.read_csv(f, sep=";", dtype={"arrond": str}) for f in sorted_files]
         len_map = len(map_df) - 1
