@@ -7,6 +7,7 @@ from deces import deces
 from pbmc_accidents_routiers import pbmc_accidents_routiers as pbmc
 from APTT_olympic import olympics
 from YA_CDL_Energy_generation import Energy_generation
+from EVHB_velib import velib
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -18,6 +19,7 @@ dec = deces.Deces(app)
 pm = pbmc.Pbmc(app)
 oly = olympics.Olympic(app)
 eeg = Energy_generation.EuropeEnergyGeneration(app)
+vel = velib.Velib(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -36,6 +38,7 @@ main_layout = html.Div([
                                   style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
                               dcc.Link(html.Button('Médailles Olympique', style={'width': "100%"}), href='/olympics'),
                               dcc.Link(html.Button("Génération d'énergie UE", style={'width':"100%"}), href='/Energy_generation'),
+                              dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/EVHB_velib'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -83,6 +86,8 @@ def display_page(pathname):
         return oly.main_layout
     elif pathname == '/Energy_generation':
         return eeg.main_layout
+    elif pathname == '/EVHB_velib':
+        return vel.main_layout
     else:
         return home_page
 
