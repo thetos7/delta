@@ -5,6 +5,7 @@ from energies import energies
 from population import population
 from deces import deces
 from pbmc_accidents_routiers import pbmc_accidents_routiers as pbmc
+from APTT_olympic import olympics
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -14,10 +15,11 @@ pop = population.WorldPopulationStats(app)
 nrg = energies.Energies(app)
 dec = deces.Deces(app)
 pm = pbmc.Pbmc(app)
+oly = olympics.Olympic(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
-             children=[ 
+             children=[
                  dcc.Location(id='url', refresh=False),
                  html.Div(className="two columns",
                           children = [
@@ -30,6 +32,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Accident Routiers', 
                                   style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
+                              dcc.Link(html.Button('Médailles Olympique', style={'width': "100%"}), href='/olympics'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -72,6 +75,8 @@ def display_page(pathname):
         return dec.main_layout
     elif pathname == '/accidents_routiers':
         return pm.main_layout
+    elif pathname == '/olympics':
+        return oly.main_layout
     else:
         return home_page
 
