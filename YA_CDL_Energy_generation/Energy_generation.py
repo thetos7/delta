@@ -21,9 +21,9 @@ pd.options.plotting.backend = "plotly"
 # ========================================================================================
 
 data = pd.read_csv(
-    'data/transformedData/energy_per_source.csv').drop(columns=['Unnamed: 0'])
+    'data/YA_CDL_Energy_generation/energy_per_source.csv').drop(columns=['Unnamed: 0'])
 energy_per_area = pd.read_csv(
-    'data/transformedData/energy_per_area.csv').drop(columns=['Unnamed: 0'])
+    'data/YA_CDL_Energy_generation/energy_per_area.csv').drop(columns=['Unnamed: 0'])
 data_per_year = {str(year):     data[data['Year'] == year]
                  for year in range(2000, 2021)}
 

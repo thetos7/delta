@@ -16,7 +16,7 @@ data['Kind of energy'] = data['Variable'].apply(
 data = data[data['Kind of energy'] != 'Other']
 
 # Write dataframe in data/transformedData/sunburst_data.csv
-data.to_csv('data/transformedData/energy_per_source.csv')
+data.to_csv('data/YA_CDL_Energy_generation/energy_per_source.csv')
 
 # Create a new dataframe for the map and the line plot
 energy_per_area_data = []
@@ -65,4 +65,4 @@ energy_per_area['iso_alpha3'] = energy_per_area['Area'].apply(
     lambda x: pc.country_name_to_country_alpha3(x) if x != 'EU-27' and x != 'EU27+1' else x)
 
 # Write dataframe in
-energy_per_area.to_csv('data/transformedData/energy_per_area.csv')
+energy_per_area.to_csv('data/YA_CDL_Energy_generation/energy_per_area.csv')
