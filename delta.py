@@ -13,6 +13,7 @@ from YA_CDL_Energy_generation import Energy_generation
 from EVHB_velib import velib
 from kkhj_happinessPerceptionReality import happinessPerceptionReality
 from mzgl_inegalites_de_revenus import mzgl_inegalites_de_revenus
+from ARPA_inequality_per_political_party import inequalities
 
 from ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe import environment
 from MDMR_NYPDCallsMeteoNY import NYPD_dash_visualisation as NYWeather
@@ -34,7 +35,7 @@ oly = olympics.Olympic(app)
 eeg = Energy_generation.EuropeEnergyGeneration(app)
 vel = velib.Velib(app)
 hap = happinessPerceptionReality.HappinessPerceptionReality(app)
-ine = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
+ine_rev = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
 alvs = environment.EuropeanEnvironmentStudies(app)
 nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
 pol = pollution.Pollution(app)
@@ -45,6 +46,7 @@ inc = income.Income(app)
 pol = pollution.Pollution(app)
 cncr = cancer.Cancer(app)
 mus = Music.Song(app)
+ine_gini = inequalities.Inequalities(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -79,6 +81,8 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Répartition des cancers', style={'width':"100%"}), href='/cancer'),
                               html.Br(),
                               dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/music'),
+                              dcc.Link(html.Button('Inégalités en Europe', style={'width':"100%"}), href='/inequality'),
+                              html.Br(),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Source Code', href='https://github.com/oricou/delta')),
@@ -123,7 +127,7 @@ def display_page(pathname):
     elif pathname == '/bonheur':
         return hap.main_layout
     elif pathname == '/inegalites':
-        return ine.main_layout
+        return ine_rev.main_layout
     elif pathname == '/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe':
         return alvs.main_layout
     elif pathname == '/MDMR_NYPDCallsMeteoNY':
@@ -145,6 +149,8 @@ def display_page(pathname):
         return cncr.main_layout
     elif pathname == '/music':
         return mus.main_layout
+    elif pathname == '/inequality':
+        return ine_gini.main_layout
     else:
         return home_page
 
