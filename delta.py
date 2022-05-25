@@ -21,7 +21,7 @@ from phllhlv_emissionglobalwarming import global_warming
 from tdmr_quality_of_life_and_worktime import tdmr_quality_of_life_and_worktime as tdmr
 from strl_EvolutionDesSalairesAnnuelsMoyens import income
 from cerg_cancer import cancer
-
+from ACJW_MusicPopularityFactor import Music
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
@@ -44,6 +44,7 @@ pet = petrole.Petrole(app)
 inc = income.Income(app)
 pol = pollution.Pollution(app)
 cncr = cancer.Cancer(app)
+mus = Music.Song(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -77,9 +78,10 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Pollution des transports', style={'width':"100%"}), href='/pollution'),
                               dcc.Link(html.Button('Répartition des cancers', style={'width':"100%"}), href='/cancer'),
                               html.Br(),
+                              dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/music'),
                               html.Br(),
                               html.Br(),
-                              html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
+                              html.Center(html.A('Source Code', href='https://github.com/oricou/delta')),
                           ]),
                  html.Div(id='page_content', className="ten columns"),
             ]),
@@ -141,6 +143,8 @@ def display_page(pathname):
         return dec.main_layout 
     elif pathname == '/cancer':
         return cncr.main_layout
+    elif pathname == '/music':
+        return mus.main_layout
     else:
         return home_page
 
