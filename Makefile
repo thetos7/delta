@@ -1,7 +1,15 @@
 .PHONY: docker
 
 run:
+	sed -i -e 's/^@profile/#@profile/' delta.py
+	sed -i -e 's/profile = True/profile = False/' delta.py
 	poetry run python delta.py
+
+profile:
+	sed -i -e 's/^#@profile/@profile/' delta.py
+	sed -i -e 's/profile = False/profile = True/' delta.py
+	poetry run kernprof -l delta.py
+	poetry run python -m line_profiler delta.py.lprof
 
 docker:
 	tar czvf apps.tgz delta.py */

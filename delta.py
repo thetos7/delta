@@ -25,135 +25,139 @@ from cerg_cancer import cancer
 from ACJW_MusicPopularityFactor import Music
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
-server = app.server
-pop = population.WorldPopulationStats(app)
-nrg = energies.Energies(app)
-dec = deces.Deces(app)
-pm = pbmc.Pbmc(app)
-oly = olympics.Olympic(app)
-eeg = Energy_generation.EuropeEnergyGeneration(app)
-vel = velib.Velib(app)
-hap = happinessPerceptionReality.HappinessPerceptionReality(app)
-ine_rev = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
-alvs = environment.EuropeanEnvironmentStudies(app)
-nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
-pol = pollution.Pollution(app)
-global_warming = global_warming.GlobalWarming(app)
-td = tdmr.Tdmr(app)
-pet = petrole.Petrole(app)
-inc = income.Income(app)
-pol = pollution.Pollution(app)
-cncr = cancer.Cancer(app)
-mus = Music.Song(app)
-ine_gini = inequalities.Inequalities(app)
+#@profile
+def init():
+    app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
+    server = app.server
+    pop = population.WorldPopulationStats(app)
+    nrg = energies.Energies(app)
+    dec = deces.Deces(app)
+    pm =  dec # pbmc.Pbmc(app)
+    oly = olympics.Olympic(app)
+    eeg = Energy_generation.EuropeEnergyGeneration(app)
+    vel = velib.Velib(app)
+    hap = dec # happinessPerceptionReality.HappinessPerceptionReality(app)
+    ine_rev = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
+    alvs = environment.EuropeanEnvironmentStudies(app)
+    nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
+    globalwarming = global_warming.GlobalWarming(app)
+    td = tdmr.Tdmr(app)
+    pet = dec # petrole.Petrole(app)
+    inc = income.Income(app)
+    pol = pollution.Pollution(app)
+    cncr = cancer.Cancer(app)
+    mus = Music.Song(app)
+    ine_gini = dec # inequalities.Inequalities(app)
 
-main_layout = html.Div([
-    html.Div(className = "row",
-             children=[
-                 dcc.Location(id='url', refresh=False),
-                 html.Div(className="two columns",
-                          children = [
-                              html.Center(html.H2("Δelta δata")),
-                              dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
-                              html.Br(),
-                              dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/pop'),
-                              html.Br(),
-                              dcc.Link(html.Button('MDMR_NYPDCallsMeteoNY', style={'width':"100%"}), href='/MDMR_NYPDCallsMeteoNY'),
-                              html.Br(),
-                              dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
-                              html.Br(),
-                              dcc.Link(html.Button('Accident Routiers', 
-                                  style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
-                              dcc.Link(html.Button('Médailles Olympique', style={'width': "100%"}), href='/olympics'),
-                              dcc.Link(html.Button("Génération d'énergie UE", style={'width':"100%"}), href='/Energy_generation'),
-                              dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/EVHB_velib'),
-                              dcc.Link(html.Button('Conception du bonheur', style={'width':"100%"}), href='/bonheur'),
-                              dcc.Link(html.Button('Inégalités de revenus', style={'width':"100%"}), href='/inegalites'),
-                              dcc.Link(html.Button('Politique et Environnement', style={'width':"100%"}), href='/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe'),
-                              html.Br(),
-                              dcc.Link(html.Button('Polutions/Pétroles', style={'width':"100%"}), href='/pollution'),
-                              dcc.Link(html.Button('Global Warming', style={'width':"100%"}), href='/global_warming'),
-                              dcc.Link(html.Button('impact temps de travail', style={'width':"100%", 'padding':'inherit'}), href='/travail'),
-                              dcc.Link(html.Button('Pétrole en Europe', style={'width':"100%"}), href='/petrole'),
-                              dcc.Link(html.Button('Evolution des salaires', style={'width':"100%", 'padding':'inherit'}), href='/salaires'),
-                              dcc.Link(html.Button('Pollution des transports', style={'width':"100%"}), href='/pollution'),
-                              dcc.Link(html.Button('Répartition des cancers', style={'width':"100%"}), href='/cancer'),
-                              html.Br(),
-                              dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/music'),
-                              dcc.Link(html.Button('Inégalités en Europe', style={'width':"100%"}), href='/inequality'),
-                              html.Br(),
-                              html.Br(),
-                              html.Br(),
-                              html.Center(html.A('Source Code', href='https://github.com/oricou/delta')),
-                          ]),
-                 html.Div(id='page_content', className="ten columns"),
-            ]),
-])
+    main_layout = html.Div([
+        html.Div(className = "row",
+                 children=[
+                     dcc.Location(id='url', refresh=False),
+                     html.Div(className="two columns",
+                              children = [
+                                  html.Center(html.H2("Δelta δata")),
+                                  dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
+                                  html.Br(),
+                                  dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/pop'),
+                                  html.Br(),
+                                  dcc.Link(html.Button('MDMR_NYPDCallsMeteoNY', style={'width':"100%"}), href='/MDMR_NYPDCallsMeteoNY'),
+                                  html.Br(),
+                                  dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
+                                  html.Br(),
+                                  dcc.Link(html.Button('Accident Routiers', 
+                                      style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
+                                  dcc.Link(html.Button('Médailles Olympique', style={'width': "100%"}), href='/olympics'),
+                                  dcc.Link(html.Button("Génération d'énergie UE", style={'width':"100%"}), href='/Energy_generation'),
+                                  dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/EVHB_velib'),
+                                  dcc.Link(html.Button('Conception du bonheur', style={'width':"100%"}), href='/bonheur'),
+                                  dcc.Link(html.Button('Inégalités de revenus', style={'width':"100%"}), href='/inegalites'),
+                                  dcc.Link(html.Button('Politique et Environnement', style={'width':"100%"}), href='/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe'),
+                                  html.Br(),
+                                  dcc.Link(html.Button('Polutions/Pétroles', style={'width':"100%"}), href='/pollution'),
+                                  dcc.Link(html.Button('Global Warming', style={'width':"100%"}), href='/global_warming'),
+                                  dcc.Link(html.Button('impact temps de travail', style={'width':"100%", 'padding':'inherit'}), href='/travail'),
+                                  dcc.Link(html.Button('Pétrole en Europe', style={'width':"100%"}), href='/petrole'),
+                                  dcc.Link(html.Button('Evolution des salaires', style={'width':"100%", 'padding':'inherit'}), href='/salaires'),
+                                  dcc.Link(html.Button('Pollution des transports', style={'width':"100%"}), href='/pollution'),
+                                  dcc.Link(html.Button('Répartition des cancers', style={'width':"100%"}), href='/cancer'),
+                                  html.Br(),
+                                  dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/music'),
+                                  dcc.Link(html.Button('Inégalités en Europe', style={'width':"100%"}), href='/inequality'),
+                                  html.Br(),
+                                  html.Br(),
+                                  html.Br(),
+                                  html.Center(html.A('Source Code', href='https://github.com/oricou/delta')),
+                              ]),
+                     html.Div(id='page_content', className="ten columns"),
+                ]),
+    ])
 
 
-home_page = html.Div([
-    html.Br(),
-    html.Br(),
-    html.Br(),
-    html.Br(),
-    dcc.Markdown("Choisissez le jeu de données dans l'index à gauche."),
-])
+    home_page = html.Div([
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        html.Br(),
+        dcc.Markdown("Choisissez le jeu de données dans l'index à gauche."),
+    ])
 
-to_be_done_page = html.Div([
-    dcc.Markdown("404 -- Désolé cette page n'est pas disponible."),
-])
+    to_be_done_page = html.Div([
+        dcc.Markdown("404 -- Désolé cette page n'est pas disponible."),
+    ])
 
-app.layout = main_layout
+    app.layout = main_layout
 
-# Update the index
-@app.callback(dash.dependencies.Output('page_content', 'children'),
-              [dash.dependencies.Input('url', 'pathname')])
-def display_page(pathname):
-    if pathname == '/energies':
-        return nrg.main_layout
-    elif pathname == '/pop':
-        return pop.main_layout
-    elif pathname == '/deces':
-        return dec.main_layout
-    elif pathname == '/accidents_routiers':
-        return pm.main_layout
-    elif pathname == '/olympics':
-        return oly.main_layout
-    elif pathname == '/Energy_generation':
-        return eeg.main_layout
-    elif pathname == '/EVHB_velib':
-        return vel.main_layout
-    elif pathname == '/bonheur':
-        return hap.main_layout
-    elif pathname == '/inegalites':
-        return ine_rev.main_layout
-    elif pathname == '/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe':
-        return alvs.main_layout
-    elif pathname == '/MDMR_NYPDCallsMeteoNY':
-        return nypd_weather.main_layout
-    elif pathname == '/pollution':
-        return pol.main_layout
-    elif pathname == '/global_warming':
-        return global_warming.main_layout
-    elif pathname == '/travail':
-        return td.main_layout
-    elif pathname == '/petrole':
-        return pet.main_layout
-    elif pathname == '/salaires':
-        return inc.main_layout
-    elif pathname == '/pollution':
-        return pol.main_layout
-        return dec.main_layout 
-    elif pathname == '/cancer':
-        return cncr.main_layout
-    elif pathname == '/music':
-        return mus.main_layout
-    elif pathname == '/inequality':
-        return ine_gini.main_layout
-    else:
-        return home_page
-
+    # Update the index
+    @app.callback(dash.dependencies.Output('page_content', 'children'),
+                  [dash.dependencies.Input('url', 'pathname')])
+    def display_page(pathname):
+        if pathname == '/energies':
+            return nrg.main_layout
+        elif pathname == '/pop':
+            return pop.main_layout
+        elif pathname == '/deces':
+            return dec.main_layout
+        elif pathname == '/accidents_routiers':
+            return pm.main_layout
+        elif pathname == '/olympics':
+            return oly.main_layout
+        elif pathname == '/Energy_generation':
+            return eeg.main_layout
+        elif pathname == '/EVHB_velib':
+            return vel.main_layout
+        elif pathname == '/bonheur':
+            return hap.main_layout
+        elif pathname == '/inegalites':
+            return ine_rev.main_layout
+        elif pathname == '/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe':
+            return alvs.main_layout
+        elif pathname == '/MDMR_NYPDCallsMeteoNY':
+            return nypd_weather.main_layout
+        elif pathname == '/pollution':
+            return pol.main_layout
+        elif pathname == '/global_warming':
+            return globalwarming.main_layout
+        elif pathname == '/travail':
+            return td.main_layout
+        elif pathname == '/petrole':
+            return pet.main_layout
+        elif pathname == '/salaires':
+            return inc.main_layout
+        elif pathname == '/pollution':
+            return pol.main_layout
+            return dec.main_layout 
+        elif pathname == '/cancer':
+            return cncr.main_layout
+        elif pathname == '/music':
+            return mus.main_layout
+        elif pathname == '/inequality':
+            return ine_gini.main_layout
+        else:
+            return home_page
+    return app
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    profile = False
+    app = init()
+    if not profile:
+        app.run_server(debug=True)

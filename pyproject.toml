@@ -21,6 +21,7 @@ folium = "^0.12.1"
 seaborn = "^0.11.2"
 statsmodels = "^0.13" 
 pycountry-convert = "^0.7.2"
+line_profiler = "^3.5"
 
 [tool.poetry.dev-dependencies]
 
