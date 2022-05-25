@@ -16,6 +16,7 @@ from ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe import environment
 from MDMR_NYPDCallsMeteoNY import NYPD_dash_visualisation as NYWeather
 from ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant import pollution
 from phllhlv_emissionglobalwarming import global_warming
+from tdmr_quality_of_life_and_worktime import tdmr_quality_of_life_and_worktime as tdmr
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -34,6 +35,7 @@ alvs = environment.EuropeanEnvironmentStudies(app)
 nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
 pol = pollution.Pollution(app)
 global_warming = global_warming.GlobalWarming(app)
+td = tdmr.Tdmr(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -61,6 +63,7 @@ main_layout = html.Div([
                               html.Br(),
                               dcc.Link(html.Button('Polutions/Pétroles', style={'width':"100%"}), href='/pollution'),
                               dcc.Link(html.Button('Global Warming', style={'width':"100%"}), href='/global_warming'),
+                              dcc.Link(html.Button('impact temps de travail', style={'width':"100%", 'padding':'inherit'}), href='/travail'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -114,6 +117,8 @@ def display_page(pathname):
         return pol.main_layout
     elif pathname == '/global_warming':
         return global_warming.main_layout
+    elif pathname == '/travail':
+        return td.main_layout
     else:
         return home_page
 
