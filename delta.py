@@ -9,6 +9,7 @@ from APTT_olympic import olympics
 from YA_CDL_Energy_generation import Energy_generation
 from EVHB_velib import velib
 from kkhj_happinessPerceptionReality import happinessPerceptionReality
+from mzgl_inegalites_de_revenus import mzgl_inegalites_de_revenus
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -22,6 +23,7 @@ oly = olympics.Olympic(app)
 eeg = Energy_generation.EuropeEnergyGeneration(app)
 vel = velib.Velib(app)
 hap = happinessPerceptionReality.HappinessPerceptionReality(app)
+ine = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -42,6 +44,7 @@ main_layout = html.Div([
                               dcc.Link(html.Button("Génération d'énergie UE", style={'width':"100%"}), href='/Energy_generation'),
                               dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/EVHB_velib'),
                               dcc.Link(html.Button('Conception du bonheur', style={'width':"100%"}), href='/bonheur'),
+                              dcc.Link(html.Button('Inégalités de revenus', style={'width':"100%"}), href='/inegalites'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -93,6 +96,8 @@ def display_page(pathname):
         return vel.main_layout
     elif pathname == '/bonheur':
         return hap.main_layout
+    elif pathname == '/inegalites':
+        return ine.main_layout
     else:
         return home_page
 
