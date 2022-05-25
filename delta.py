@@ -4,6 +4,7 @@ from dash import dcc
 from dash import html
 from energies import energies
 from population import population
+from MC_AB_consommationEtProductionEnergétique import petrole
 from deces import deces
 from pbmc_accidents_routiers import pbmc_accidents_routiers as pbmc
 from APTT_olympic import olympics
@@ -36,6 +37,7 @@ nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
 pol = pollution.Pollution(app)
 global_warming = global_warming.GlobalWarming(app)
 td = tdmr.Tdmr(app)
+pet = petrole.Petrole(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -64,6 +66,7 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Polutions/Pétroles', style={'width':"100%"}), href='/pollution'),
                               dcc.Link(html.Button('Global Warming', style={'width':"100%"}), href='/global_warming'),
                               dcc.Link(html.Button('impact temps de travail', style={'width':"100%", 'padding':'inherit'}), href='/travail'),
+                              dcc.Link(html.Button('Pétrole en Europe', style={'width':"100%"}), href='/petrole'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -119,6 +122,8 @@ def display_page(pathname):
         return global_warming.main_layout
     elif pathname == '/travail':
         return td.main_layout
+    elif pathname == '/petrole':
+        return pet.main_layout
     else:
         return home_page
 
