@@ -13,6 +13,7 @@ from kkhj_happinessPerceptionReality import happinessPerceptionReality
 from mzgl_inegalites_de_revenus import mzgl_inegalites_de_revenus
 
 from ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe import environment
+from MDMR_NYPDCallsMeteoNY import NYPD_dash_visualisation as NYWeather
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -29,6 +30,7 @@ hap = happinessPerceptionReality.HappinessPerceptionReality(app)
 ine = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
 
 alvs = environment.EuropeanEnvironmentStudies(app)
+nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -40,6 +42,8 @@ main_layout = html.Div([
                               dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
                               html.Br(),
                               dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/pop'),
+                              html.Br(),
+                              dcc.Link(html.Button('MDMR_NYPDCallsMeteoNY', style={'width':"100%"}), href='/MDMR_NYPDCallsMeteoNY'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
@@ -99,6 +103,8 @@ def display_page(pathname):
         return ine.main_layout
     elif pathname == '/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe':
         return alvs.main_layout
+    elif pathname == '/MDMR_NYPDCallsMeteoNY':
+        return nypd_weather.main_layout
     else:
         return home_page
 
