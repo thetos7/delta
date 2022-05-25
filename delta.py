@@ -14,6 +14,7 @@ from mzgl_inegalites_de_revenus import mzgl_inegalites_de_revenus
 
 from ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe import environment
 from MDMR_NYPDCallsMeteoNY import NYPD_dash_visualisation as NYWeather
+from ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant import pollution
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -28,9 +29,9 @@ eeg = Energy_generation.EuropeEnergyGeneration(app)
 vel = velib.Velib(app)
 hap = happinessPerceptionReality.HappinessPerceptionReality(app)
 ine = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
-
 alvs = environment.EuropeanEnvironmentStudies(app)
 nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
+pol = pollution.Pollution(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -56,6 +57,7 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Inégalités de revenus', style={'width':"100%"}), href='/inegalites'),
                               dcc.Link(html.Button('Politique et Environnement', style={'width':"100%"}), href='/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe'),
                               html.Br(),
+                              dcc.Link(html.Button('Polutions/Pétroles', style={'width':"100%"}), href='/pollution'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -105,6 +107,8 @@ def display_page(pathname):
         return alvs.main_layout
     elif pathname == '/MDMR_NYPDCallsMeteoNY':
         return nypd_weather.main_layout
+    elif pathname == '/pollution':
+        return pol.main_layout
     else:
         return home_page
 
