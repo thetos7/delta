@@ -1,3 +1,4 @@
+import re
 import dash
 from dash import dcc
 from dash import html
@@ -10,6 +11,8 @@ from YA_CDL_Energy_generation import Energy_generation
 from EVHB_velib import velib
 from kkhj_happinessPerceptionReality import happinessPerceptionReality
 from mzgl_inegalites_de_revenus import mzgl_inegalites_de_revenus
+
+from ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe import environment
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -25,6 +28,8 @@ vel = velib.Velib(app)
 hap = happinessPerceptionReality.HappinessPerceptionReality(app)
 ine = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
 
+alvs = environment.EuropeanEnvironmentStudies(app)
+
 main_layout = html.Div([
     html.Div(className = "row",
              children=[
@@ -34,7 +39,7 @@ main_layout = html.Div([
                               html.Center(html.H2("Δelta δata")),
                               dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
                               html.Br(),
-                              dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
+                              dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/pop'),
                               html.Br(),
                               dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                               html.Br(),
@@ -45,6 +50,7 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/EVHB_velib'),
                               dcc.Link(html.Button('Conception du bonheur', style={'width':"100%"}), href='/bonheur'),
                               dcc.Link(html.Button('Inégalités de revenus', style={'width':"100%"}), href='/inegalites'),
+                              dcc.Link(html.Button('Politique et Environnement', style={'width':"100%"}), href='/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -69,20 +75,13 @@ to_be_done_page = html.Div([
 
 app.layout = main_layout
 
-# "complete" layout (not sure that I need that)
-app.validation_layout = html.Div([
-    main_layout,
-    to_be_done_page,
-    pop.main_layout,
-])
-
 # Update the index
 @app.callback(dash.dependencies.Output('page_content', 'children'),
               [dash.dependencies.Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/energies':
         return nrg.main_layout
-    elif pathname == '/population':
+    elif pathname == '/pop':
         return pop.main_layout
     elif pathname == '/deces':
         return dec.main_layout
@@ -98,6 +97,8 @@ def display_page(pathname):
         return hap.main_layout
     elif pathname == '/inegalites':
         return ine.main_layout
+    elif pathname == '/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe':
+        return alvs.main_layout
     else:
         return home_page
 
