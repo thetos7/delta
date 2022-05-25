@@ -18,6 +18,7 @@ from MDMR_NYPDCallsMeteoNY import NYPD_dash_visualisation as NYWeather
 from ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant import pollution
 from phllhlv_emissionglobalwarming import global_warming
 from tdmr_quality_of_life_and_worktime import tdmr_quality_of_life_and_worktime as tdmr
+from strl_EvolutionDesSalairesAnnuelsMoyens import income
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -38,6 +39,7 @@ pol = pollution.Pollution(app)
 global_warming = global_warming.GlobalWarming(app)
 td = tdmr.Tdmr(app)
 pet = petrole.Petrole(app)
+inc = income.Income(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -67,6 +69,7 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Global Warming', style={'width':"100%"}), href='/global_warming'),
                               dcc.Link(html.Button('impact temps de travail', style={'width':"100%", 'padding':'inherit'}), href='/travail'),
                               dcc.Link(html.Button('Pétrole en Europe', style={'width':"100%"}), href='/petrole'),
+                              dcc.Link(html.Button('Evolution des salaires', style={'width':"100%", 'padding':'inherit'}), href='/salaires'),
                               html.Br(),
                               html.Br(),
                               html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
@@ -124,6 +127,8 @@ def display_page(pathname):
         return td.main_layout
     elif pathname == '/petrole':
         return pet.main_layout
+    elif pathname == '/salaires':
+        return inc.main_layout
     else:
         return home_page
 
