@@ -20,6 +20,7 @@ from ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant import poll
 from phllhlv_emissionglobalwarming import global_warming
 from tdmr_quality_of_life_and_worktime import tdmr_quality_of_life_and_worktime as tdmr
 from strl_EvolutionDesSalairesAnnuelsMoyens import income
+from cerg_cancer import cancer
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -42,6 +43,7 @@ td = tdmr.Tdmr(app)
 pet = petrole.Petrole(app)
 inc = income.Income(app)
 pol = pollution.Pollution(app)
+cncr = cancer.Cancer(app)
 
 main_layout = html.Div([
     html.Div(className = "row",
@@ -73,6 +75,7 @@ main_layout = html.Div([
                               dcc.Link(html.Button('Pétrole en Europe', style={'width':"100%"}), href='/petrole'),
                               dcc.Link(html.Button('Evolution des salaires', style={'width':"100%", 'padding':'inherit'}), href='/salaires'),
                               dcc.Link(html.Button('Pollution des transports', style={'width':"100%"}), href='/pollution'),
+                              dcc.Link(html.Button('Répartition des cancers', style={'width':"100%"}), href='/cancer'),
                               html.Br(),
                               html.Br(),
                               html.Br(),
@@ -135,6 +138,9 @@ def display_page(pathname):
         return inc.main_layout
     elif pathname == '/pollution':
         return pol.main_layout
+        return dec.main_layout 
+    elif pathname == '/cancer':
+        return cncr.main_layout
     else:
         return home_page
 
