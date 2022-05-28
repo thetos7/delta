@@ -1,4 +1,5 @@
 import re
+#from this import d
 import dash
 from dash import dcc
 from dash import html
@@ -25,7 +26,7 @@ from cerg_cancer import cancer
 from ACJW_MusicPopularityFactor import Music
 from RCNT_sujetTelevise import sujetTelevise
 from ym_jf_energy_mix import energymix
-# external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+from afhy_electricite import electricite
 
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
@@ -51,6 +52,7 @@ def init():
     ine_gini = dec # inequalities.Inequalities(app)
     suj = sujetTelevise.TvSubject(app)
     nrgmix = energymix.EnergyMix(app)
+    ele = electricite.Eletricite(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -86,6 +88,7 @@ def init():
                                   dcc.Link(html.Button('Inégalités en Europe', style={'width':"100%"}), href='/inequality'),
                                   dcc.Link(html.Button('Sujet tv', style={'width':"100%"}), href='/sujetTV'),
                                   dcc.Link(html.Button('Electricité monde', style={'width':"100%"}), href='/energymix'),
+                                  dcc.Link(html.Button("Électricité", style={'width':"100%"}), href='/electricite'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -104,7 +107,6 @@ def init():
     to_be_done_page = html.Div([
         dcc.Markdown("404 -- Désolé cette page n'est pas disponible."),
     ])
-
     app.layout = main_layout
 
     # "complete" layout (not sure that I need that)
@@ -163,6 +165,8 @@ def init():
             return suj.main_layout
         elif pathname == '/energymix':
             return nrgmix.main_layout
+        elif pathname == '/electricite':
+            return ele.main_layout
         else:
             return home_page
     return app
