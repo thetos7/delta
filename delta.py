@@ -23,9 +23,9 @@ from tdmr_quality_of_life_and_worktime import tdmr_quality_of_life_and_worktime 
 from strl_EvolutionDesSalairesAnnuelsMoyens import income
 from cerg_cancer import cancer
 from ACJW_MusicPopularityFactor import Music
+from RCNT_sujetTelevise import sujetTelevise
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-#@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
     server = app.server
@@ -48,7 +48,8 @@ def init():
     cncr = cancer.Cancer(app)
     mus = Music.Song(app)
     ine_gini = dec # inequalities.Inequalities(app)
-
+    suj = sujetTelevise.TvSubject(app)
+    
     main_layout = html.Div([
         html.Div(className = "row",
                  children=[
@@ -84,15 +85,15 @@ def init():
                                   dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/music'),
                                   dcc.Link(html.Button('Inégalités en Europe', style={'width':"100%"}), href='/inequality'),
                                   html.Br(),
+                                  dcc.Link(html.Button('Sujet tv', style={'width':"100%"}), href='/sujetTV'),
                                   html.Br(),
                                   html.Br(),
-                                  html.Center(html.A('Source Code', href='https://github.com/oricou/delta')),
+                                  html.Br(),
+                                  html.Center(html.A('Code source', href='https://github.com/oricou/delta')),
                               ]),
                      html.Div(id='page_content', className="ten columns"),
                 ]),
     ])
-
-
     home_page = html.Div([
         html.Br(),
         html.Br(),
@@ -100,13 +101,19 @@ def init():
         html.Br(),
         dcc.Markdown("Choisissez le jeu de données dans l'index à gauche."),
     ])
-
     to_be_done_page = html.Div([
         dcc.Markdown("404 -- Désolé cette page n'est pas disponible."),
     ])
 
     app.layout = main_layout
 
+    # "complete" layout (not sure that I need that)
+    app.validation_layout = html.Div([
+        main_layout,
+        to_be_done_page,
+        pop.main_layout,
+    ])
+    
     # Update the index
     @app.callback(dash.dependencies.Output('page_content', 'children'),
                   [dash.dependencies.Input('url', 'pathname')])
@@ -152,6 +159,8 @@ def init():
             return mus.main_layout
         elif pathname == '/inequality':
             return ine_gini.main_layout
+        elif pathname == '/sujetTV':
+            return suj.main_layout
         else:
             return home_page
     return app

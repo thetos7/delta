@@ -14,11 +14,3 @@ Ce dépôt GitHub propose des pages Jupyter et des service Dash pour analyser de
 Note : le choix du français est volontaire, il s'agit de promouvoir l'usage
        des données ouvertes auprès du grand public en France. Cela étant il
        est possible d'en faire une version dans une autre langue.
-
-
-### Données pour la partie cancer
-
-Les données que nous récupérons dans la partie cancer proviennent du site https://ci5.iarc.fr/CI5I-X/Default.aspx CI5 pour Cancer Incidence in 5 Continents et IARC pour International Agency for Research on Cancer.
-On trouve les CSV que nous avons utilisés en suivant ce lien https://ci5.iarc.fr/CI5I-X/Pages/download.aspx (le volume X en cliquant sur le lien 'detailed data').
-Ces CSV, bien que très complets, était très codifiés. En effet, chaque fichier était nommé avec un identifiant à 8 chiffres, qui correspondaient en fait à des zones géographiques qui était répertoriées dans un fichier texte. Pour simplifier notre tâche, nous avons créé à la main un nouveau dossier CI5_treated_data contenant des sous-dossiers nommés selon les différents continents. Chaque sous-dossier contient lui-même de nombreux sous-dossiers correspondants aux pays du continent en question. Nous avons alors copié chaque CSV dans le sous-dossier de pays qui le concernait selon sa zone géographique.
-Cela nous a été très utile car nous voulions dans notre dataset global l'information du continent mais également du pays, pour pouvoir ensuite filtrer selon ses composantes-là.
