@@ -187,4 +187,4 @@ class Energies():
         
 if __name__ == '__main__':
     nrg = Energies()
-    nrg.app.run_server(debug=True, port=8051)
+    nrg.app.run_server(debug=True, port=8052)

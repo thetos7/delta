@@ -24,6 +24,7 @@ from strl_EvolutionDesSalairesAnnuelsMoyens import income
 from cerg_cancer import cancer
 from ACJW_MusicPopularityFactor import Music
 from RCNT_sujetTelevise import sujetTelevise
+from ym_jf_energy_mix import energymix
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 def init():
@@ -49,7 +50,8 @@ def init():
     mus = Music.Song(app)
     ine_gini = dec # inequalities.Inequalities(app)
     suj = sujetTelevise.TvSubject(app)
-    
+    nrgmix = energymix.EnergyMix(app)
+
     main_layout = html.Div([
         html.Div(className = "row",
                  children=[
@@ -73,7 +75,6 @@ def init():
                                   dcc.Link(html.Button('Conception du bonheur', style={'width':"100%"}), href='/bonheur'),
                                   dcc.Link(html.Button('Inégalités de revenus', style={'width':"100%"}), href='/inegalites'),
                                   dcc.Link(html.Button('Politique et Environnement', style={'width':"100%"}), href='/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe'),
-                                  html.Br(),
                                   dcc.Link(html.Button('Polutions/Pétroles', style={'width':"100%"}), href='/pollution'),
                                   dcc.Link(html.Button('Global Warming', style={'width':"100%"}), href='/global_warming'),
                                   dcc.Link(html.Button('impact temps de travail', style={'width':"100%", 'padding':'inherit'}), href='/travail'),
@@ -81,11 +82,10 @@ def init():
                                   dcc.Link(html.Button('Evolution des salaires', style={'width':"100%", 'padding':'inherit'}), href='/salaires'),
                                   dcc.Link(html.Button('Pollution des transports', style={'width':"100%"}), href='/pollution'),
                                   dcc.Link(html.Button('Répartition des cancers', style={'width':"100%"}), href='/cancer'),
-                                  html.Br(),
                                   dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/music'),
                                   dcc.Link(html.Button('Inégalités en Europe', style={'width':"100%"}), href='/inequality'),
-                                  html.Br(),
                                   dcc.Link(html.Button('Sujet tv', style={'width':"100%"}), href='/sujetTV'),
+                                  dcc.Link(html.Button('Electricité monde', style={'width':"100%"}), href='/energymix'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -113,7 +113,7 @@ def init():
         to_be_done_page,
         pop.main_layout,
     ])
-    
+
     # Update the index
     @app.callback(dash.dependencies.Output('page_content', 'children'),
                   [dash.dependencies.Input('url', 'pathname')])
@@ -161,6 +161,8 @@ def init():
             return ine_gini.main_layout
         elif pathname == '/sujetTV':
             return suj.main_layout
+        elif pathname == '/energymix':
+            return nrgmix.main_layout
         else:
             return home_page
     return app
