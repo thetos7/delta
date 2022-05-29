@@ -28,6 +28,7 @@ from ym_jf_energy_mix import energymix
 from afhy_electricite import electricite
 from NINL_Impact_de_lexposition_aux_particules_fines_face_a_celui_de_la_pollution_sur_lesperance_de_vie_en_europe import impact
 from ps_ap_chessgames.src import chess
+from JD_NJ_Etude_de_la_pollution import dash_app_pollution
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -58,6 +59,7 @@ def init():
     ele = electricite.Eletricite(app)
     imp = impact.Impact(app)
     chs = chess.Chess(app)
+    pol = dash_app_pollution.PollutionFrancaise(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -95,6 +97,7 @@ def init():
                                   dcc.Link(html.Button("Électricité", style={'width':"100%"}), href='/electricite'),
                                   dcc.Link(html.Button('Espérance de vie vs pollution', style={'width':"100%"}), href='/impact'),
                                   dcc.Link(html.Button("Parties d'échecs", style={"width": "100%"}), href="/chess"),
+                                  dcc.Link(html.Button('Etude de la pollution', style={'width':"100%"}), href='/pollution'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -177,6 +180,8 @@ def init():
             return imp.main_layout
         elif pathname == "/chess":
             return chs.main_layout
+        elif pathname == "/pollution" :
+            return pol.main_layout
         else:
             return home_page
     return app
