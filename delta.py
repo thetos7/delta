@@ -5,9 +5,9 @@ from dash import dcc
 from dash import html
 from energies import energies
 from population import population
+from deces import deces
 from MC_AB_consommationEtProductionEnergétique import petrole
 from SG_AH_pollution_des_transports import pollution
-from deces import deces
 from pbmc_accidents_routiers import pbmc_accidents_routiers as pbmc
 from APTT_olympic import olympics
 from YA_CDL_Energy_generation import Energy_generation
@@ -15,7 +15,6 @@ from EVHB_velib import velib
 from kkhj_happinessPerceptionReality import happinessPerceptionReality
 from mzgl_inegalites_de_revenus import mzgl_inegalites_de_revenus
 from ARPA_inequality_per_political_party import inequalities
-
 from ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe import environment
 from MDMR_NYPDCallsMeteoNY import NYPD_dash_visualisation as NYWeather
 from ABNZ_Pollution_aux_US_et_corrélation_avec_le_prix_du_carburant import pollution
@@ -28,6 +27,7 @@ from RCNT_sujetTelevise import sujetTelevise
 from ym_jf_energy_mix import energymix
 from afhy_electricite import electricite
 from NINL_Impact_de_lexposition_aux_particules_fines_face_a_celui_de_la_pollution_sur_lesperance_de_vie_en_europe import impact
+from ps_ap_chessgames.src import chess
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -35,8 +35,8 @@ def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
     server = app.server
     pop = population.WorldPopulationStats(app)
-    nrg = energies.Energies(app)
     dec = deces.Deces(app)
+    nrg = energies.Energies(app)
     pm =  dec # pbmc.Pbmc(app)
     oly = olympics.Olympic(app)
     eeg = Energy_generation.EuropeEnergyGeneration(app)
@@ -57,6 +57,7 @@ def init():
     nrgmix = energymix.EnergyMix(app)
     ele = electricite.Eletricite(app)
     imp = impact.Impact(app)
+    chs = chess.Chess(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -73,8 +74,7 @@ def init():
                                   html.Br(),
                                   dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                                   html.Br(),
-                                  dcc.Link(html.Button('Accident Routiers', 
-                                      style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
+                                  dcc.Link(html.Button('Accident Routiers', style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
                                   dcc.Link(html.Button('Médailles Olympique', style={'width': "100%"}), href='/olympics'),
                                   dcc.Link(html.Button("Génération d'énergie UE", style={'width':"100%"}), href='/Energy_generation'),
                                   dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/EVHB_velib'),
@@ -94,6 +94,7 @@ def init():
                                   dcc.Link(html.Button('Electricité monde', style={'width':"100%"}), href='/energymix'),
                                   dcc.Link(html.Button("Électricité", style={'width':"100%"}), href='/electricite'),
                                   dcc.Link(html.Button('Espérance de vie vs pollution', style={'width':"100%"}), href='/impact'),
+                                  dcc.Link(html.Button("Parties d'échecs", style={"width": "100%"}), href="/chess"),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -174,6 +175,8 @@ def init():
             return ele.main_layout
         elif pathname == '/impact':
             return imp.main_layout
+        elif pathname == "/chess":
+            return chs.main_layout
         else:
             return home_page
     return app
