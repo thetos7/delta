@@ -27,6 +27,9 @@ from ACJW_MusicPopularityFactor import Music
 from RCNT_sujetTelevise import sujetTelevise
 from ym_jf_energy_mix import energymix
 from afhy_electricite import electricite
+from NINL_Impact_de_lexposition_aux_particules_fines_face_a_celui_de_la_pollution_sur_lesperance_de_vie_en_europe import impact
+
+    # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
@@ -53,6 +56,7 @@ def init():
     suj = sujetTelevise.TvSubject(app)
     nrgmix = energymix.EnergyMix(app)
     ele = electricite.Eletricite(app)
+    imp = impact.Impact(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -89,6 +93,7 @@ def init():
                                   dcc.Link(html.Button('Sujet tv', style={'width':"100%"}), href='/sujetTV'),
                                   dcc.Link(html.Button('Electricité monde', style={'width':"100%"}), href='/energymix'),
                                   dcc.Link(html.Button("Électricité", style={'width':"100%"}), href='/electricite'),
+                                  dcc.Link(html.Button('Espérance de vie vs pollution', style={'width':"100%"}), href='/impact'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -167,6 +172,8 @@ def init():
             return nrgmix.main_layout
         elif pathname == '/electricite':
             return ele.main_layout
+        elif pathname == '/impact':
+            return imp.main_layout
         else:
             return home_page
     return app
