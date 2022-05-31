@@ -36,6 +36,7 @@ from aa_sc_metacritic import metacritic
 from TBGP_salaires_inflation import app as tbgp_si_lib
 from jcwg_naissance_deces import naissance_deces
 from YBYB_Analyse_football import football
+from avel_top_100_billboard_usa import top_100_billboard_usa
 
 #@profile
 def init():
@@ -71,6 +72,7 @@ def init():
     tbgp_si = tbgp_si_lib.SalaryInflation(app)
     jcwg_nd = naissance_deces.Naissance(app)
     foot = football.Football(app)
+    billboard = top_100_billboard_usa.Top100BillboardUSA(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -115,6 +117,7 @@ def init():
                                   dcc.Link(html.Button('Salaires / inflation', style={'width':"100%"}), href='/tbgp-salaires-inflation'),
                                   dcc.Link(html.Button('Naissances et décès', style={'width':"100%"}), href='/jcwg_naissance_deces'),
                                   dcc.Link(html.Button("Football Classement, Age, €", style={'width':"100%"}), href='/football'),
+                                  dcc.Link(html.Button('Top 100 Billboard USA', style={'width':"100%"}), href='/usa_billboard'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -212,6 +215,8 @@ def init():
             return jcwg_nd.main_layout
         elif pathname == '/football':
             return foot.main_layout
+        elif pathname == '/usa_billboard':
+            return billboard.main_layout
         else:
             return home_page
     return app
