@@ -1,9 +1,14 @@
 .PHONY: docker
 
-run:
+debug:
 	sed -i -e 's/^@profile/#@profile/' delta.py
 	sed -i -e 's/profile = True/profile = False/' delta.py
 	poetry run python delta.py
+
+run:
+	sed -i -e 's/^@profile/#@profile/' delta.py
+	sed -i -e 's/profile = True/profile = False/' delta.py
+	poetry run gunicorn -b 0.0.0.0:8000 delta:server
 
 profile:
 	sed -i -e 's/^#@profile/@profile/' delta.py

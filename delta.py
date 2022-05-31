@@ -1,6 +1,7 @@
 import re
 #from this import d
 import dash
+import flask
 from dash import dcc
 from dash import html
 from energies import energies
@@ -34,7 +35,6 @@ from JD_NJ_Etude_de_la_pollution import dash_app_pollution
 
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
-    server = app.server
     pop = population.WorldPopulationStats(app)
     dec = deces.Deces(app)
     nrg = energies.Energies(app)
@@ -186,8 +186,10 @@ def init():
             return home_page
     return app
 
+app = init()
+server = app.server
+
 if __name__ == '__main__':
     profile = False
-    app = init()
     if not profile:
         app.run_server(debug=True)
