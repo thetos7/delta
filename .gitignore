@@ -74,6 +74,9 @@ docs/_build/
 # PyBuilder
 target/
 
+# Poetry
+poetry.lock
+
 # Jupyter Notebook
 .ipynb_checkpoints
 
