@@ -34,6 +34,7 @@ from ybjd_deces_en_france_selon_le_revenu_par_departement import ybjd_deces_en_f
 from TA_MG_SpotifyMusicPopularity import spotify
 from aa_sc_metacritic import metacritic
 from TBGP_salaires_inflation import app as tbgp_si_lib
+from jcwg_naissance_deces import naissance_deces
 
 #@profile
 def init():
@@ -67,6 +68,7 @@ def init():
     spo = spotify.Spotify(app)
     meta = metacritic.Metacritic(app)
     tbgp_si = tbgp_si_lib.SalaryInflation(app)
+    jcwg_nd = naissance_deces.Naissance(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -109,6 +111,7 @@ def init():
                                   dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/spotify'),
                                   dcc.Link(html.Button('Analyse Metacritic', style={'width':"100%"}), href='/aa_sc_metacritic'),
                                   dcc.Link(html.Button('Salaires / inflation', style={'width':"100%"}), href='/tbgp-salaires-inflation'),
+                                  dcc.Link(html.Button('Naissances et décès', style={'width':"100%"}), href='/jcwg_naissance_deces'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -202,6 +205,8 @@ def init():
             return meta.main_layout
         elif pathname == '/tbgp-salaires-inflation':
             return tbgp_si.main_layout
+        elif pathname == '/jcwg_naissance_deces':
+            return jcwg_nd.main_layout
         else:
             return home_page
     return app
