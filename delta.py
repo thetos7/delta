@@ -32,8 +32,7 @@ from ps_ap_chessgames.src import chess
 from JD_NJ_Etude_de_la_pollution import dash_app_pollution
 from ybjd_deces_en_france_selon_le_revenu_par_departement import ybjd_deces_en_france_selon_le_revenu_par_departement as ybjd
 from TA_MG_SpotifyMusicPopularity import spotify
-
-    # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+from aa_sc_metacritic import metacritic
 
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
@@ -64,6 +63,7 @@ def init():
     pol = dash_app_pollution.PollutionFrancaise(app)
     drd = ybjd.DecesFranceRevenu(app)
     spo = spotify.Spotify(app)
+    meta = metacritic.Metacritic(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -104,6 +104,7 @@ def init():
                                   dcc.Link(html.Button('Etude de la pollution', style={'width':"100%"}), href='/pollution'),
                                   dcc.Link(html.Button('Décès selon le revenu', style={'width':"100%"}), href='/ybjd_deces_en_france_selon_le_revenu_par_departement'),
                                   dcc.Link(html.Button('Popularité des musiques', style={'width':"100%"}), href='/spotify'),
+                                  dcc.Link(html.Button('Analyse Metacritic', style={'width':"100%"}), href='/aa_sc_metacritic'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -193,6 +194,8 @@ def init():
             return drd.main_layout
         elif pathname == '/spotify':
             return spo.main_layout
+        elif pathname == '/aa_sc_metacritic':
+            return meta.main_layout
         else:
             return home_page
     return app
