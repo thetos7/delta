@@ -39,6 +39,7 @@ from YBYB_Analyse_football import football
 from avel_top_100_billboard_usa import top_100_billboard_usa
 from abih import abih
 from TBGT_population_vs_train_speed import TBGT_population_vs_train_speed as tbgt_lib
+from postbac import postbac
 
 #@profile
 def init():
@@ -77,6 +78,7 @@ def init():
     billboard = top_100_billboard_usa.Top100BillboardUSA(app)
     meteor = abih.Abih(app)
     tbgt = tbgt_lib.TBGT(app)
+    psb = postbac.PostBac(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -124,6 +126,7 @@ def init():
                                   dcc.Link(html.Button('Top 100 Billboard USA', style={'width':"100%"}), href='/usa_billboard'),
                                   dcc.Link(html.Button('Les météorites', style={'width':"100%"}), href='/meteor'),
                                   dcc.Link(html.Button('Population vs Grandes Lignes', style={'width':"100%", 'margin':0, 'padding': 0}), href='/population_vs_train_speed'),
+                                  dcc.Link(html.Button('Education test', style={'width':"100%"}), href='/postbac'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -227,6 +230,8 @@ def init():
             return meteor.main_layout
         elif pathname == '/population_vs_train_speed':
             return tbgt.main_layout
+        elif pathname == '/postbac':
+            return psb.main_layout
         else:
             return home_page
     return app
