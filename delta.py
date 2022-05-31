@@ -35,6 +35,7 @@ from TA_MG_SpotifyMusicPopularity import spotify
 from aa_sc_metacritic import metacritic
 from TBGP_salaires_inflation import app as tbgp_si_lib
 from jcwg_naissance_deces import naissance_deces
+from YBYB_Analyse_football import football
 
 #@profile
 def init():
@@ -69,6 +70,7 @@ def init():
     meta = metacritic.Metacritic(app)
     tbgp_si = tbgp_si_lib.SalaryInflation(app)
     jcwg_nd = naissance_deces.Naissance(app)
+    foot = football.Football(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -112,6 +114,7 @@ def init():
                                   dcc.Link(html.Button('Analyse Metacritic', style={'width':"100%"}), href='/aa_sc_metacritic'),
                                   dcc.Link(html.Button('Salaires / inflation', style={'width':"100%"}), href='/tbgp-salaires-inflation'),
                                   dcc.Link(html.Button('Naissances et décès', style={'width':"100%"}), href='/jcwg_naissance_deces'),
+                                  dcc.Link(html.Button("Football Classement, Age, €", style={'width':"100%"}), href='/football'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -207,6 +210,8 @@ def init():
             return tbgp_si.main_layout
         elif pathname == '/jcwg_naissance_deces':
             return jcwg_nd.main_layout
+        elif pathname == '/football':
+            return foot.main_layout
         else:
             return home_page
     return app
