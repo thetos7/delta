@@ -34,6 +34,7 @@ from ybjd_deces_en_france_selon_le_revenu_par_departement import ybjd_deces_en_f
 from TA_MG_SpotifyMusicPopularity import spotify
 from aa_sc_metacritic import metacritic
 
+#@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
     pop = population.WorldPopulationStats(app)
@@ -61,7 +62,7 @@ def init():
     imp = impact.Impact(app)
     chs = chess.Chess(app)
     pol = dash_app_pollution.PollutionFrancaise(app)
-    drd = ybjd.DecesFranceRevenu(app)
+    drd = dec # ybjd.DecesFranceRevenu(app)
     spo = spotify.Spotify(app)
     meta = metacritic.Metacritic(app)
 
