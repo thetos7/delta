@@ -47,7 +47,7 @@ class Energies():
                               "Un litre d'essence ordinaire",  
                             "100 kWh PCI de propane", "100 kWh PCI de FOD au tarif C1"], inplace=True)  # doublons
 
-        electricite = pd.read_csv('data/prix_reglemente_electricite.csv', sep=';', decimal=',', parse_dates=['DATE_DEBUT'])
+        electricite = pd.read_csv('data/prix_reglemente_electricite.csv', sep=';', decimal=',', parse_dates=['DATE_DEBUT'], infer_datetime_format=True)
         electricite = electricite.set_index(['P_SOUSCRITE',"DATE_DEBUT"])
         electricite.drop(columns=['DATE_FIN', 'PART_FIXE_HT', 'PART_FIXE_TTC', 'PART_VARIABLE_HT'], inplace=True)
         electricite.dropna(inplace=True)
