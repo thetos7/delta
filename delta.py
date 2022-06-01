@@ -51,6 +51,7 @@ from parrainage import parrainage
 from tpmm_RGPD import RGPD
 #from bars import bars
 from companies import companies
+from dc_sujet import covid_basics
 
 #@profile
 def init():
@@ -101,6 +102,7 @@ def init():
     rgpd = RGPD.RGPD(app)
     bar = dec # bars.Bars(app)
     comp = companies.FrenchCompaniesStats(app)
+    covid = covid_basics.CovidBasics(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -158,6 +160,7 @@ def init():
                                   dcc.Link(html.Button('tpmm_RGPD', style={'width':"100%"}), href='/rgpd'),
                                   dcc.Link(html.Button('Bars en France', style={'width':"100%"}), href='/bars'),
                                   dcc.Link(html.Button( "Création d'Entreprises", style={'width': "100%"}), href='/companies'),
+                                  dcc.Link(html.Button('Covid basics', style={'width':"100%"}), href='/covid_stats'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -285,6 +288,8 @@ def init():
            return bar.main_layout
         elif pathname == '/companies':
             return comp.main_layout
+        elif pathname == '/covid_stats':
+            return covid.main_layout
         else:
             return home_page
     return app
