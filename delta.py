@@ -45,6 +45,7 @@ from EC_CD_Evolution_des_Mariages_en_France import mariages_en_France as md_lib
 from ma_aj_netflix import netflix
 from TFRT_obesity import obesity_calories
 from hcbjbd_Deces_dans_le_monde_classe_par_cause import deathanalysis
+from lmsb_animalcrossing import lmsb_animalcrossing as ac
 
 #@profile
 def init():
@@ -89,6 +90,7 @@ def init():
     net = netflix.NetflixStats(app)
     obcal = obesity_calories.Obesity_calories(app)
     ana = deathanalysis.DeathAnalysis(app)
+    ani = ac.Animal(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -142,6 +144,7 @@ def init():
                                   dcc.Link(html.Button('Popularité vs sensibilité', style={'width':"100%"}), href='/netflix'),
                                   dcc.Link(html.Button('Lien obésité/calories', style={'width':"100%"}), href='/TFRT_obesity'),
                                   dcc.Link(html.Button('Analyse des Décès', style={'width':"100%"}), href='/deathanalysis'),
+                                  dcc.Link(html.Button('Animal Crossing', style={'width':"100%"}),href='/lmsb_animalcrossing'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -257,6 +260,8 @@ def init():
             return obcal.main_layout
         elif pathname == '/deathanalysis':
             return ana.main_layout
+        elif pathname == '/lmsb_animalcrossing':
+            return ani.main_layout
         else:
             return home_page
     return app

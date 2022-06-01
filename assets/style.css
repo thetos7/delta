@@ -122,13 +122,17 @@
 /* NOTE
 html is set to 62.5% so that all the REM measurements throughout Skeleton
 are based on 10px sizing. So basically 1.5rem = 15px :) */
+@font-face {
+    font-family: 'FinkHeavy'; 
+    src: url('fonts/FinkHeavy.ttf');
+}
 html {
   font-size: 62.5%; }
 body {
   font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
   font-weight: 400;
-  font-family: "Open Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Open Sans", "HelveticaNeue", "Helvetica Neue", 'Helvetica', 'Arial', 'sans-serif', 'FinkHeavy';
   color: rgb(50, 50, 50); }
 
 
@@ -228,7 +232,6 @@ input[type="button"].button-primary:focus {
   color: #FFF;
   background-color: #1EAEDB;
   border-color: #1EAEDB; }
-
 
 /* Forms
 ââââââââââââââââââââââââââââââââââââââââââââââââââ */
