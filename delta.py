@@ -42,8 +42,9 @@ from TBGT_population_vs_train_speed import TBGT_population_vs_train_speed as tbg
 from postbac import postbac
 from presidentielle import presidentielle
 from EC_CD_Evolution_des_Mariages_en_France import mariages_en_France as md_lib
+from ma_aj_netflix import netflix
 
-@profile
+#@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
     pop = population.WorldPopulationStats(app)
@@ -83,6 +84,7 @@ def init():
     psb = postbac.PostBac(app)
     pres = presidentielle.Presidentielles(app)
     md = md_lib.Mariage(app)
+    net = netflix.NetflixStats(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -133,6 +135,7 @@ def init():
                                   dcc.Link(html.Button('Education test', style={'width':"100%"}), href='/postbac'),
                                   dcc.Link( html.Button('Présidentielle', style={'width': "100%", 'margin-bottom': '5px'}), href='/presidentielle'),
                                   dcc.Link(html.Button('Mariages', style={'width':"100%"}), href='/EC_DC_Evolution_des_Mariages_en_France'),
+                                  dcc.Link(html.Button('Popularité vs sensibilité', style={'width':"100%"}), href='/netflix'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -242,6 +245,8 @@ def init():
             return pres.main_layout
         elif pathname == '/EC_DC_Evolution_des_Mariages_en_France' :
             return md.main_layout
+        elif pathname == '/netflix':
+            return net.main_layout
         else:
             return home_page
     return app
@@ -250,6 +255,6 @@ app = init()
 server = app.server
 
 if __name__ == '__main__':
-    profile = True
+    profile = False
     if not profile:
         app.run_server(debug=True)
