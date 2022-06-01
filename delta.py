@@ -41,7 +41,7 @@ from abih import abih
 from TBGT_population_vs_train_speed import TBGT_population_vs_train_speed as tbgt_lib
 from postbac import postbac
 from presidentielle import presidentielle
-from presidentielle import presidentielle
+from EC_CD_Evolution_des_Mariages_en_France import mariages_en_France as md_lib
 
 #@profile
 def init():
@@ -82,6 +82,7 @@ def init():
     tbgt = tbgt_lib.TBGT(app)
     psb = postbac.PostBac(app)
     pres = presidentielle.Presidentielles(app)
+    md = md_lib.Mariage(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -131,6 +132,7 @@ def init():
                                   dcc.Link(html.Button('Population vs Grandes Lignes', style={'width':"100%", 'margin':0, 'padding': 0}), href='/population_vs_train_speed'),
                                   dcc.Link(html.Button('Education test', style={'width':"100%"}), href='/postbac'),
                                   dcc.Link( html.Button('Présidentielle', style={'width': "100%", 'margin-bottom': '5px'}), href='/presidentielle'),
+                                  dcc.Link(html.Button('Mariages', style={'width':"100%"}), href='/EC_DC_Evolution_des_Mariages_en_France'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -238,6 +240,8 @@ def init():
             return psb.main_layout
         elif pathname == '/presidentielle':
             return pres.main_layout
+        elif pathname == '/EC_DC_Evolution_des_Mariages_en_France' :
+            return md.main_layout
         else:
             return home_page
     return app
