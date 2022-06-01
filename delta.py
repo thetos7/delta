@@ -53,6 +53,7 @@ from tpmm_RGPD import RGPD
 from companies import companies
 from dc_sujet import covid_basics
 from rbmb_electricityVSgaz import electricityVSgaz
+from NHAJ_BMO_and_attractive_zone import bmo
 
 #@profile
 def init():
@@ -105,6 +106,7 @@ def init():
     comp = companies.FrenchCompaniesStats(app)
     covid = covid_basics.CovidBasics(app)
     elcVgaz = electricityVSgaz.Stats(app)
+    bmo_ = bmo.Bmo(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -164,6 +166,7 @@ def init():
                                   dcc.Link(html.Button( "Création d'Entreprises", style={'width': "100%"}), href='/companies'),
                                   dcc.Link(html.Button('Covid basics', style={'width':"100%"}), href='/covid_stats'),
                                   dcc.Link(html.Button('Énergie vs Gaz à effet de serre', style={'width':"100%"}), href='/rbmb_electricityVSgaz'),
+                                  dcc.Link(html.Button("Répartission d'offres d'emploi", style={ 'width': "100%"}), href='/bmo'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -295,6 +298,8 @@ def init():
             return covid.main_layout
         elif pathname == '/rbmb_electricityVSgaz':
             return elcVgaz.layout
+        elif pathname == '/bmo':
+            return bmo_.main_layout
         else:
             return home_page
     return app
