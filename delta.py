@@ -52,6 +52,7 @@ from tpmm_RGPD import RGPD
 #from bars import bars
 from companies import companies
 from dc_sujet import covid_basics
+from rbmb_electricityVSgaz import electricityVSgaz
 
 #@profile
 def init():
@@ -103,6 +104,7 @@ def init():
     bar = dec # bars.Bars(app)
     comp = companies.FrenchCompaniesStats(app)
     covid = covid_basics.CovidBasics(app)
+    elcVgaz = electricityVSgaz.Stats(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -161,6 +163,7 @@ def init():
                                   dcc.Link(html.Button('Bars en France', style={'width':"100%"}), href='/bars'),
                                   dcc.Link(html.Button( "Création d'Entreprises", style={'width': "100%"}), href='/companies'),
                                   dcc.Link(html.Button('Covid basics', style={'width':"100%"}), href='/covid_stats'),
+                                  dcc.Link(html.Button('Énergie vs Gaz à effet de serre', style={'width':"100%"}), href='/rbmb_electricityVSgaz'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -290,6 +293,8 @@ def init():
             return comp.main_layout
         elif pathname == '/covid_stats':
             return covid.main_layout
+        elif pathname == '/rbmb_electricityVSgaz':
+            return elcVgaz.layout
         else:
             return home_page
     return app
