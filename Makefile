@@ -9,7 +9,7 @@ run:
 	sed -i -e 's/^@profile/#@profile/' delta.py
 	sed -i -e 's/profile = True/profile = False/' delta.py
 	#poetry run gunicorn --workers 1 -b 0.0.0.0:8000 delta:server
-	poetry run gunicorn --timeout 60 --workers 1 -b 0.0.0.0:8000 delta:server
+	poetry run gunicorn --timeout 360 --workers 1 -b 0.0.0.0:8000 delta:server
 
 profile:
 	sed -i -e 's/^#@profile/@profile/' delta.py
