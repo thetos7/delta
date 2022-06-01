@@ -14,7 +14,7 @@ class DeathAnalysis():
     
     def __init__(self, application = None):
         #open Data
-        frame = pd.read_csv("deathanalysis/data/data.csv", sep=";")
+        frame = pd.read_csv("hcbjbd_Deces_dans_le_monde_classe_par_cause/data/data.csv", sep=";")
         #Create Frame
 	    #New Start
         frame = frame.fillna(0)
