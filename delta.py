@@ -54,6 +54,7 @@ from companies import companies
 from dc_sujet import covid_basics
 from rbmb_electricityVSgaz import electricityVSgaz
 from NHAJ_BMO_and_attractive_zone import bmo
+from lptr_radar_accidents import radar_accidents
 
 #@profile
 def init():
@@ -107,6 +108,7 @@ def init():
     covid = covid_basics.CovidBasics(app)
     elcVgaz = electricityVSgaz.Stats(app)
     bmo_ = bmo.Bmo(app)
+    rd_acc = radar_accidents.Radar_Accidents(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -167,6 +169,7 @@ def init():
                                   dcc.Link(html.Button('Covid basics', style={'width':"100%"}), href='/covid_stats'),
                                   dcc.Link(html.Button('Énergie vs Gaz à effet de serre', style={'width':"100%"}), href='/rbmb_electricityVSgaz'),
                                   dcc.Link(html.Button("Répartission d'offres d'emploi", style={ 'width': "100%"}), href='/bmo'),
+                                  dcc.Link(html.Button('Radars vs accidents', style={'width':"100%"}), href='/radar_accidents'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -300,6 +303,8 @@ def init():
             return elcVgaz.layout
         elif pathname == '/bmo':
             return bmo_.main_layout
+        elif pathname == '/radar_accidents':
+            return rd_acc.main_layout
         else:
             return home_page
     return app
