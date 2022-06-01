@@ -48,6 +48,7 @@ from hcbjbd_Deces_dans_le_monde_classe_par_cause import deathanalysis
 from lmsb_animalcrossing import lmsb_animalcrossing as ac
 from SM_HB_accidents import accidents
 from parrainage import parrainage
+from tpmm_RGPD import RGPD
 
 #@profile
 def init():
@@ -95,6 +96,7 @@ def init():
     ani = ac.Animal(app)
     acc = accidents.Accidents(app)
     par = parrainage.Parrainage(app)
+    rgpd = RGPD.RGPD(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -149,6 +151,7 @@ def init():
                                   dcc.Link(html.Button('Animal Crossing', style={'width':"100%"}),href='/lmsb_animalcrossing'),
                                   dcc.Link(html.Button("Accidents routiers", style={'width':"100%"}), href='/accidents'),
                                   dcc.Link(html.Button('Parrainage', style={'width':"100%"}), href='/parrainage'),
+                                  dcc.Link(html.Button('tpmm_RGPD', style={'width':"100%"}), href='/rgpd'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -270,6 +273,8 @@ def init():
             return acc.main_layout
         elif pathname == '/parrainage':
             return par.main_layout
+        elif pathname == '/rgpd':
+            return rgpd.main_layout
         else:
             return home_page
     return app
