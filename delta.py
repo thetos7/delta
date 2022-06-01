@@ -43,7 +43,7 @@ from postbac import postbac
 from presidentielle import presidentielle
 from EC_CD_Evolution_des_Mariages_en_France import mariages_en_France as md_lib
 
-#@profile
+@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
     pop = population.WorldPopulationStats(app)
@@ -250,6 +250,6 @@ app = init()
 server = app.server
 
 if __name__ == '__main__':
-    profile = False
+    profile = True
     if not profile:
         app.run_server(debug=True)
