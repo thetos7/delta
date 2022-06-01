@@ -46,6 +46,7 @@ from ma_aj_netflix import netflix
 from TFRT_obesity import obesity_calories
 from hcbjbd_Deces_dans_le_monde_classe_par_cause import deathanalysis
 from lmsb_animalcrossing import lmsb_animalcrossing as ac
+from SM_HB_accidents import accidents
 
 #@profile
 def init():
@@ -91,6 +92,9 @@ def init():
     obcal = obesity_calories.Obesity_calories(app)
     ana = deathanalysis.DeathAnalysis(app)
     ani = ac.Animal(app)
+    acc = accidents.Accidents(app)
+
+    # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -100,13 +104,9 @@ def init():
                               children = [
                                   html.Center(html.H2("Δelta δata")),
                                   dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
-                                  html.Br(),
                                   dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/pop'),
-                                  html.Br(),
-                                  dcc.Link(html.Button('MDMR_NYPDCallsMeteoNY', style={'width':"100%"}), href='/MDMR_NYPDCallsMeteoNY'),
-                                  html.Br(),
                                   dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
-                                  html.Br(),
+                                  dcc.Link(html.Button('MDMR_NYPDCallsMeteoNY', style={'width':"100%"}), href='/MDMR_NYPDCallsMeteoNY'),
                                   dcc.Link(html.Button('Accident Routiers', style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
                                   dcc.Link(html.Button('Médailles Olympique', style={'width': "100%"}), href='/olympics'),
                                   dcc.Link(html.Button("Génération d'énergie UE", style={'width':"100%"}), href='/Energy_generation'),
@@ -145,6 +145,7 @@ def init():
                                   dcc.Link(html.Button('Lien obésité/calories', style={'width':"100%"}), href='/TFRT_obesity'),
                                   dcc.Link(html.Button('Analyse des Décès', style={'width':"100%"}), href='/deathanalysis'),
                                   dcc.Link(html.Button('Animal Crossing', style={'width':"100%"}),href='/lmsb_animalcrossing'),
+                                  dcc.Link(html.Button("Accidents routiers", style={'width':"100%"}), href='/accidents'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -262,6 +263,8 @@ def init():
             return ana.main_layout
         elif pathname == '/lmsb_animalcrossing':
             return ani.main_layout
+        elif pathname == '/accidents':
+            return acc.main_layout
         else:
             return home_page
     return app
