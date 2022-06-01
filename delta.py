@@ -44,6 +44,7 @@ from presidentielle import presidentielle
 from EC_CD_Evolution_des_Mariages_en_France import mariages_en_France as md_lib
 from ma_aj_netflix import netflix
 from TFRT_obesity import obesity_calories
+from hcbjbd_Deces_dans_le_monde_classe_par_cause import deathanalysis
 
 #@profile
 def init():
@@ -87,6 +88,7 @@ def init():
     md = md_lib.Mariage(app)
     net = netflix.NetflixStats(app)
     obcal = obesity_calories.Obesity_calories(app)
+    ana = deathanalysis.DeathAnalysis(app)
 
     main_layout = html.Div([
         html.Div(className = "row",
@@ -139,6 +141,7 @@ def init():
                                   dcc.Link(html.Button('Mariages', style={'width':"100%"}), href='/EC_DC_Evolution_des_Mariages_en_France'),
                                   dcc.Link(html.Button('Popularité vs sensibilité', style={'width':"100%"}), href='/netflix'),
                                   dcc.Link(html.Button('Lien obésité/calories', style={'width':"100%"}), href='/TFRT_obesity'),
+                                  dcc.Link(html.Button('Analyse des Décès', style={'width':"100%"}), href='/deathanalysis'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -252,6 +255,8 @@ def init():
             return net.main_layout
         elif pathname == '/TFRT_obesity':
             return obcal.main_layout
+        elif pathname == '/deathanalysis':
+            return ana.main_layout
         else:
             return home_page
     return app
