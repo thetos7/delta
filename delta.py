@@ -49,6 +49,7 @@ from lmsb_animalcrossing import lmsb_animalcrossing as ac
 from SM_HB_accidents import accidents
 from parrainage import parrainage
 from tpmm_RGPD import RGPD
+from bars import bars
 
 #@profile
 def init():
@@ -97,6 +98,7 @@ def init():
     acc = accidents.Accidents(app)
     par = parrainage.Parrainage(app)
     rgpd = RGPD.RGPD(app)
+    bar = bars.Bars(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -152,6 +154,7 @@ def init():
                                   dcc.Link(html.Button("Accidents routiers", style={'width':"100%"}), href='/accidents'),
                                   dcc.Link(html.Button('Parrainage', style={'width':"100%"}), href='/parrainage'),
                                   dcc.Link(html.Button('tpmm_RGPD', style={'width':"100%"}), href='/rgpd'),
+                                  dcc.Link(html.Button('Bars en France', style={'width':"100%"}), href='/bars'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -275,6 +278,8 @@ def init():
             return par.main_layout
         elif pathname == '/rgpd':
             return rgpd.main_layout
+        elif pathname == '/bars':
+           return bar.main_layout
         else:
             return home_page
     return app
