@@ -60,6 +60,7 @@ from __LeagueOfLegendsChampionsStats import champs_win_rate
 from formations import formations as formations_lib
 from APAAL_criminalite_education import criminalite_education
 from ADHD_Movies import movies
+from ab_wg_apb_parcoursup import apb_parcoursup
 
 #@profile
 def init():
@@ -119,6 +120,7 @@ def init():
     formations = formations_lib.Formations(app)
     crim_edu = criminalite_education.Criminalite_Education(app)
     mvs = movies.MoviesStats(app)
+    apb = apb_parcoursup.APB_PARCOURSUP(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -185,6 +187,7 @@ def init():
                                   dcc.Link(html.Button('Formations supérieur', style={'width': "100%"}), href='/formations'),
                                   dcc.Link(html.Button("Criminalité et Education", style={"width": "100%"}), href="/criminalite-education"),
                                   dcc.Link(html.Button('Rentabilité des films', style={'width':"100%"}), href='/ADHD_Movies'),
+                                  dcc.Link( html.Button("APB / Parcoursup", style={"width": "100%"}), href="/ab-wg_apb-parcoursup",),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -330,6 +333,8 @@ def init():
             return crim_edu.main_layout
         elif pathname == '/ADHD_Movies':
             return mvs.main_layout
+        elif pathname == "/ab-wg_apb-parcoursup":
+            return apb.main_layout
         else:
             return home_page
     return app
