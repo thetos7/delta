@@ -40,20 +40,20 @@ class Accidents:
         self.main_layout = html.Div(children=[
             html.H3(children='Répartition des accidents de la route en France métropolitaine entre 2005 et 2020'),
             html.Div([
-                html.Div([ dcc.Graph(id='acc-main-graph'), ], style={'width':'100%', }),
-                html.Div([ dcc.RadioItems(id='acc-type', 
+                html.Div([ dcc.Graph(id='pgab-acc-main-graph'), ], style={'width':'100%', }),
+                html.Div([ dcc.RadioItems(id='pgab-acc-type', 
                                          options=[{'label':'Heatmap', 'value':0},
                                                   {'label':'Emplacements exacts', 'value':1}], 
                                          value=0,
                                          labelStyle={'display':'block'}),
-                           html.Div(html.Button(self.START, id='button-start-stop', style={'display':'inline-block'}), style={'margin-right':'15px', 'width': '7em', 'float':'right'}),
+                           html.Div(html.Button(self.START, id='pgab-button-start-stop', style={'display':'inline-block'}), style={'margin-right':'15px', 'width': '7em', 'float':'right'}),
                          ]),
                      ]),
             html.Div([
                 html.Br(),
                 html.Div(
                     dcc.Slider(
-                            id='year-slider',
+                            id='pgab-year-slider',
                             min=2005,
                             max=2020,
                             step = 1,
@@ -63,7 +63,7 @@ class Accidents:
                     style={'display':'inline-block', 'width':"90%"}
                 ),
                 dcc.Interval(
-                    id='auto-stepper',
+                    id='pgab-auto-stepper',
                     interval=1500,
                     max_intervals = -1,
                     n_intervals = 0
@@ -72,7 +72,7 @@ class Accidents:
                     'padding': '0px 50px', 
                     'width':'100%'
                 }),
-            html.Div([ dcc.Graph(id='acc-month-bar-graph'), ], style={'width':'100%', }),
+            html.Div([ dcc.Graph(id='pgab-acc-month-bar-graph'), ], style={'width':'100%', }),
             dcc.Markdown("""
             Carte interactive des accidents de la route recensés entre 2005 et 2020.
             
@@ -116,24 +116,24 @@ class Accidents:
             self.app.layout = self.main_layout
 
         self.app.callback(
-            dash.dependencies.Output('acc-month-bar-graph', 'figure'),
-            dash.dependencies.Input('year-slider', 'value'))(self.update_month_bar_graph)
+            dash.dependencies.Output('pgab-acc-month-bar-graph', 'figure'),
+            dash.dependencies.Input('pgab-year-slider', 'value'))(self.update_month_bar_graph)
         self.app.callback(
-            dash.dependencies.Output('acc-main-graph', 'figure'),
-            [ dash.dependencies.Input('acc-type', 'value'),
-              dash.dependencies.Input('year-slider', 'value')])(self.update_main_graph)
+            dash.dependencies.Output('pgab-acc-main-graph', 'figure'),
+            [ dash.dependencies.Input('pgab-acc-type', 'value'),
+              dash.dependencies.Input('pgab-year-slider', 'value')])(self.update_main_graph)
         self.app.callback(
-            dash.dependencies.Output('button-start-stop', 'children'),
-            dash.dependencies.Input('button-start-stop', 'n_clicks'),
-            dash.dependencies.State('button-start-stop', 'children'))(self.button_on_click)
+            dash.dependencies.Output('pgab-button-start-stop', 'children'),
+            dash.dependencies.Input('pgab-button-start-stop', 'n_clicks'),
+            dash.dependencies.State('pgab-button-start-stop', 'children'))(self.button_on_click)
         self.app.callback(
-            dash.dependencies.Output('auto-stepper', 'max_interval'),
-            [dash.dependencies.Input('button-start-stop', 'children')])(self.run_movie)
+            dash.dependencies.Output('pgab-auto-stepper', 'max_interval'),
+            [dash.dependencies.Input('pgab-button-start-stop', 'children')])(self.run_movie)
         self.app.callback(
-            dash.dependencies.Output('year-slider', 'value'),
-            dash.dependencies.Input('auto-stepper', 'n_intervals'),
-            [dash.dependencies.State('year-slider', 'value'),
-             dash.dependencies.State('button-start-stop', 'children')])(self.on_interval)
+            dash.dependencies.Output('pgab-year-slider', 'value'),
+            dash.dependencies.Input('pgab-auto-stepper', 'n_intervals'),
+            [dash.dependencies.State('pgab-year-slider', 'value'),
+             dash.dependencies.State('pgab-button-start-stop', 'children')])(self.on_interval)
 
     def update_month_bar_graph(self, year):
         dfg = self.df
