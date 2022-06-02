@@ -1,7 +1,7 @@
 import dash
 from dash import dcc
 from dash import html
-from .get_data import get_data, about_md, documentation_lexique
+from .data.get_data import get_data, about_md, documentation_lexique
 from .figures import (
     repartition_map,
     formation_details_sunburst,
