@@ -13,7 +13,7 @@ class MoviesStats():
     STOP  = 'Stop'
 
     def __init__(self, application = None):
-        self.df = pd.read_pickle('movies_data/data/movies_data.pkl')
+        self.df = pd.read_pickle('ADHD_Movies/data/movies_data.pkl')
         self.genres_colors = {'Crime':'black', 'Comedy':'Silver', 'Action':'rosybrown', 'Thriller':'firebrick',
                                  'Adventure':'darksalmon', 'Science Fiction': 'sienna', 'Animation':'sandybrown',
                                  'Family':'tan', 'Drama':'gold', 'Romance':'darkkhaki', 'Mystery':'olivedrab',
