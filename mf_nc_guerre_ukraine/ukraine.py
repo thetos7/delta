@@ -116,14 +116,14 @@ class Ukraine():
                         style={'display':'inline-block', 'width':"90%"}
                     ),
                     dcc.Interval(            # fire a callback periodically
-                        id='auto-stepper',
+                        id='mf-auto-stepper',
                         interval=500,       # in milliseconds
                         max_intervals = -1,  # start running
                         n_intervals = 0
                 ),
                 html.Button(
                             self.START,
-                            id='button-start-stop', 
+                            id='mf-button-start-stop', 
                             style={'display':'inline-block'}
                         ),
                 html.Div([ dcc.RadioItems(id='tweet-format', 
@@ -164,7 +164,7 @@ class Ukraine():
 
         self.app.callback(
                     dash.dependencies.Output('equipement-main-graph', 'figure'),
-                    [dash.dependencies.Input('equipement-dropdown', 'value'), 
+                    [dash.dependencies.Input('equipement-dropdown', 'value'),
                      dash.dependencies.Input('equipement-yaxis-type', 'value')])(self.update_equipement)
         
         self.app.callback(
@@ -172,19 +172,19 @@ class Ukraine():
                     [dash.dependencies.Input('personnel-type', 'value')])(self.update_personnel)
         
         self.app.callback(
-            dash.dependencies.Output('button-start-stop', 'children'),
-            dash.dependencies.Input('button-start-stop', 'n_clicks'),
-            dash.dependencies.State('button-start-stop', 'children'))(self.button_on_click)
+            dash.dependencies.Output('mf-button-start-stop', 'children'),
+            dash.dependencies.Input('mf-button-start-stop', 'n_clicks'),
+            dash.dependencies.State('mf-button-start-stop', 'children'))(self.button_on_click)
         
         self.app.callback(
-            dash.dependencies.Output('auto-stepper', 'max_interval'),
-            [dash.dependencies.Input('button-start-stop', 'children')])(self.run_movie)
+            dash.dependencies.Output('mf-auto-stepper', 'max_interval'),
+            [dash.dependencies.Input('mf-button-start-stop', 'children')])(self.run_movie)
         
         self.app.callback(
             dash.dependencies.Output('tweets-slider', 'value'),
-            dash.dependencies.Input('auto-stepper', 'n_intervals'),
+            dash.dependencies.Input('mf-auto-stepper', 'n_intervals'),
             [dash.dependencies.State('tweets-slider', 'value'),
-             dash.dependencies.State('button-start-stop', 'children')])(self.on_interval)
+             dash.dependencies.State('mf-button-start-stop', 'children')])(self.on_interval)
 
         self.app.callback(
                     dash.dependencies.Output('Tweet-main-graph', 'figure'),
