@@ -56,6 +56,7 @@ from rbmb_electricityVSgaz import electricityVSgaz
 from NHAJ_BMO_and_attractive_zone import bmo
 from lptr_radar_accidents import radar_accidents
 from tc_urban import urban
+from __LeagueOfLegendsChampionsStats import champs_win_rate
 
 #@profile
 def init():
@@ -111,6 +112,7 @@ def init():
     bmo_ = bmo.Bmo(app)
     rd_acc = radar_accidents.Radar_Accidents(app)
     urb = urban.UrbanPolutionStats(app)
+    lol = champs_win_rate.ChampWinRate(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -173,6 +175,7 @@ def init():
                                   dcc.Link(html.Button("Répartission d'offres d'emploi", style={ 'width': "100%"}), href='/bmo'),
                                   dcc.Link(html.Button('Radars vs accidents', style={'width':"100%"}), href='/radar_accidents'),
                                   dcc.Link(html.Button('CO₂ vs Urbanisation', style={'width':"100%"}), href='/tc_urban'),
+                                  dcc.Link(html.Button('League Of Legends Statistics', style={'width': "100%"}), href='/lol'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -310,6 +313,8 @@ def init():
             return rd_acc.main_layout
         elif pathname == '/tc_urban':
             return urb.main_layout
+        elif pathname == '/lol':
+            return lol.main_layout
         else:
             return home_page
     return app
