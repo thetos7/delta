@@ -23,7 +23,6 @@ Ce dépôt GitHub propose des pages Jupyter et des service Dash pour analyser de
 Le fichier `get_data.py` permet de récupérer les données depuis un lien et de les transformer pour notre utilisation.
 Exécuter ce fichier mettra à jour les données.
 
-
 Note : le choix du français est volontaire, il s'agit de promouvoir l'usage
 des données ouvertes auprès du grand public en France. Cela étant il
 est possible d'en faire une version dans une autre langue.
