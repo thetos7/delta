@@ -58,6 +58,7 @@ from lptr_radar_accidents import radar_accidents
 from tc_urban import urban
 from __LeagueOfLegendsChampionsStats import champs_win_rate
 from formations import formations as formations_lib
+from APAAL_criminalite_education import criminalite_education
 
 #@profile
 def init():
@@ -115,6 +116,7 @@ def init():
     urb = urban.UrbanPolutionStats(app)
     lol = champs_win_rate.ChampWinRate(app)
     formations = formations_lib.Formations(app)
+    crim_edu = criminalite_education.Criminalite_Education(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -179,6 +181,7 @@ def init():
                                   dcc.Link(html.Button('CO₂ vs Urbanisation', style={'width':"100%"}), href='/tc_urban'),
                                   dcc.Link(html.Button('League Of Legends Statistics', style={'width': "100%"}), href='/lol'),
                                   dcc.Link(html.Button('Formations supérieur', style={'width': "100%"}), href='/formations'),
+                                  dcc.Link(html.Button("Criminalité et Education", style={"width": "100%"}), href="/criminalite-education"),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -320,6 +323,8 @@ def init():
             return lol.main_layout
         elif pathname == '/formations':
             return formations.main_layout
+        elif pathname == "/criminalite-education":
+            return crim_edu.main_layout
         else:
             return home_page
     return app
