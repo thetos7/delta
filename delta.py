@@ -136,7 +136,7 @@ def init():
                                   dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                                   dcc.Link(html.Button('MDMR_NYPDCallsMeteoNY', style={'width':"100%"}), href='/MDMR_NYPDCallsMeteoNY'),
                                   dcc.Link(html.Button('Accident Routiers', style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
-                                  dcc.Link(html.Button('Accidents de la route (PGAB)', style={'width':"100%"}), href='/pgab_accidents'),
+                                  dcc.Link(html.Button('Accidents de la route', style={'width':"100%"}), href='/pgab_accidents'),
                                   dcc.Link(html.Button('Médailles Olympique', style={'width': "100%"}), href='/olympics'),
                                   dcc.Link(html.Button("Génération d'énergie UE", style={'width':"100%"}), href='/Energy_generation'),
                                   dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/EVHB_velib'),
