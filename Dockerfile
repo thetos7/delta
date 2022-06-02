@@ -44,4 +44,4 @@ ADD apps.tgz .
 RUN cd ps_ap_chessgames/; python3 get_data.py 
 
 # Finally, run gunicorn.
-CMD [ "gunicorn", "--workers=5", "--threads=1", "-b 0.0.0.0:8000", "delta:server"]
+CMD [ "gunicorn", "--timeout=300", "--workers=5", "--threads=1", "-b 0.0.0.0:8000", "delta:server"]
