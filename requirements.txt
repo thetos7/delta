@@ -16,7 +16,3 @@ flask
 scipy
 statsmodels
 glob2
-regex
-requests
-rotten-tomatoes-scraper
-helper

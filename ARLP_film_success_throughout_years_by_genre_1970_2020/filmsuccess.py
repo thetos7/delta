@@ -1,12 +1,7 @@
 import dash
-from dash import dcc
-from dash import html
-from dash.dependencies import Input,Output
+from dash import dcc, html
 import plotly.express as px
-import glob
 import pandas as pd
-import random
-from helper import *
 from .data.get_data import extract_data
 import numpy as np
 
@@ -84,8 +79,8 @@ class FilmSuccess():
             dash.dependencies.Input('fig2', 'clickData'))
         def update_fig3(clickData):
           if clickData == None:
-            year = random.choice([i for i in range(1970,2021)])
-            genre = random.choice(genres.tolist())
+            year = 2015
+            genre = genres.tolist()[0]
           else:
             year = clickData['points'][0]['x']
             genre = clickData['points'][0]['customdata'][0]
