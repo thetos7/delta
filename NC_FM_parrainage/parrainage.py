@@ -10,18 +10,18 @@ import plotly.graph_objs as go
 import plotly.express as px
 import json
 
-from parrainage.get_data import fetch_data
+from NC_FM_parrainage.get_data import fetch_data
 
 class Parrainage():
 
     def __init__(self, application = None):
         fetch_data()
-        self.df = pd.read_csv("parrainage/data/parrainagestotal.csv", sep=";", infer_datetime_format=True)
+        self.df = pd.read_csv("NC_FM_parrainage/data/parrainagestotal.csv", sep=";", infer_datetime_format=True)
         self.df['Date de publication'] = pd.to_datetime(self.df['Date de publication'], format='%d/%m/%Y')
         self.candidats_occurences = self.df['Candidat'].value_counts()
         self.candidats_list = self.candidats_occurences[self.candidats_occurences > 500].keys()
 
-        with open("parrainage/data/departements.geojson") as f:
+        with open("NC_FM_parrainage/data/departements.geojson") as f:
             self.departements_json = json.load(f)
         
         self.main_layout = html.Div(children=[

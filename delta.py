@@ -61,6 +61,7 @@ from formations import formations as formations_lib
 from APAAL_criminalite_education import criminalite_education
 from ADHD_Movies import movies
 from ab_wg_apb_parcoursup import apb_parcoursup
+from NC_FM_parrainage import parrainage
 
 #@profile
 def init():
