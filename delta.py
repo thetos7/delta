@@ -90,7 +90,7 @@ def init():
     imp = impact.Impact(app)
     chs = chess.Chess(app)
     pol = dash_app_pollution.PollutionFrancaise(app)
-    drd = dec # ybjd.DecesFranceRevenu(app)
+    drd = ybjd.DecesFranceRevenu(app)
     spo = spotify.Spotify(app)
     meta = metacritic.Metacritic(app)
     tbgp_si = tbgp_si_lib.SalaryInflation(app)
