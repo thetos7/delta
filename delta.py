@@ -47,7 +47,6 @@ from TFRT_obesity import obesity_calories
 from hcbjbd_Deces_dans_le_monde_classe_par_cause import deathanalysis
 from lmsb_animalcrossing import lmsb_animalcrossing as ac
 from SM_HB_accidents import accidents
-from parrainage import parrainage
 from tpmm_RGPD import RGPD
 #from bars import bars
 from companies import companies
