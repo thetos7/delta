@@ -68,7 +68,7 @@ def init():
     pop = population.WorldPopulationStats(app)
     dec = deces.Deces(app)
     nrg = energies.Energies(app)
-    pm =  dec # pbmc.Pbmc(app)
+    pm =  pbmc.Pbmc(app)
     oly = olympics.Olympic(app)
     eeg = Energy_generation.EuropeEnergyGeneration(app)
     vel = velib.Velib(app)
