@@ -61,6 +61,7 @@ from formations import formations as formations_lib
 from APAAL_criminalite_education import criminalite_education
 from ADHD_Movies import movies
 from ab_wg_apb_parcoursup import apb_parcoursup
+from PMPR_WineStats import dataAnalysis
 
 #@profile
 def init():
@@ -121,6 +122,7 @@ def init():
     crim_edu = criminalite_education.Criminalite_Education(app)
     mvs = movies.MoviesStats(app)
     apb = apb_parcoursup.APB_PARCOURSUP(app)
+    wine = dataAnalysis.WineStats(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -188,6 +190,7 @@ def init():
                                   dcc.Link(html.Button("Criminalité et Education", style={"width": "100%"}), href="/criminalite-education"),
                                   dcc.Link(html.Button('Rentabilité des films', style={'width':"100%"}), href='/ADHD_Movies'),
                                   dcc.Link( html.Button("APB / Parcoursup", style={"width": "100%"}), href="/ab-wg_apb-parcoursup",),
+                                  dcc.Link(html.Button('Vins dans le monde', style={'width':"100%"}), href='/PMPR_WineStats'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -254,7 +257,7 @@ def init():
             return inc.main_layout
         elif pathname == '/pollution':
             return pol.main_layout
-            return dec.main_layout 
+            #return dec.main_layout 
         elif pathname == '/cancer':
             return cncr.main_layout
         elif pathname == '/music':
@@ -335,6 +338,8 @@ def init():
             return mvs.main_layout
         elif pathname == "/ab-wg_apb-parcoursup":
             return apb.main_layout
+        elif pathname == '/PMPR_WineStats':
+            return wine.main_layout
         else:
             return home_page
     return app
