@@ -62,6 +62,9 @@ from APAAL_criminalite_education import criminalite_education
 from ADHD_Movies import movies
 from ab_wg_apb_parcoursup import apb_parcoursup
 
+
+from HH_MT_Etude_population_française import dash_pop
+
 #@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
@@ -121,6 +124,8 @@ def init():
     crim_edu = criminalite_education.Criminalite_Education(app)
     mvs = movies.MoviesStats(app)
     apb = apb_parcoursup.APB_PARCOURSUP(app)
+
+    popfr = dash_pop.Population(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -188,6 +193,7 @@ def init():
                                   dcc.Link(html.Button("Criminalité et Education", style={"width": "100%"}), href="/criminalite-education"),
                                   dcc.Link(html.Button('Rentabilité des films', style={'width':"100%"}), href='/ADHD_Movies'),
                                   dcc.Link( html.Button("APB / Parcoursup", style={"width": "100%"}), href="/ab-wg_apb-parcoursup",),
+                                  dcc.Link(html.Button('Population Française', style={'width':"100%"}), href='/popfr'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -254,7 +260,7 @@ def init():
             return inc.main_layout
         elif pathname == '/pollution':
             return pol.main_layout
-            return dec.main_layout 
+            return dec.main_layout
         elif pathname == '/cancer':
             return cncr.main_layout
         elif pathname == '/music':
@@ -335,6 +341,8 @@ def init():
             return mvs.main_layout
         elif pathname == "/ab-wg_apb-parcoursup":
             return apb.main_layout
+        elif pathname == '/popfr':
+            return popfr.main_layout    
         else:
             return home_page
     return app
