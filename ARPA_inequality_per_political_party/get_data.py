@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 
 def color_party(left, mid, right):
