@@ -83,7 +83,7 @@ def init():
     pol = pollution.Pollution(app)
     cncr = cancer.Cancer(app)
     mus = Music.Song(app)
-    ine_gini = dec # inequalities.Inequalities(app)
+    ine_gini = inequalities.Inequalities(app)
     suj = sujetTelevise.TvSubject(app)
     nrgmix = energymix.EnergyMix(app)
     ele = electricite.Eletricite(app)
