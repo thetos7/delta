@@ -33,6 +33,7 @@ from ybjd_deces_en_france_selon_le_revenu_par_departement import ybjd_deces_en_f
 from TA_MG_SpotifyMusicPopularity import spotify
 from aa_sc_metacritic import metacritic
 from TBGP_salaires_inflation import app as tbgp_si_lib
+from EFEB_Etude_sur_levolution_des_retards_TGV_depuis_2018 import chart as EFEB_chart, map as EFEB_map
 from jcwg_naissance_deces import naissance_deces
 from YBYB_Analyse_football import football
 from avel_top_100_billboard_usa import top_100_billboard_usa
@@ -111,6 +112,8 @@ def init():
     obcal = obesity_calories.Obesity_calories(app)
     ana = deathanalysis.DeathAnalysis(app)
     ani = ac.Animal(app)
+    tgv1 = EFEB_chart.Chart(app)
+    tgv2 = EFEB_map.Map(app)
     acc = accidents.Accidents(app)
     par = parrainage.Parrainage(app)
     rgpd = RGPD.RGPD(app)
@@ -175,6 +178,8 @@ def init():
                                   dcc.Link(html.Button("Football Classement, Age, €", style={'width':"100%"}), href='/football'),
                                   dcc.Link(html.Button('Top 100 Billboard USA', style={'width':"100%"}), href='/usa_billboard'),
                                   dcc.Link(html.Button('Les météorites', style={'width':"100%"}), href='/meteor'),
+                                  dcc.Link(html.Button("Retards des TGVs depuis 2018 (1)", style={"width": "100%"}), href="/efeb_tgv_1",),
+                                  dcc.Link(html.Button("Retards des TGVs depuis 2018 (2)", style={"width": "100%"}), href="/efeb_tgv_2",),
                                   dcc.Link(html.Button('Population vs Grandes Lignes', style={'width':"100%", 'margin':0, 'padding': 0}), href='/population_vs_train_speed'),
                                   dcc.Link(html.Button('Postbac', style={'width':"100%"}), href='/postbac'),
                                   dcc.Link( html.Button('Présidentielle', style={'width': "100%", 'margin-bottom': '5px'}), href='/presidentielle'),
@@ -329,6 +334,10 @@ def init():
             return par.main_layout
         elif pathname == '/rgpd':
             return rgpd.main_layout
+        elif pathname == '/efeb_tgv_1':
+            return tgv1.main_layout
+        elif pathname == '/efeb_tgv_2':
+            return tgv2.main_layout
         elif pathname == '/bars':
            return bar.main_layout
         elif pathname == '/companies':
