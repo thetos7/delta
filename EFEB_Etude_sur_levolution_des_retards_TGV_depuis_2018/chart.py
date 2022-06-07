@@ -15,7 +15,7 @@ import json
 class Chart():
 
     def __init__(self, application = None):
-        self.df = pd.read_pickle('data/df.pkl')
+        self.df = pd.read_pickle('EFEB_Etude_sur_levolution_des_retards_TGV_depuis_2018/data/df.pkl')
         self.df.set_index('Date')
         self.df_everywhere = self.df[self.df['connid'] == 'LYON PART DIEU→RENNES']
         self.dates = self.df['Date'].unique()
