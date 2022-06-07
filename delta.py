@@ -113,7 +113,6 @@ def init():
     ana = deathanalysis.DeathAnalysis(app)
     ani = ac.Animal(app)
     tgv1 = EFEB_chart.Chart(app)
-    tgv2 = EFEB_map.Map(app)
     acc = accidents.Accidents(app)
     par = parrainage.Parrainage(app)
     rgpd = RGPD.RGPD(app)
@@ -178,8 +177,7 @@ def init():
                                   dcc.Link(html.Button("Football Classement, Age, €", style={'width':"100%"}), href='/football'),
                                   dcc.Link(html.Button('Top 100 Billboard USA', style={'width':"100%"}), href='/usa_billboard'),
                                   dcc.Link(html.Button('Les météorites', style={'width':"100%"}), href='/meteor'),
-                                  dcc.Link(html.Button("Retards des TGVs depuis 2018 (1)", style={"width": "100%"}), href="/efeb_tgv_1",),
-                                  dcc.Link(html.Button("Retards des TGVs depuis 2018 (2)", style={"width": "100%"}), href="/efeb_tgv_2",),
+                                  dcc.Link(html.Button("Retards des TGVs depuis 2018", style={"width": "100%"}), href="/efeb_tgv_1",),
                                   dcc.Link(html.Button('Population vs Grandes Lignes', style={'width':"100%", 'margin':0, 'padding': 0}), href='/population_vs_train_speed'),
                                   dcc.Link(html.Button('Postbac', style={'width':"100%"}), href='/postbac'),
                                   dcc.Link( html.Button('Présidentielle', style={'width': "100%", 'margin-bottom': '5px'}), href='/presidentielle'),
@@ -336,8 +334,6 @@ def init():
             return rgpd.main_layout
         elif pathname == '/efeb_tgv_1':
             return tgv1.main_layout
-        elif pathname == '/efeb_tgv_2':
-            return tgv2.main_layout
         elif pathname == '/bars':
            return bar.main_layout
         elif pathname == '/companies':
