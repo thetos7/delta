@@ -64,8 +64,9 @@ from ARLP_film_success_throughout_years_by_genre_1970_2020 import filmsuccess
 from AMEG_vaccination import AMEG_vaccination
 from PMPR_WineStats import dataAnalysis
 from mf_nc_guerre_ukraine import ukraine
+from corporate_impact import corp_impact
 
-@profile
+#@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
     server = app.server
@@ -129,6 +130,7 @@ def init():
     vac = AMEG_vaccination.Vaccinations(app)
     wine = dataAnalysis.WineStats(app)
     ukr = ukraine.Ukraine(app)
+    c_i = corp_impact.CorporateImpact(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -200,6 +202,7 @@ def init():
                                   dcc.Link(html.Button('Vaccination COVID-19', style={'width':'100%'}), href='/AMEG_vaccination'),
                                   dcc.Link(html.Button('Vins dans le monde', style={'width':"100%"}), href='/PMPR_WineStats'),
                                   dcc.Link(html.Button('Ukraine', style={'width':"100%"}), href='/ukraine'),
+                                  dcc.Link(html.Button('Corporate Envt Impact', style={'width':"100%"}), href='/corp_impact'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -358,6 +361,8 @@ def init():
             return wine.main_layout
         elif pathname == '/ukraine':
             return ukr.main_layout
+        elif pathname == '/corp_impact':
+            return c_i.main_layout
         else:
             return home_page
     return app
@@ -367,6 +372,6 @@ app = init()
 server = app.server
 
 if __name__ == '__main__':
-    profile = True
+    profile = False
     if not profile:
         app.run_server(debug=True)
