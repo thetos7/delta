@@ -78,7 +78,7 @@ def init():
     nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
     globalwarming = global_warming.GlobalWarming(app)
     td = tdmr.Tdmr(app)
-    pet = dec # petrole.Petrole(app)
+    pet = petrole.Petrole(app)
     inc = income.Income(app)
     pol = pollution.Pollution(app)
     cncr = cancer.Cancer(app)
