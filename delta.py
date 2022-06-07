@@ -72,7 +72,7 @@ def init():
     eeg = Energy_generation.EuropeEnergyGeneration(app)
     vel = velib.Velib(app)
     hap = dec # happinessPerceptionReality.HappinessPerceptionReality(app)
-    ine_rev = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
+    mzgl_ine_rev = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
     alvs = environment.EuropeanEnvironmentStudies(app)
     nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
     globalwarming = global_warming.GlobalWarming(app)
@@ -139,7 +139,7 @@ def init():
                                   dcc.Link(html.Button("Génération d'énergie UE", style={'width':"100%"}), href='/Energy_generation'),
                                   dcc.Link(html.Button('Utilisation Vélibs', style={'width':"100%"}), href='/EVHB_velib'),
                                   dcc.Link(html.Button('Conception du bonheur', style={'width':"100%"}), href='/bonheur'),
-                                  dcc.Link(html.Button('Inégalités de revenus', style={'width':"100%"}), href='/inegalites'),
+                                  dcc.Link(html.Button('Inégalités de revenus', style={'width':"100%"}), href='/mzgl_inegalites'),
                                   dcc.Link(html.Button('Politique et Environnement', style={'width':"100%"}), href='/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe'),
                                   dcc.Link(html.Button('Polutions/Pétroles', style={'width':"100%"}), href='/pollution'),
                                   dcc.Link(html.Button('Global Warming', style={'width':"100%"}), href='/global_warming'),
@@ -235,8 +235,8 @@ def init():
             return vel.main_layout
         elif pathname == '/bonheur':
             return hap.main_layout
-        elif pathname == '/inegalites':
-            return ine_rev.main_layout
+        elif pathname == '/mzgl_inegalites':
+            return mzgl_ine_rev.main_layout
         elif pathname == '/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe':
             return alvs.main_layout
         elif pathname == '/MDMR_NYPDCallsMeteoNY':
