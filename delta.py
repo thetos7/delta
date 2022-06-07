@@ -62,6 +62,7 @@ from ab_wg_apb_parcoursup import apb_parcoursup
 from ARLP_film_success_throughout_years_by_genre_1970_2020 import filmsuccess
 from AMEG_vaccination import AMEG_vaccination
 from NC_FM_parrainage import parrainage
+from PMPR_WineStats import dataAnalysis
 
 #@profile
 def init():
@@ -125,6 +126,7 @@ def init():
     apb = apb_parcoursup.APB_PARCOURSUP(app)
     filmsuc = filmsuccess.FilmSuccess(app)
     vac = AMEG_vaccination.Vaccinations(app)
+    wine = dataAnalysis.WineStats(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -194,6 +196,7 @@ def init():
                                   dcc.Link( html.Button("APB / Parcoursup", style={"width": "100%"}), href="/ab-wg_apb-parcoursup",),
                                   dcc.Link(html.Button('Succès des films par genre', style={'width':"100%"}), href='/filmsuccess'),
                                   dcc.Link(html.Button('Vaccination COVID-19', style={'width':'100%'}), href='/AMEG_vaccination'),
+                                  dcc.Link(html.Button('Vins dans le monde', style={'width':"100%"}), href='/PMPR_WineStats'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -263,7 +266,7 @@ def init():
             return inc.main_layout
         elif pathname == '/pollution':
             return pol.main_layout
-            return dec.main_layout 
+            #return dec.main_layout 
         elif pathname == '/cancer':
             return cncr.main_layout
         elif pathname == '/music':
@@ -348,6 +351,8 @@ def init():
             return filmsuc.main_layout
         elif pathname == '/AMEG_vaccination':
             return vac.main_layout
+        elif pathname == '/PMPR_WineStats':
+            return wine.main_layout
         else:
             return home_page
     return app
