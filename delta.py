@@ -65,7 +65,7 @@ from AMEG_vaccination import AMEG_vaccination
 from PMPR_WineStats import dataAnalysis
 from mf_nc_guerre_ukraine import ukraine
 
-#@profile
+@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
     server = app.server
@@ -102,7 +102,7 @@ def init():
     foot = football.Football(app)
     billboard = top_100_billboard_usa.Top100BillboardUSA(app)
     meteor = abih.Abih(app)
-    tbgt = tbgt_lib.TBGT(app)
+    tbgt = dec # tbgt_lib.TBGT(app)
     psb = postbac.PostBac(app)
     pres = presidentielle.Presidentielles(app)
     md = md_lib.Mariage(app)
@@ -117,7 +117,7 @@ def init():
     comp = companies.FrenchCompaniesStats(app)
     covid = covid_basics.CovidBasics(app)
     elcVgaz = electricityVSgaz.Stats(app)
-    bmo_ = bmo.Bmo(app)
+    bmo_ = dec # bmo.Bmo(app)
     rd_acc = radar_accidents.Radar_Accidents(app)
     urb = urban.UrbanPolutionStats(app)
     lol = champs_win_rate.ChampWinRate(app)
@@ -367,6 +367,6 @@ app = init()
 server = app.server
 
 if __name__ == '__main__':
-    profile = False
+    profile = True
     if not profile:
         app.run_server(debug=True)
