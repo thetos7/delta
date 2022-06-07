@@ -21,4 +21,10 @@ def extract_data():
 
     df2 = pd.read_excel('./ARPA_inequality_per_political_party/data/inegalite_europe.xlsx', header=None, names=['country', 'def', 'pall', 'year', 'gini'], usecols=['country', 'year', 'gini'])
     df2['gini_display'] = df2['gini'] ** 6 # A displayable gini coefficient
-    return pd.merge(df1, df2)
+
+    pd.merge(df1, df2).to_pickle("./ARPA_inequality_per_political_party/data/inequalities.pkl")
+
+if __name__ == '__main__':
+    # Our base datas cannot be downloaded from code, so we added them manually as they were not to heavy.
+    # It implies that "data/inegalite_europe.xlsx" and "data/politique_mondiale.xlsx" should be present for the code to work.
+    extract_data()
