@@ -28,15 +28,15 @@ class Pib():
             html.Div('Déplacez la souris sur une bulle pour avoir les graphiques du pays en bas.'), 
 
             html.Div([
-                    html.Div([ dcc.Graph(id='main-graph'), ], style={'width':'90%', }),
+                    html.Div([ dcc.Graph(id='pib-main-graph'), ], style={'width':'90%', }),
 
                     html.Div([
                         html.Div('Continents'),
-                        dcc.Dropdown(self.df['Country Name'].unique(), ['France'],id="choose-country", multi=True),
+                        dcc.Dropdown(self.df['Country Name'].unique(), ['France'],id="pib-choose-country", multi=True),
                         html.Br(),
                         html.Div('Échelle en X'),
                         dcc.RadioItems(
-                            id='crossfilter-xaxis-type',
+                            id='pib-crossfilter-xaxis-type',
                             options=[{'label': i, 'value': i} for i in ['Linéaire', 'Log']],
                             value='Log',
                             labelStyle={'display':'block'},
@@ -47,7 +47,7 @@ class Pib():
                         html.Br(),
                         html.Button(
                             self.START,
-                            id='button-start-stop', 
+                            id='pib-button-start-stop', 
                             style={'display':'inline-block'}
                         ),
                     ], style={'margin-left':'15px', 'width': '7em', 'float':'right'}),
@@ -58,7 +58,7 @@ class Pib():
                 }),            
             
             html.Div([
-                    html.Div([ dcc.Graph(id='map-graph'), ], style={'width':'90%', }),
+                    html.Div([ dcc.Graph(id='pib-map-graph'), ], style={'width':'90%', }),
 
                 ], style={
                     'padding': '10px 50px', 
@@ -69,7 +69,7 @@ class Pib():
             html.Div([
                 html.Div(
                     dcc.Slider(
-                            id='crossfilter-year-slider',
+                            id='pib-crossfilter-year-slider',
                             min=self.years[0],
                             max=self.years[-1],
                             step = 1,
@@ -79,7 +79,7 @@ class Pib():
                     style={'display':'inline-block', 'width':"90%"}
                 ),
                 dcc.Interval(            # fire a callback periodically
-                    id='auto-stepper',
+                    id='pib-auto-stepper',
                     interval=500,       # in milliseconds
                     max_intervals = -1,  # start running
                     n_intervals = 0
@@ -90,12 +90,12 @@ class Pib():
                 }),
 
             html.Br(),
-            html.Div(id='div-country'),
+            html.Div(id='pib-div-country'),
 
             html.Div([
-                dcc.Graph(id='income-time-series', 
+                dcc.Graph(id='pib-income-time-series', 
                           style={'width':'33%', 'display':'inline-block'}),
-                dcc.Graph(id='internet-time-series',
+                dcc.Graph(id='pib-internet-time-series',
                           style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
                 dcc.Graph(id='pop-time-series',
                           style={'width':'33%', 'display':'inline-block', 'padding-left': '0.5%'}),
@@ -141,43 +141,43 @@ class Pib():
         # I link callbacks here since @app decorator does not work inside a class
         # (somhow it is more clear to have here all interaction between functions and components)
         self.app.callback(
-            dash.dependencies.Output('main-graph', 'figure'),
-            [ dash.dependencies.Input('choose-country', 'value'),
-              dash.dependencies.Input('crossfilter-xaxis-type', 'value'),
-              dash.dependencies.Input('crossfilter-year-slider', 'value')])(self.update_graph)
+            dash.dependencies.Output('pib-main-graph', 'figure'),
+            [ dash.dependencies.Input('pib-choose-country', 'value'),
+              dash.dependencies.Input('pib-crossfilter-xaxis-type', 'value'),
+              dash.dependencies.Input('pib-crossfilter-year-slider', 'value')])(self.update_graph)
         self.app.callback(
-            dash.dependencies.Output('map-graph', 'figure'),
-            [ dash.dependencies.Input('choose-country', 'value'),
-              dash.dependencies.Input('crossfilter-year-slider', 'value')])(self.update_map_graph)
+            dash.dependencies.Output('pib-map-graph', 'figure'),
+            [ dash.dependencies.Input('pib-choose-country', 'value'),
+              dash.dependencies.Input('pib-crossfilter-year-slider', 'value')])(self.update_map_graph)
         self.app.callback(
-            dash.dependencies.Output('div-country', 'children'),
-            dash.dependencies.Input('main-graph', 'hoverData'))(self.country_chosen)
+            dash.dependencies.Output('pib-div-country', 'children'),
+            dash.dependencies.Input('pib-main-graph', 'hoverData'))(self.country_chosen)
         self.app.callback(
-            dash.dependencies.Output('button-start-stop', 'children'),
-            dash.dependencies.Input('button-start-stop', 'n_clicks'),
-            dash.dependencies.State('button-start-stop', 'children'))(self.button_on_click)
+            dash.dependencies.Output('pib-button-start-stop', 'children'),
+            dash.dependencies.Input('pib-button-start-stop', 'n_clicks'),
+            dash.dependencies.State('pib-button-start-stop', 'children'))(self.button_on_click)
         # this one is triggered by the previous one because we cannot have 2 outputs for the same callback
         self.app.callback(
-            dash.dependencies.Output('auto-stepper', 'max_interval'),
-            [dash.dependencies.Input('button-start-stop', 'children')])(self.run_movie)
+            dash.dependencies.Output('pib-auto-stepper', 'max_interval'),
+            [dash.dependencies.Input('pib-button-start-stop', 'children')])(self.run_movie)
         # triggered by previous
         self.app.callback(
-            dash.dependencies.Output('crossfilter-year-slider', 'value'),
-            dash.dependencies.Input('auto-stepper', 'n_intervals'),
-            [dash.dependencies.State('crossfilter-year-slider', 'value'),
-             dash.dependencies.State('button-start-stop', 'children')])(self.on_interval)
+            dash.dependencies.Output('pib-crossfilter-year-slider', 'value'),
+            dash.dependencies.Input('pib-auto-stepper', 'n_intervals'),
+            [dash.dependencies.State('pib-crossfilter-year-slider', 'value'),
+             dash.dependencies.State('pib-button-start-stop', 'children')])(self.on_interval)
         self.app.callback(
-            dash.dependencies.Output('income-time-series', 'figure'),
-            [dash.dependencies.Input('main-graph', 'hoverData'),
-             dash.dependencies.Input('crossfilter-xaxis-type', 'value')])(self.update_income_timeseries)
+            dash.dependencies.Output('pib-income-time-series', 'figure'),
+            [dash.dependencies.Input('pib-main-graph', 'hoverData'),
+             dash.dependencies.Input('pib-crossfilter-xaxis-type', 'value')])(self.update_income_timeseries)
         self.app.callback(
-            dash.dependencies.Output('internet-time-series', 'figure'),
-            [dash.dependencies.Input('main-graph', 'hoverData'),
-             dash.dependencies.Input('crossfilter-xaxis-type', 'value')])(self.update_internet_timeseries)
+            dash.dependencies.Output('pib-internet-time-series', 'figure'),
+            [dash.dependencies.Input('pib-main-graph', 'hoverData'),
+             dash.dependencies.Input('pib-crossfilter-xaxis-type', 'value')])(self.update_internet_timeseries)
         self.app.callback(
             dash.dependencies.Output('pop-time-series', 'figure'),
-            [dash.dependencies.Input('main-graph', 'hoverData'),
-             dash.dependencies.Input('crossfilter-xaxis-type', 'value')])(self.update_pop_timeseries)
+            [dash.dependencies.Input('pib-main-graph', 'hoverData'),
+             dash.dependencies.Input('pib-crossfilter-xaxis-type', 'value')])(self.update_pop_timeseries)
 
 
     def update_graph(self, country, xaxis_type, year):

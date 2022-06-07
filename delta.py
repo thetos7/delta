@@ -67,7 +67,7 @@ from PMPR_WineStats import dataAnalysis
 from mf_nc_guerre_ukraine import ukraine
 from corporate_impact import corp_impact
 from HH_MT_Etude_population_française import dash_pop
-from MP_pib import pib
+# from MP_pib import pib
 
 #@profile
 def init():
@@ -136,7 +136,7 @@ def init():
     ukr = ukraine.Ukraine(app)
     c_i = corp_impact.CorporateImpact(app)
     popfr = dash_pop.Population(app)
-    pint = pib.Pib(app)
+    # pint = pib.Pib(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -211,7 +211,7 @@ def init():
                                   dcc.Link(html.Button('Ukraine', style={'width':"100%"}), href='/ukraine'),
                                   dcc.Link(html.Button('Corporate Envt Impact', style={'width':"100%"}), href='/corp_impact'),
                                   dcc.Link(html.Button('Population Française', style={'width':"100%"}), href='/popfr'),
-                                  dcc.Link(html.Button('Accès à Internet vs PIB', style={'width':"100%"}), href='/pib'),
+                                  # dcc.Link(html.Button('Accès à Internet vs PIB', style={'width':"100%"}), href='/pib'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -376,8 +376,8 @@ def init():
             return c_i.main_layout
         elif pathname == '/popfr':
             return popfr.main_layout    
-        elif pathname == "/pib":
-            return pint.main_layout
+        # elif pathname == "/pib":
+        #     return pint.main_layout
         else:
             return home_page
     return app
