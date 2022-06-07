@@ -14,7 +14,7 @@ class Presidentielles():
 
         # Figure tour 1
         # Lecture du dataset
-        df = pd.read_csv('./presidentielle/data/sondages_tour_1.csv')
+        df = pd.read_csv('./GL_EGD_presidentielle/data/sondages_tour_1.csv')
 
         fig_sond_t1 = px.line(df, y="intentions", x="date_enquete", color="candidat",
                               title='Sondage en vu du premier tous des présidentielles par candidat',
@@ -26,10 +26,11 @@ class Presidentielles():
 
         # Figure tour 2
         # Lecture du dataset
-        df = pd.read_csv('./presidentielle/data/sondages_tour_2.csv')
+        df = pd.read_csv('./GL_EGD_presidentielle/data/sondages_tour_2.csv')
         df_lepen = df[df["candidat"] == "Marine Le Pen"]
         df_macron = df[df["candidat"] == "Emmanuel Macron"]
 
+        res_lepen = [41.45 for _ in range(len(df_lepen))]
         fig_sond_t2 = go.Figure()
         fig_sond_t2.add_trace(go.Scatter(x=df_lepen["date_enquete"], y=df_lepen["intentions"], name="Marine Le Pen",
                                          line=dict(color='royalblue', width=2)))
@@ -39,9 +40,11 @@ class Presidentielles():
         fig_sond_t2.add_trace(
             go.Scatter(x=df_lepen["date_enquete"], y=df_lepen["erreur_inf"], name="Erreur Inf : Marine Le Pen",
                        line=dict(color='royalblue', width=2, dash='dot')))
+        fig_sond_t2.add_trace(
+            go.Scatter(x=df_lepen["date_enquete"], y=res_lepen, name="Res : Marine Le Pen",
+                       line=dict(color='red', width=1, dash='dot')))
 
-
-        df_macron["res"] = 58.5
+        res_macron = [58.55 for _ in range(len(df_macron))]
         fig_sond_t2.add_trace(go.Scatter(x=df_macron["date_enquete"], y=df_macron["intentions"], name="Emmanuel Macron",
                                          line=dict(color='firebrick', width=2)))
         fig_sond_t2.add_trace(
@@ -51,12 +54,8 @@ class Presidentielles():
             go.Scatter(x=df_macron["date_enquete"], y=df_macron["erreur_inf"], name="Erreur Inf : Emmanuel Macron",
                        line=dict(color='firebrick', width=2, dash='dot')))
         fig_sond_t2.add_trace(
-            go.Scatter(x=df_macron["date_enquete"], y=df_macron["res"], name="Res : Emmanuel Macron",
+            go.Scatter(x=df_macron["date_enquete"], y=res_macron, name="Res : Emmanuel Macron",
                        line=dict(color='green', width=1, dash='dot')))
-        df_lepen["res"] = 41.45
-        fig_sond_t2.add_trace(
-            go.Scatter(x=df_lepen["date_enquete"], y=df_lepen["res"], name="Res : Marine Le Pen",
-                       line=dict(color='red', width=1, dash='dot')))
 
         fig_sond_t2.update_layout(title='Sondages présidentiels du second tour avec prise en compte de l\'erreur',
                                   xaxis_title='Temps',
@@ -67,33 +66,36 @@ class Presidentielles():
         # --------------------------------------------- #
 
         # Lecture du dataset
-        df_tdp = pd.read_csv('./presidentielle/data/temps_de_parole_presidentielles_2022.csv')
+        df_tdp = pd.read_csv(
+            './GL_EGD_presidentielle/data/temps_de_parole_presidentielles_2022.csv')
 
         # Figure tour 1
-        df_tdp = pd.read_csv('./presidentielle/data/temps_de_parole_presidentielles_2022.csv')
+        df_tdp = pd.read_csv(
+            './GL_EGD_presidentielle/data/temps_de_parole_presidentielles_2022.csv')
         self.df_tdp = df_tdp
         # Figure tour 2
         fig_tdp_t2 = px.bar(df_tdp[(df_tdp['Période'] == '2022-04-08') & (
-                (df_tdp['Candidat'] == 'Macron') | (df_tdp['Candidat'] == 'Lepen'))], x='Candidat', y="Somme",
-                            color='Chaîne', barmode="group", labels={
-                "Période": "Temps en jours",
+            (df_tdp['Candidat'] == 'Macron') | (df_tdp['Candidat'] == 'Lepen'))], x='Candidat', y="Somme",
+            color='Chaîne', barmode="group", labels={
+            "Période": "Temps en jours",
                 "Somme": "Temps de parole en minutes",
                 "Chaîne": "Chaînes",
                 "Candidat": "Candidats"
-            }, title="Temps de parole pour chaque candidats en fonction des médias")
+        }, title="Temps de parole pour chaque candidats en fonction des médias")
 
         fig_tdp_cum = px.bar(df_tdp[df_tdp['Période'].isin(['2022-03-27', '2022-04-03', '2022-04-08'])], x='Candidat',
                              y="Somme",
                              color='Chaîne', labels={
-                "Période": "Temps en jours",
-                "Somme": "Temps de parole en minutes",
-                "Chaîne": "Chaînes",
-                "Candidat": "Candidats"
-            },
-                             title="Temps de parole cumulés sur tous les médias pour chaque candidat. Durant la période officiele de campagne")
+            "Période": "Temps en jours",
+            "Somme": "Temps de parole en minutes",
+            "Chaîne": "Chaînes",
+            "Candidat": "Candidats"
+        },
+            title="Temps de parole cumulés sur tous les médias pour chaque candidat. Durant la période officiele de campagne")
 
         self.main_layout = html.Div(children=[
-            html.H2(children='Sondages présidentiels et temps de parole dans les médias'),
+            html.H2(
+                children='Sondages présidentiels et temps de parole dans les médias'),
             html.H3(children='Premier tour'),
             html.Div(
                 [dcc.Graph(id='sond_t1', figure=fig_sond_t1)], style={'width': '100%', }),
@@ -174,8 +176,10 @@ class Presidentielles():
             dash.dependencies.Input('bar_slider', 'value'))(self.update_graph)
 
     def update_graph(self, selected_date):
-        date_tmp = ['2022-03-13', '2022-03-20', '2022-03-27', '2022-04-03', '2022-04-08']
-        filtered_df = self.df_tdp[self.df_tdp['Période'] == date_tmp[selected_date]]
+        date_tmp = ['2022-03-13', '2022-03-20',
+                    '2022-03-27', '2022-04-03', '2022-04-08']
+        filtered_df = self.df_tdp[self.df_tdp['Période']
+                                  == date_tmp[selected_date]]
 
         fig = px.bar(filtered_df, x='Candidat', y="Somme",
                      color='Chaîne', barmode="group",
