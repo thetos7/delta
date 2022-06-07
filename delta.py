@@ -350,6 +350,7 @@ def init():
             return vac.main_layout
         else:
             return home_page
+    return app
     
 
 app = init()
