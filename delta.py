@@ -46,6 +46,7 @@ from TFRT_obesity import obesity_calories
 from hcbjbd_Deces_dans_le_monde_classe_par_cause import deathanalysis
 from lmsb_animalcrossing import lmsb_animalcrossing as ac
 from SM_HB_accidents import accidents
+from parrainage import parrainage
 from tpmm_RGPD import RGPD
 #from bars import bars
 from companies import companies
@@ -61,8 +62,8 @@ from ADHD_Movies import movies
 from ab_wg_apb_parcoursup import apb_parcoursup
 from ARLP_film_success_throughout_years_by_genre_1970_2020 import filmsuccess
 from AMEG_vaccination import AMEG_vaccination
-from NC_FM_parrainage import parrainage
 from PMPR_WineStats import dataAnalysis
+from mf_nc_guerre_ukraine import ukraine
 
 #@profile
 def init():
@@ -76,12 +77,12 @@ def init():
     eeg = Energy_generation.EuropeEnergyGeneration(app)
     vel = velib.Velib(app)
     hap = dec # happinessPerceptionReality.HappinessPerceptionReality(app)
-    mzgl_ine_rev = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
+    ine_rev = mzgl_inegalites_de_revenus.Inegalites_de_revenus(app)
     alvs = environment.EuropeanEnvironmentStudies(app)
     nypd_weather = NYWeather.MDMR_NYPDCallsMeteoNY(app)
     globalwarming = global_warming.GlobalWarming(app)
     td = tdmr.Tdmr(app)
-    pet = petrole.Petrole(app)
+    pet = dec # petrole.Petrole(app)
     inc = income.Income(app)
     pol = pollution.Pollution(app)
     cncr = cancer.Cancer(app)
@@ -127,6 +128,7 @@ def init():
     filmsuc = filmsuccess.FilmSuccess(app)
     vac = AMEG_vaccination.Vaccinations(app)
     wine = dataAnalysis.WineStats(app)
+    ukr = ukraine.Ukraine(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -197,6 +199,7 @@ def init():
                                   dcc.Link(html.Button('Succès des films par genre', style={'width':"100%"}), href='/filmsuccess'),
                                   dcc.Link(html.Button('Vaccination COVID-19', style={'width':'100%'}), href='/AMEG_vaccination'),
                                   dcc.Link(html.Button('Vins dans le monde', style={'width':"100%"}), href='/PMPR_WineStats'),
+                                  dcc.Link(html.Button('Ukraine', style={'width':"100%"}), href='/ukraine'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -206,6 +209,7 @@ def init():
                 ]),
     ])
 
+    # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
     home_page = html.Div([
         html.Br(),
@@ -234,7 +238,7 @@ def init():
     def display_page(pathname):
         if pathname == '/energies':
             return nrg.main_layout
-        elif pathname == '/population':
+        elif pathname == '/pop':
             return pop.main_layout
         elif pathname == '/deces':
             return dec.main_layout
@@ -248,8 +252,8 @@ def init():
             return vel.main_layout
         elif pathname == '/bonheur':
             return hap.main_layout
-        elif pathname == '/mzgl_inegalites':
-            return mzgl_ine_rev.main_layout
+        elif pathname == '/inegalites':
+            return ine_rev.main_layout
         elif pathname == '/ALVS_Greenhouse_gas_and_Environmental_Policy_in_Europe':
             return alvs.main_layout
         elif pathname == '/MDMR_NYPDCallsMeteoNY':
@@ -266,7 +270,6 @@ def init():
             return inc.main_layout
         elif pathname == '/pollution':
             return pol.main_layout
-            #return dec.main_layout 
         elif pathname == '/cancer':
             return cncr.main_layout
         elif pathname == '/music':
@@ -353,6 +356,8 @@ def init():
             return vac.main_layout
         elif pathname == '/PMPR_WineStats':
             return wine.main_layout
+        elif pathname == '/ukraine':
+            return ukr.main_layout
         else:
             return home_page
     return app
@@ -365,4 +370,3 @@ if __name__ == '__main__':
     profile = False
     if not profile:
         app.run_server(debug=True)
-
