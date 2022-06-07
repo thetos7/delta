@@ -174,7 +174,7 @@ def init():
                                   dcc.Link(html.Button('Top 100 Billboard USA', style={'width':"100%"}), href='/usa_billboard'),
                                   dcc.Link(html.Button('Les météorites', style={'width':"100%"}), href='/meteor'),
                                   dcc.Link(html.Button('Population vs Grandes Lignes', style={'width':"100%", 'margin':0, 'padding': 0}), href='/population_vs_train_speed'),
-                                  dcc.Link(html.Button('Education test', style={'width':"100%"}), href='/postbac'),
+                                  dcc.Link(html.Button('Postbac', style={'width':"100%"}), href='/postbac'),
                                   dcc.Link( html.Button('Présidentielle', style={'width': "100%", 'margin-bottom': '5px'}), href='/presidentielle'),
                                   dcc.Link(html.Button('Mariages', style={'width':"100%"}), href='/EC_DC_Evolution_des_Mariages_en_France'),
                                   dcc.Link(html.Button('Popularité vs sensibilité', style={'width':"100%"}), href='/netflix'),
