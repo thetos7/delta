@@ -1,6 +1,5 @@
 import re
 import dash
-import flask
 from dash import dcc
 from dash import html
 from energies import energies
@@ -61,12 +60,13 @@ from APAAL_criminalite_education import criminalite_education
 from ADHD_Movies import movies
 from ab_wg_apb_parcoursup import apb_parcoursup
 from ARLP_film_success_throughout_years_by_genre_1970_2020 import filmsuccess
+from AMEG_vaccination import AMEG_vaccination
 
 #@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
+    server = app.server
     pop = population.WorldPopulationStats(app)
-    dec = deces.Deces(app)
     nrg = energies.Energies(app)
     pm =  dec # pbmc.Pbmc(app)
     oly = olympics.Olympic(app)
@@ -122,18 +122,21 @@ def init():
     mvs = movies.MoviesStats(app)
     apb = apb_parcoursup.APB_PARCOURSUP(app)
     filmsuc = filmsuccess.FilmSuccess(app)
+    vac = AMEG_vaccination.Vaccinations(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
     main_layout = html.Div([
         html.Div(className = "row",
-                 children=[
+                 children=[ 
                      dcc.Location(id='url', refresh=False),
                      html.Div(className="two columns",
                               children = [
                                   html.Center(html.H2("Δelta δata")),
                                   dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
-                                  dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/pop'),
+                                  html.Br(),
+                                  dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
+                                  html.Br(),
                                   dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                                   dcc.Link(html.Button('MDMR_NYPDCallsMeteoNY', style={'width':"100%"}), href='/MDMR_NYPDCallsMeteoNY'),
                                   dcc.Link(html.Button('Accident Routiers', style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
@@ -190,6 +193,7 @@ def init():
                                   dcc.Link(html.Button('Rentabilité des films', style={'width':"100%"}), href='/ADHD_Movies'),
                                   dcc.Link( html.Button("APB / Parcoursup", style={"width": "100%"}), href="/ab-wg_apb-parcoursup",),
                                   dcc.Link(html.Button('Succès des films par genre', style={'width':"100%"}), href='/filmsuccess'),
+                                  dcc.Link(html.Button('Vaccination COVID-19', style={'width':'100%'}), href='/AMEG_vaccination'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -199,6 +203,7 @@ def init():
                 ]),
     ])
 
+
     home_page = html.Div([
         html.Br(),
         html.Br(),
@@ -206,9 +211,11 @@ def init():
         html.Br(),
         dcc.Markdown("Choisissez le jeu de données dans l'index à gauche."),
     ])
+
     to_be_done_page = html.Div([
         dcc.Markdown("404 -- Désolé cette page n'est pas disponible."),
     ])
+
     app.layout = main_layout
 
     # "complete" layout (not sure that I need that)
@@ -224,7 +231,7 @@ def init():
     def display_page(pathname):
         if pathname == '/energies':
             return nrg.main_layout
-        elif pathname == '/pop':
+        elif pathname == '/population':
             return pop.main_layout
         elif pathname == '/deces':
             return dec.main_layout
@@ -339,9 +346,10 @@ def init():
             return apb.main_layout
         elif pathname == '/filmsuccess':
             return filmsuc.main_layout
+        elif pathname == '/AMEG_vaccination':
+            return vac.main_layout
         else:
             return home_page
-    return app
 
 app = init()
 server = app.server
@@ -350,3 +358,4 @@ if __name__ == '__main__':
     profile = False
     if not profile:
         app.run_server(debug=True)
+
