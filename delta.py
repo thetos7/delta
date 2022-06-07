@@ -1,5 +1,6 @@
 import re
 import dash
+import flask
 from dash import dcc
 from dash import html
 from energies import energies
@@ -45,7 +46,6 @@ from TFRT_obesity import obesity_calories
 from hcbjbd_Deces_dans_le_monde_classe_par_cause import deathanalysis
 from lmsb_animalcrossing import lmsb_animalcrossing as ac
 from SM_HB_accidents import accidents
-from parrainage import parrainage
 from tpmm_RGPD import RGPD
 #from bars import bars
 from companies import companies
@@ -61,12 +61,14 @@ from ADHD_Movies import movies
 from ab_wg_apb_parcoursup import apb_parcoursup
 from ARLP_film_success_throughout_years_by_genre_1970_2020 import filmsuccess
 from AMEG_vaccination import AMEG_vaccination
+from NC_FM_parrainage import parrainage
 
 #@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
     server = app.server
     pop = population.WorldPopulationStats(app)
+    dec = deces.Deces(app)
     nrg = energies.Energies(app)
     pm =  dec # pbmc.Pbmc(app)
     oly = olympics.Olympic(app)
@@ -134,9 +136,7 @@ def init():
                               children = [
                                   html.Center(html.H2("Δelta δata")),
                                   dcc.Link(html.Button("Prix d'énergies", style={'width':"100%"}), href='/energies'),
-                                  html.Br(),
                                   dcc.Link(html.Button('Natalité vs revenus', style={'width':"100%"}), href='/population'),
-                                  html.Br(),
                                   dcc.Link(html.Button('Décès journaliers', style={'width':"100%"}), href='/deces'),
                                   dcc.Link(html.Button('MDMR_NYPDCallsMeteoNY', style={'width':"100%"}), href='/MDMR_NYPDCallsMeteoNY'),
                                   dcc.Link(html.Button('Accident Routiers', style={'width':"100%", 'margin':0, 'padding': 0}), href='/accidents_routiers'),
@@ -350,6 +350,7 @@ def init():
             return vac.main_layout
         else:
             return home_page
+    
 
 app = init()
 server = app.server
