@@ -67,6 +67,9 @@ from PMPR_WineStats import dataAnalysis
 from mf_nc_guerre_ukraine import ukraine
 from corporate_impact import corp_impact
 
+
+from HH_MT_Etude_population_française import dash_pop
+
 #@profile
 def init():
     app = dash.Dash(__name__,  title="Delta", suppress_callback_exceptions=True) # , external_stylesheets=external_stylesheets)
@@ -133,6 +136,7 @@ def init():
     wine = dataAnalysis.WineStats(app)
     ukr = ukraine.Ukraine(app)
     c_i = corp_impact.CorporateImpact(app)
+    popfr = dash_pop.Population(app)
 
     # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -206,6 +210,7 @@ def init():
                                   dcc.Link(html.Button('Vins dans le monde', style={'width':"100%"}), href='/PMPR_WineStats'),
                                   dcc.Link(html.Button('Ukraine', style={'width':"100%"}), href='/ukraine'),
                                   dcc.Link(html.Button('Corporate Envt Impact', style={'width':"100%"}), href='/corp_impact'),
+                                  dcc.Link(html.Button('Population Française', style={'width':"100%"}), href='/popfr'),
                                   html.Br(),
                                   html.Br(),
                                   html.Br(),
@@ -368,6 +373,8 @@ def init():
             return ukr.main_layout
         elif pathname == '/corp_impact':
             return c_i.main_layout
+        elif pathname == '/popfr':
+            return popfr.main_layout    
         else:
             return home_page
     return app
