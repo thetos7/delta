@@ -250,7 +250,7 @@ def init():
     def display_page(pathname):
         if pathname == '/energies':
             return nrg.main_layout
-        elif pathname == '/pop':
+        elif pathname == '/population':
             return pop.main_layout
         elif pathname == '/deces':
             return dec.main_layout
